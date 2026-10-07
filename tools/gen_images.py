@@ -99,7 +99,19 @@ SPRITES = {
         "...vVv...",
         "....v....",
     ],
+    "moon": [
+        "..MMMM..",
+        ".MMM....",
+        "MMM.....",
+        "MMM.....",
+        "MMM.....",
+        "MMM.....",
+        ".MMM....",
+        "..MMMM..",
+    ],
+    "star": ["..W..", "..W..", "WWWWW", "..W..", "..W.."],
 }
+PAL["M"] = "#fff3c4"
 
 
 def sprite(name, x, y, px, extra=""):
@@ -205,6 +217,33 @@ IMAGES = {
         '<rect x="170" y="440" width="260" height="14" rx="7" fill="#4a3f8a"/></g>'
         + f'<g filter="url(#glow)">{centered("invader", 300, 290, 22)}</g>', "#24304a"),
 }
+
+
+def hero_scene():
+    """메인 배너용 800x600 픽셀 씬: 성벽 위 슬라임 + 검 + 보물상자."""
+    bricks = "".join(
+        f'<rect x="{x + (24 if row % 2 else 0)}" y="{430 + row * 28}" width="44" height="22" fill="#2b2552"/>'
+        for row in range(6) for x in range(-24, 800, 48)
+    )
+    hearts = "".join(sprite("heart", 40 + i * 52, 36, 5, 'opacity=".3"' if i == 2 else "") for i in range(3))
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" shape-rendering="crispEdges">{DEFS}
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17123a"/><stop offset="1" stop-color="#2a1f5c"/></linearGradient>
+<rect width="800" height="600" fill="url(#sky)"/><rect width="800" height="600" fill="url(#grid)"/>
+{centered("moon", 400, 90, 6)}{centered("star", 250, 130, 4)}{centered("star", 560, 80, 4)}{centered("star", 700, 200, 4)}
+{hearts}{sprite("coin", 640, 36, 5)}
+<rect x="0" y="420" width="800" height="180" fill="#1d1838"/><rect x="0" y="416" width="800" height="8" fill="#4a3f8a"/>{bricks}
+<g filter="url(#shadow)">{centered("slime", 360, 350, 14)}{centered("sword", 545, 346, 8)}{centered("chest", 660, 372, 9)}</g>
+</svg>"""
+
+
+def logo():
+    """헤더·푸터 로고용 투명 배경 인베이더."""
+    w, h = size("invader", 1)
+    return f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" shape-rendering="crispEdges">{sprite("invader", 0, 0, 1)}</svg>'
+
+
+IMAGES["hero-scene"] = hero_scene()
+IMAGES["logo-invader"] = logo()
 
 
 if __name__ == "__main__":

@@ -1,10 +1,67 @@
+import Link from "next/link";
+import ProductCard from "@/components/ProductCard";
 import { products } from "@/data/products";
+
+// 카테고리가 골고루 보이도록 고른 추천 상품
+const recommendedIds = [1, 3, 5, 8];
+const recommended = products.filter((product) => recommendedIds.includes(product.id));
 
 export default function Home() {
   return (
-    <main className="p-10">
-      <h1 className="text-2xl font-bold">PIXEL MART</h1>
-      <p>등록된 상품 {products.length}개</p>
-    </main>
+    <>
+      {/* 히어로 배너 */}
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:px-8 md:py-20">
+        <div>
+          <p className="mb-4 flex items-center gap-2 font-pixel text-sm tracking-widest text-mint">
+            <span className="size-2 bg-mint" />
+            GOOD ITEMS, BETTER DAYS
+          </p>
+          <h1 className="mb-5 bg-linear-to-b from-white via-[#dccfff] to-mint bg-clip-text font-pixel text-4xl leading-tight font-bold text-transparent drop-shadow-[4px_4px_0_#3a2a80] md:text-6xl">
+            일상에 아이템을
+            <br />
+            장착하세요.
+          </h1>
+          <p className="mb-8 text-sub md:text-lg">
+            좋아하는 게임이 있는 하루는,
+            <br />
+            언제나 조금 더 특별하니까.
+          </p>
+          <div className="flex flex-wrap items-center gap-5">
+            <Link
+              href="/products"
+              className="rounded-lg bg-lime px-7 py-4 font-extrabold text-lime-ink shadow-[0_0_24px_rgba(182,255,92,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_0_32px_rgba(182,255,92,0.55)]"
+            >
+              상품 둘러보기 →
+            </Link>
+            <span className="text-sm text-dim">신상품 {products.filter((p) => p.isNew).length}종 입고</span>
+          </div>
+        </div>
+
+        {/* eslint-disable-next-line @next/next/no-img-element -- 과제 권장: 설정 없이 쓰는 일반 img */}
+        <img
+          src="/images/hero-scene.svg"
+          alt="성벽 위에서 검과 보물상자 옆에 서 있는 초록 슬라임"
+          className="aspect-[4/3] w-full rounded-2xl border border-line object-cover"
+        />
+      </section>
+
+      {/* 추천 상품 */}
+      <section className="mx-auto max-w-6xl px-4 pb-20 md:px-8">
+        <div className="mb-6 flex items-end justify-between">
+          <h2 className="text-2xl font-extrabold">
+            추천 아이템 <span className="ml-1 font-pixel text-xs font-normal tracking-widest text-dim">RECOMMENDED</span>
+          </h2>
+          <Link href="/products" className="text-sm font-semibold text-sub transition-colors hover:text-ink">
+            전체 보기 →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {recommended.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+    </>
   );
 }
