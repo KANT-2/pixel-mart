@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+/* PIXEL MART 디자인 토큰 → bg-night, text-sub, text-lime, font-pixel 처럼 클래스로 사용 */
+@theme {
+  --color-night: #0d0b1a;
+  --color-panel: #18152d;
+  --color-panel-2: #211d3b;
+  --color-line: rgb(180 160 255 / 0.14);
+  --color-ink: #f4f2ff;
+  --color-sub: #b9b4d8;
+  --color-dim: #8e88b3;
+  --color-lime: #b6ff5c;
+  --color-lime-ink: #14210a;
+  --color-violet: #a78bff;
+  --color-mint: #6ef2d6;
+  --color-pink: #ff7ab6;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-pixel: "Galmuri11", ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--color-night);
+  color: var(--color-ink);
+  word-break: keep-all;
+}
