@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, health, products
+from app.routers import auth, cart, health, products
 
 app = FastAPI(
     title="PIXEL MART API",
@@ -22,5 +22,5 @@ app.add_middleware(
 )
 
 # 새 라우터는 여기에 한 줄씩 추가 (모든 API는 /api 로 시작)
-for router in (health.router, auth.router, products.router):
+for router in (health.router, auth.router, products.router, cart.router):
     app.include_router(router, prefix="/api")
