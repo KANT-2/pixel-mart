@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response, status
+from authlib.integrations.starlette_client import OAuthError
+from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 
 from app.core.config import settings
@@ -7,10 +9,36 @@ from app.deps import CurrentUser, DbSession
 from app.models import User
 from app.schemas.common import Message
 from app.schemas.user import DevLoginIn, UserOut
+from app.services.google_auth import get_or_create_google_user, google_callback_url, oauth
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-# TODO(BE-A): 구글 로그인 — GET /auth/google/login, GET /auth/google/callback (docs/backend/ROADMAP.md 참고)
+
+@router.get("/google/login", summary="구글 로그인 시작 (구글 로그인 화면으로 이동)")
+async def google_login(request: Request):
+    if not settings.google_client_id or not settings.google_client_secret:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "구글 로그인 설정(GOOGLE_CLIENT_ID/SECRET)이 없습니다."
+        )
+    return await oauth.google.authorize_redirect(request, google_callback_url())
+
+
+@router.get("/google/callback", summary="구글 로그인 완료 → 쿠키 설정 → 메인으로 이동")
+async def google_callback(request: Request, db: DbSession):
+    """실패하면 쿠키 없이 메인으로 보내고 `?loginError=google`로 알린다"""
+    try:
+        token = await oauth.google.authorize_access_token(request)
+        user, created = await get_or_create_google_user(db, token.get("userinfo") or {})
+    except (OAuthError, ValueError):
+        return RedirectResponse(f"{settings.frontend_url}/?loginError=google", status_code=status.HTTP_302_FOUND)
+
+    if created:
+        # TODO(BE-C 연동): award_badge() 시그니처가 확정되면 NEW_PLAYER 뱃지 지급
+        pass
+
+    response = RedirectResponse(settings.frontend_url, status_code=status.HTTP_302_FOUND)
+    set_session_cookie(response, user.id)
+    return response
 
 
 @router.post("/dev-login", response_model=UserOut, summary="[로컬 전용] 이메일만으로 로그인")
