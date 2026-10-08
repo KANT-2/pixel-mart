@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
-from app.routers import auth, cart, faqs, health, local, orders, products, wishlist
+from app.routers import auth, cancel_requests, cart, faqs, health, local, orders, products, users, wishlist
 
 app = FastAPI(
     title="PIXEL MART API",
@@ -21,6 +22,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 구글 로그인(Authlib)이 state 값을 잠깐 보관하는 용도 — 로그인 세션 자체는 pm_session 쿠키(JWT)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.jwt_secret,
+    session_cookie="pm_oauth",
+    max_age=600,
+    https_only=not settings.is_local,
+)
+
 # 새 라우터는 여기에 한 줄씩 추가 (모든 API는 /api 로 시작)
 for router in (
     health.router,
@@ -30,6 +40,9 @@ for router in (
     cart.router,
     orders.router,
     orders.dev_router,
+    cancel_requests.router,
+    cancel_requests.dev_router,
+    users.router,
     wishlist.router,
     local.router,
 ):
