@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CartButton from "@/components/CartButton";
 
 const navItems = [
   { href: "/", label: "홈" },
@@ -27,18 +28,8 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* 도전 과제 B: 장바구니 담기 시 이 아이콘 옆에 숫자 뱃지 표시 */}
-        <button
-          type="button"
-          aria-label="장바구니"
-          className="grid size-10 place-items-center rounded-lg border border-line bg-white/5 transition-colors hover:border-violet/40"
-        >
-          <svg viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2" />
-            <circle cx="9.5" cy="20" r="1.2" />
-            <circle cx="17" cy="20" r="1.2" />
-          </svg>
-        </button>
+        {/* 도전 과제 B: 장바구니 담은 개수 뱃지 (클라이언트 컴포넌트) */}
+        <CartButton />
       </div>
     </header>
   );

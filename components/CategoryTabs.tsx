@@ -1,0 +1,44 @@
+import Link from "next/link";
+import { categories } from "@/data/categories";
+import { products } from "@/data/products";
+
+interface CategoryTabsProps {
+  current?: string; // 선택된 카테고리 slug (없으면 "전체")
+}
+
+export default function CategoryTabs({ current }: CategoryTabsProps) {
+  const tabs = [
+    { slug: undefined, name: "전체", count: products.length },
+    ...categories.map((category) => ({
+      slug: category.slug,
+      name: category.name,
+      count: products.filter((product) => product.category === category.name).length,
+    })),
+  ];
+
+  return (
+    <nav aria-label="카테고리" className="-mx-4 mb-8 overflow-x-auto px-4 [scrollbar-width:none]">
+      <ul className="flex w-max gap-2">
+        {tabs.map((tab) => {
+          const active = tab.slug === current;
+          return (
+            <li key={tab.name}>
+              <Link
+                href={tab.slug ? `/products?category=${tab.slug}` : "/products"}
+                aria-current={active ? "page" : undefined}
+                className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                  active
+                    ? "border-lime bg-lime text-lime-ink"
+                    : "border-line bg-panel text-sub hover:border-violet/40 hover:text-ink"
+                }`}
+              >
+                {tab.name}
+                <span className={active ? "text-lime-ink/70" : "text-dim"}>{tab.count}</span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
