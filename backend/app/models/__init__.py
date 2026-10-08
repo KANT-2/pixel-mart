@@ -5,6 +5,7 @@ from app.models.faq import Faq
 from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
+from app.models.review import Review
 from app.models.user import User
 from app.models.wishlist import Wishlist
 
@@ -20,6 +21,7 @@ __all__ = [
     "OrderStatusHistory",
     "Product",
     "Region",
+    "Review",
     "TradePost",
     "User",
     "UserInterest",
