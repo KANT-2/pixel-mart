@@ -6,8 +6,11 @@
 | **BE-A 플랫폼·커머스** | ______ | 구글 로그인, 사용자·아바타, 상품 API 확장, 장바구니, 찜 → (3단계) PIXEL LOCAL | `routers/auth.py`, `users.py`, `cart.py`, `wishlist.py`, `local.py` |
 | **BE-B 주문·CS** | ______ | 가상 주문·배송 조회, 취소 신청, 리뷰, 상품 Q&A, FAQ, 키캡 호환성 | `routers/orders.py`, `reviews.py`, `questions.py`, `faqs.py`, `compatibility.py` |
 | **BE-C 커뮤니티·게임** | ______ | 데스크 사양 시드, 데스크 저장·규칙 검사, 토너먼트(예선·대진·투표), 뱃지 | `routers/desks.py`, `tournaments.py`, `badges.py`, `services/desk_rules.py`, `services/bracket.py` |
-| 프론트 연동 | 1차 팀 2명 | 화면에서 API 호출, 로그인 UI, 각 기능 화면 | `lib/api.ts`, 각 페이지 |
+| **FE 프론트** | 채희주 | 모든 화면 · API 연동 · 로그인 UI · 픽셀 아바타 변환(Canvas) · 데스크 꾸미기·키캡 미리착샷 화면 | `lib/api.ts`, 각 페이지·컴포넌트 |
 
+> 프론트는 1명이 모든 화면을 맡으므로, **각 BE 트랙은 API가 완성될 때마다 Swagger 예시(요청·응답)를 PR에 남겨** 프론트가 바로 연결할 수 있게 해 주세요.
+> API 모양(필드 이름 등)을 바꿀 때는 **먼저 FE 담당자에게 알리기**.
+>
 > 각 트랙은 **자기 라우터·모델·마이그레이션 파일만** 만듭니다. 공용 파일(`main.py`의 라우터 등록, `models/__init__.py`)은 한 줄 추가만 하고, 충돌 나면 둘 다 살리면 됩니다.
 
 ## 지금 바로 시작할 수 있는 이유
