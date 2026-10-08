@@ -12,8 +12,9 @@
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
 | GET | /api/auth/google/login | 구글 로그인 시작 | |
 | GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 | |
-| PATCH | /api/users/me 🔒 | 닉네임 변경 | |
-| PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB) | |
+| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자) | ✅ |
+| PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB, 아니면 422) | ✅ |
+| DELETE | /api/users/me/avatar 🔒 | 아바타 삭제 (기본 슬라임으로) | ✅ |
 | GET | /api/categories | 카테고리 6개 | ✅ |
 | GET | /api/products?category=&q=&sort=&page=&size= | 목록 (sort: `id/new/price_asc/price_desc`) | ✅ |
 | GET | /api/products/{id} | 상세 (없으면 404) | ✅ |
