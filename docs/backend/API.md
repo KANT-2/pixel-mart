@@ -10,10 +10,11 @@
 | POST | /api/auth/dev-login | [로컬 전용] 이메일로 로그인 | ✅ |
 | POST | /api/auth/logout | 로그아웃 (쿠키 삭제) | ✅ |
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
-| GET | /api/auth/google/login | 구글 로그인 시작 | |
-| GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 | |
-| PATCH | /api/users/me 🔒 | 닉네임 변경 | |
-| PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB) | |
+| GET | /api/auth/google/login | 구글 로그인 시작 (키 없으면 503) | ✅ |
+| GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 (실패 시 `/?loginError=google`) | ✅ |
+| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자) | ✅ |
+| PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB, 아니면 422) | ✅ |
+| DELETE | /api/users/me/avatar 🔒 | 아바타 삭제 (기본 슬라임으로) | ✅ |
 | GET | /api/categories | 카테고리 6개 | ✅ |
 | GET | /api/products?category=&q=&sort=&page=&size= | 목록 (sort: `id/new/price_asc/price_desc`) | ✅ |
 | GET | /api/products/{id} | 상세 (없으면 404) | ✅ |
@@ -26,7 +27,9 @@
 | POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 | ✅ |
 | GET | /api/orders 🔒 | 내 주문 목록 | ✅ |
 | GET | /api/orders/{id} 🔒 | 주문 상세 + 배송 타임라인 | ✅ |
-| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) |  |
+| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) | ✅ |
+| POST | /api/dev/cancel-requests/{id}/approve | [로컬 전용] 취소 승인 → 주문 취소 완료 | ✅ |
+| POST | /api/dev/cancel-requests/{id}/reject | [로컬 전용] 취소 거절 → 신청 직전 상태로 복귀 | ✅ |
 | POST | /api/dev/orders/{id}/advance | [로컬 전용] 배송 단계 진행 | ✅ |
 | GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 |  |
 | POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) |  |

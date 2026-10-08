@@ -1,7 +1,7 @@
 """add wishlists
 
 Revision ID: f399ed2f1fd2
-Revises: 8efdbcc5aa1e
+Revises: 835590172129
 Create Date: 2026-10-08 16:52:18.064910
 """
 
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "f399ed2f1fd2"
-down_revision: str | None = "8efdbcc5aa1e"
+down_revision: str | None = "835590172129"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
