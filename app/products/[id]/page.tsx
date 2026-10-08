@@ -4,19 +4,19 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
 import { formatPrice } from "@/utils/formatPrice";
-import { findCategoryByName, findProduct } from "@/utils/products";
+import { getProduct, getProducts, getProductParams } from "@/lib/products";
+import { ProductFallbackNotice } from "@/components/products/ProductStates";
 
-// 빌드할 때 180개 상세 페이지를 미리 만들어 둠 (Cache Components에서는 최소 1개 이상 필요)
+// API가 꺼져 있어도 정적 상품 ID로 상세 경로를 생성합니다.
 export function generateStaticParams() {
-  return products.map((product) => ({ id: String(product.id) }));
+  return getProductParams();
 }
 
 // 브라우저 탭 제목
 export async function generateMetadata({ params }: PageProps<"/products/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const product = findProduct(id);
+  const { data: product } = await getProduct(id);
   return { title: product ? `${product.name} | PIXEL MART` : "상품을 찾을 수 없습니다 | PIXEL MART" };
 }
 
@@ -34,18 +34,19 @@ export default function ProductDetailPage({ params }: PageProps<"/products/[id]"
 
 async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params; // Next 15+ : params는 Promise
-  const product = findProduct(id);
+  const result = await getProduct(id);
+  const product = result.data;
 
   // 없는 id(/products/999, /products/abc) → 같은 폴더의 not-found.tsx 표시
   if (!product) notFound();
 
-  const category = findCategoryByName(product.category);
-  const related = products
-    .filter((item) => item.category === product.category && item.id !== product.id)
-    .slice(0, 4);
+  const category = { slug: product.categorySlug, name: product.category };
+  const relatedResult = await getProducts(product.categorySlug, 1, 5);
+  const related = relatedResult.data.items.filter((item) => item.id !== product.id).slice(0, 4);
 
   return (
     <>
+      {(result.fallback || relatedResult.fallback) && <ProductFallbackNotice />}
       {/* 경로 표시 */}
       <nav aria-label="현재 위치" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-dim">
         <Link href="/" className="hover:text-ink">홈</Link>

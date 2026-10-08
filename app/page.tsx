@@ -1,10 +1,26 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
+import { getProducts } from "@/lib/products";
+import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 
 // 카테고리가 골고루 보이도록 고른 추천 상품
 const recommendedIds = [1, 3, 5, 8];
-const recommended = products.filter((product) => recommendedIds.includes(product.id));
+
+async function RecommendedProducts() {
+  const result = await getProducts(undefined, 1, 60);
+  const recommended = result.data.items.filter((product) => recommendedIds.includes(product.id));
+  return (
+    <>
+      {result.fallback && <ProductFallbackNotice />}
+      {recommended.length === 0 ? <EmptyProducts /> : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {recommended.map((product) => <ProductCard key={product.id} product={product} />)}
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function Home() {
   return (
@@ -33,7 +49,8 @@ export default function Home() {
             >
               상품 둘러보기 →
             </Link>
-            <span className="text-sm text-dim">신상품 {products.filter((p) => p.isNew).length}종 입고</span>
+            {/* TODO(#16): API 신상품 집계가 제공되면 입고 수 표시 */}
+            <span className="text-sm text-dim">새로운 아이템을 만나보세요</span>
           </div>
         </div>
 
@@ -56,11 +73,9 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {recommended.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <Suspense fallback={<ProductSkeleton />}>
+          <RecommendedProducts />
+        </Suspense>
       </section>
     </>
   );
