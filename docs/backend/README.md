@@ -65,6 +65,13 @@ python -m scripts.seed
 - API 문서(Swagger)는 **http://localhost:3000/api/docs** 에서도 열립니다. 여기서 바로 요청을 보내 볼 수 있습니다.
 - 로그인이 필요한 API 테스트: Swagger에서 `POST /api/auth/dev-login` 실행 → 쿠키가 저장되어 이후 요청이 로그인 상태가 됩니다.
 
+### 구글 로그인 써 보기 (선택)
+1. 팀 채널에서 받은 구글 키를 `backend/.env`의 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`에 넣고 백엔드를 재시작합니다. (키가 없으면 `/api/auth/google/login`이 503)
+2. 브라우저에서 **http://localhost:3000/api/auth/google/login** 으로 이동 → 구글 로그인 → 메인으로 돌아오면 로그인 상태 (`/api/auth/me`로 확인)
+- 구글 콘솔(OAuth 클라이언트 · 웹 애플리케이션)의 승인된 리디렉션 URI: `http://localhost:3000/api/auth/google/callback`
+- 실패하면 쿠키 없이 `http://localhost:3000/?loginError=google`로 돌아옵니다.
+- 같은 이메일로 dev-login 한 계정이 있으면 그 계정에 구글 계정이 연결됩니다.
+
 ---
 
 ## 3. 폴더 구조

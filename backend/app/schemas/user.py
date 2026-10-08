@@ -1,8 +1,10 @@
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import Field
+from pydantic import AfterValidator, Field, StringConstraints
 
 from app.schemas.common import CamelModel
+from app.services.avatar import validate_avatar_data_url
 
 
 class UserOut(CamelModel):
@@ -18,3 +20,17 @@ class DevLoginIn(CamelModel):
 
     email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$", max_length=320, examples=["player1@pixelmart.test"])
     nickname: str | None = Field(default=None, max_length=30, examples=["PLAYER 1"])
+
+
+class UserUpdateIn(CamelModel):
+    nickname: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=30)] = Field(
+        examples=["PLAYER 1"]
+    )
+
+
+class AvatarIn(CamelModel):
+    """브라우저에서 픽셀 변환한 PNG (data URL, 디코딩 50KB 이하). 얼굴 원본 사진은 받지 않는다"""
+
+    avatar_url: Annotated[str, AfterValidator(validate_avatar_data_url)] = Field(
+        examples=["data:image/png;base64,iVBORw0KGgo..."]
+    )
