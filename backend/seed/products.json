@@ -1,0 +1,1482 @@
+[
+  {
+    "id": 1,
+    "name": "HP 하트 키캡",
+    "price": 9900,
+    "category": "키캡",
+    "imageUrl": "/images/products/001-heart-keycap.webp",
+    "description": "작은 하트가 주는 큰 만족. 체리 프로파일 호환 반투명 레진 키캡"
+  },
+  {
+    "id": 2,
+    "name": "코인 키캡 세트",
+    "price": 12900,
+    "category": "키캡",
+    "imageUrl": "/images/products/002-coin-keycap-set.webp",
+    "description": "누를 때마다 코인 획득! 골드 코인 키캡 3종 세트",
+    "isNew": true
+  },
+  {
+    "id": 3,
+    "name": "던전 맵 장패드",
+    "price": 24900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/003-dungeon-deskmat.webp",
+    "description": "책상 위, 새로운 모험의 시작. 800×300mm 방수 코팅 원단",
+    "isNew": true
+  },
+  {
+    "id": 4,
+    "name": "인베이더 장패드",
+    "price": 22900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/004-invader-deskmat.webp",
+    "description": "고전 아케이드 감성 그대로. 900×400mm 미끄럼 방지 고무 바닥"
+  },
+  {
+    "id": 5,
+    "name": "슬라임 아크릴 키링",
+    "price": 7900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/005-slime-keyring.webp",
+    "description": "언제나 함께하는 귀여운 동료. 양면 UV 인쇄 아크릴, 5cm"
+  },
+  {
+    "id": 6,
+    "name": "픽셀 스티커 팩",
+    "price": 4500,
+    "category": "굿즈",
+    "imageUrl": "/images/products/006-sticker-pack.webp",
+    "description": "하트, 슬라임, 보석, 코인 4종. 어디든 붙였다 떼는 리무버블 재질",
+    "isNew": true
+  },
+  {
+    "id": 7,
+    "name": "보물상자 소품함",
+    "price": 12900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/007-treasure-box.webp",
+    "description": "자잘한 아이템은 여기에 보관. 원목 MDF 뚜껑형 수납함"
+  },
+  {
+    "id": 8,
+    "name": "인베이더 LED 무드등",
+    "price": 29900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/008-invader-lamp.webp",
+    "description": "밤이 되면 깨어나는 침략자. USB-C 전원, 밝기 3단계 조절",
+    "isNew": true
+  },
+  {
+    "id": 9,
+    "name": "슬라임 아티산 키캡",
+    "price": 4900,
+    "category": "키캡",
+    "imageUrl": "/images/products/009-slime-artisan-keycap.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. 체리 프로파일 호환 레진 1키",
+    "isNew": true
+  },
+  {
+    "id": 10,
+    "name": "슬라임 장패드",
+    "price": 12900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/010-slime-desk-mat.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. 800×300mm 방수 원단과 고무 바닥",
+    "isNew": true
+  },
+  {
+    "id": 11,
+    "name": "슬라임 미니 무드등",
+    "price": 5900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/011-slime-mini-mood-lamp.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. USB-C 전원 아크릴 램프 1개",
+    "isNew": true
+  },
+  {
+    "id": 12,
+    "name": "슬라임 미니 아크릴 키링",
+    "price": 2900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/012-slime-mini-acrylic-keyring.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. 5cm 양면 UV 아크릴 키링",
+    "isNew": true
+  },
+  {
+    "id": 13,
+    "name": "슬라임 머그컵",
+    "price": 7900,
+    "category": "리빙",
+    "imageUrl": "/images/products/013-slime-mug.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. 330ml 세라믹 머그컵",
+    "isNew": true
+  },
+  {
+    "id": 14,
+    "name": "슬라임 케이블 홀더",
+    "price": 5900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/014-slime-cable-holder.webp",
+    "description": "슬라임 한 조각으로 손끝에 레트로 감성을. 실리콘 홀더 4개 구성",
+    "isNew": true
+  },
+  {
+    "id": 15,
+    "name": "루비 하트 ESC 키캡",
+    "price": 5900,
+    "category": "키캡",
+    "imageUrl": "/images/products/015-ruby-heart-esc-keycap.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 1u 규격 PBT 1키",
+    "isNew": true
+  },
+  {
+    "id": 16,
+    "name": "루비 하트 와이드 장패드",
+    "price": 14900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/016-ruby-heart-wide-desk-mat.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 900×400mm 미끄럼 방지 장패드",
+    "isNew": true
+  },
+  {
+    "id": 17,
+    "name": "루비 하트 펜꽂이",
+    "price": 6900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/017-ruby-heart-pen-holder.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 높이 10cm 스틸 펜꽂이",
+    "isNew": true
+  },
+  {
+    "id": 18,
+    "name": "루비 하트 스티커 팩",
+    "price": 3900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/018-ruby-heart-sticker-pack.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 리무버블 스티커 6장 구성",
+    "isNew": true
+  },
+  {
+    "id": 19,
+    "name": "루비 하트 콜드컵",
+    "price": 8900,
+    "category": "리빙",
+    "imageUrl": "/images/products/019-ruby-heart-cold-cup.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 500ml 아크릴 콜드컵",
+    "isNew": true
+  },
+  {
+    "id": 20,
+    "name": "루비 하트 케이블 정리 클립",
+    "price": 6900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/020-ruby-heart-cable-clips.webp",
+    "description": "루비 하트 모티프가 일상에 작은 퀘스트를 더해요. 케이블 클립 6개 구성",
+    "isNew": true
+  },
+  {
+    "id": 21,
+    "name": "골드 코인 스페이스바 키캡",
+    "price": 6900,
+    "category": "키캡",
+    "imageUrl": "/images/products/021-gold-coin-spacebar-keycap.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 6.25u 규격 PBT 스페이스바",
+    "isNew": true
+  },
+  {
+    "id": 22,
+    "name": "골드 코인 마우스패드",
+    "price": 15900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/022-gold-coin-mouse-pad.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 260×220mm 패브릭 마우스패드",
+    "isNew": true
+  },
+  {
+    "id": 23,
+    "name": "골드 코인 메모패드",
+    "price": 7900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/023-gold-coin-memo-pad.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 90×90mm 메모지 80매",
+    "isNew": true
+  },
+  {
+    "id": 24,
+    "name": "골드 코인 금속 뱃지",
+    "price": 4500,
+    "category": "굿즈",
+    "imageUrl": "/images/products/024-gold-coin-metal-badge.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 32mm 아연합금 에나멜 뱃지",
+    "isNew": true
+  },
+  {
+    "id": 25,
+    "name": "골드 코인 텀블러",
+    "price": 9900,
+    "category": "리빙",
+    "imageUrl": "/images/products/025-gold-coin-tumbler.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 450ml 스테인리스 텀블러",
+    "isNew": true
+  },
+  {
+    "id": 26,
+    "name": "골드 코인 충전 거치대",
+    "price": 7900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/026-gold-coin-charging-stand.webp",
+    "description": "골드 코인 감성으로 평범한 자리를 아케이드처럼. 알루미늄 거치대 1개",
+    "isNew": true
+  },
+  {
+    "id": 27,
+    "name": "보물상자 방향키 세트",
+    "price": 7900,
+    "category": "키캡",
+    "imageUrl": "/images/products/027-treasure-chest-arrow-key-set.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 방향키 4개 구성 PBT 세트",
+    "isNew": true
+  },
+  {
+    "id": 28,
+    "name": "보물상자 손목 받침",
+    "price": 17900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/028-treasure-chest-wrist-rest.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 360mm 메모리폼 손목 받침",
+    "isNew": true
+  },
+  {
+    "id": 29,
+    "name": "보물상자 미니 피규어",
+    "price": 8900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/029-treasure-chest-mini-figure.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 높이 6cm PVC 피규어",
+    "isNew": true
+  },
+  {
+    "id": 30,
+    "name": "보물상자 에나멜 핀",
+    "price": 4900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/030-treasure-chest-enamel-pin.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 28mm 하드 에나멜 핀 1개",
+    "isNew": true
+  },
+  {
+    "id": 31,
+    "name": "보물상자 코스터 세트",
+    "price": 10900,
+    "category": "리빙",
+    "imageUrl": "/images/products/031-treasure-chest-coaster-set.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 90mm 실리콘 코스터 2개",
+    "isNew": true
+  },
+  {
+    "id": 32,
+    "name": "보물상자 폰 케이스",
+    "price": 8900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/032-treasure-chest-phone-case.webp",
+    "description": "보물상자 한 장면을 데스크 위에 가볍게 소환해요. 투명 TPU 범퍼 케이스",
+    "isNew": true
+  },
+  {
+    "id": 33,
+    "name": "보랏빛 보석 포인트 키캡 세트",
+    "price": 8900,
+    "category": "키캡",
+    "imageUrl": "/images/products/033-purple-gem-accent-keycap-set.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 포인트 키캡 4개 구성",
+    "isNew": true
+  },
+  {
+    "id": 34,
+    "name": "보랏빛 보석 데스크 러그",
+    "price": 19900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/034-purple-gem-desk-rug.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 700×300mm 폴리에스터 펠트",
+    "isNew": true
+  },
+  {
+    "id": 35,
+    "name": "보랏빛 보석 모니터 받침",
+    "price": 9900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/035-purple-gem-monitor-riser.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 폭 52cm MDF·스틸 받침",
+    "isNew": true
+  },
+  {
+    "id": 36,
+    "name": "보랏빛 보석 엽서 세트",
+    "price": 5900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/036-purple-gem-postcard-set.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 100×150mm 엽서 4장 구성",
+    "isNew": true
+  },
+  {
+    "id": 37,
+    "name": "보랏빛 보석 쿠션",
+    "price": 12900,
+    "category": "리빙",
+    "imageUrl": "/images/products/037-purple-gem-cushion.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 40×40cm 폴리에스터 쿠션",
+    "isNew": true
+  },
+  {
+    "id": 38,
+    "name": "보랏빛 보석 헤드셋 거치대",
+    "price": 9900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/038-purple-gem-headset-stand.webp",
+    "description": "보랏빛 보석 한 조각으로 손끝에 레트로 감성을. 높이 25cm 헤드셋 스탠드",
+    "isNew": true
+  },
+  {
+    "id": 39,
+    "name": "던전 게이트 투명 키캡",
+    "price": 9900,
+    "category": "키캡",
+    "imageUrl": "/images/products/039-dungeon-gate-clear-keycap.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. 체리 프로파일 호환 투명 레진 1키",
+    "isNew": true
+  },
+  {
+    "id": 40,
+    "name": "던전 게이트 장패드",
+    "price": 21900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/040-dungeon-gate-desk-mat.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. 800×300mm 방수 원단과 고무 바닥",
+    "isNew": true
+  },
+  {
+    "id": 41,
+    "name": "던전 게이트 클립 트레이",
+    "price": 10900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/041-dungeon-gate-clip-tray.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. 15×10cm 스틸 정리 트레이",
+    "isNew": true
+  },
+  {
+    "id": 42,
+    "name": "던전 게이트 아크릴 스탠드",
+    "price": 6900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/042-dungeon-gate-acrylic-stand.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. 높이 9cm 투명 아크릴 스탠드",
+    "isNew": true
+  },
+  {
+    "id": 43,
+    "name": "던전 게이트 미니 포스터",
+    "price": 14900,
+    "category": "리빙",
+    "imageUrl": "/images/products/043-dungeon-gate-mini-poster.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. A3 무광 아트지 포스터",
+    "isNew": true
+  },
+  {
+    "id": 44,
+    "name": "던전 게이트 USB 허브",
+    "price": 10900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/044-dungeon-gate-usb-hub.webp",
+    "description": "던전 게이트 모티프가 일상에 작은 퀘스트를 더해요. USB 포트 4개 알루미늄 허브",
+    "isNew": true
+  },
+  {
+    "id": 45,
+    "name": "은빛 검 메탈 키캡",
+    "price": 10900,
+    "category": "키캡",
+    "imageUrl": "/images/products/045-silver-sword-metal-keycap.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 1u 알루미늄 키캡 1개"
+  },
+  {
+    "id": 46,
+    "name": "은빛 검 와이드 장패드",
+    "price": 22900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/046-silver-sword-wide-desk-mat.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 900×400mm 미끄럼 방지 장패드"
+  },
+  {
+    "id": 47,
+    "name": "은빛 검 볼펜 세트",
+    "price": 12900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/047-silver-sword-pen-set.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 0.5mm 볼펜 2개 구성"
+  },
+  {
+    "id": 48,
+    "name": "은빛 검 아크릴 키링",
+    "price": 7900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/048-silver-sword-acrylic-keyring.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 5cm 양면 UV 아크릴 키링"
+  },
+  {
+    "id": 49,
+    "name": "은빛 검 무릎 담요",
+    "price": 15900,
+    "category": "리빙",
+    "imageUrl": "/images/products/049-silver-sword-lap-blanket.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 100×70cm 극세사 담요"
+  },
+  {
+    "id": 50,
+    "name": "은빛 검 마우스 번지",
+    "price": 12900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/050-silver-sword-mouse-bungee.webp",
+    "description": "은빛 검 감성으로 평범한 자리를 아케이드처럼. 높이 11cm 실리콘 암 번지"
+  },
+  {
+    "id": 51,
+    "name": "푸른 방패 아티산 키캡",
+    "price": 12900,
+    "category": "키캡",
+    "imageUrl": "/images/products/051-blue-shield-artisan-keycap.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. 체리 프로파일 호환 레진 1키"
+  },
+  {
+    "id": 52,
+    "name": "푸른 방패 마우스패드",
+    "price": 24900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/052-blue-shield-mouse-pad.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. 260×220mm 패브릭 마우스패드"
+  },
+  {
+    "id": 53,
+    "name": "푸른 방패 미니 무드등",
+    "price": 14900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/053-blue-shield-mini-mood-lamp.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. USB-C 전원 아크릴 램프 1개"
+  },
+  {
+    "id": 54,
+    "name": "푸른 방패 스티커 팩",
+    "price": 8900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/054-blue-shield-sticker-pack.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. 리무버블 스티커 6장 구성"
+  },
+  {
+    "id": 55,
+    "name": "푸른 방패 룸 슬리퍼",
+    "price": 17900,
+    "category": "리빙",
+    "imageUrl": "/images/products/055-blue-shield-room-slippers.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. 250mm 폼 쿠션 실내화"
+  },
+  {
+    "id": 56,
+    "name": "푸른 방패 웹캠 커버 세트",
+    "price": 14900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/056-blue-shield-webcam-cover-set.webp",
+    "description": "푸른 방패 한 장면을 데스크 위에 가볍게 소환해요. 슬라이드 커버 3개 구성"
+  },
+  {
+    "id": 57,
+    "name": "회복 포션 ESC 키캡",
+    "price": 14900,
+    "category": "키캡",
+    "imageUrl": "/images/products/057-healing-potion-esc-keycap.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 1u 규격 PBT 1키"
+  },
+  {
+    "id": 58,
+    "name": "회복 포션 손목 받침",
+    "price": 26900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/058-healing-potion-wrist-rest.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 360mm 메모리폼 손목 받침"
+  },
+  {
+    "id": 59,
+    "name": "회복 포션 펜꽂이",
+    "price": 15900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/059-healing-potion-pen-holder.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 높이 10cm 스틸 펜꽂이"
+  },
+  {
+    "id": 60,
+    "name": "회복 포션 금속 뱃지",
+    "price": 9900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/060-healing-potion-metal-badge.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 32mm 아연합금 에나멜 뱃지"
+  },
+  {
+    "id": 61,
+    "name": "회복 포션 미니 트레이",
+    "price": 19900,
+    "category": "리빙",
+    "imageUrl": "/images/products/061-healing-potion-mini-tray.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 24×16cm 멜라민 트레이"
+  },
+  {
+    "id": 62,
+    "name": "회복 포션 케이블 슬리브",
+    "price": 15900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/062-healing-potion-cable-sleeve.webp",
+    "description": "회복 포션 한 조각으로 손끝에 레트로 감성을. 길이 1.5m 브레이드 슬리브"
+  },
+  {
+    "id": 63,
+    "name": "마나 포션 스페이스바 키캡",
+    "price": 15900,
+    "category": "키캡",
+    "imageUrl": "/images/products/063-mana-potion-spacebar-keycap.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 6.25u 규격 PBT 스페이스바"
+  },
+  {
+    "id": 64,
+    "name": "마나 포션 데스크 러그",
+    "price": 28900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/064-mana-potion-desk-rug.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 700×300mm 폴리에스터 펠트"
+  },
+  {
+    "id": 65,
+    "name": "마나 포션 메모패드",
+    "price": 17900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/065-mana-potion-memo-pad.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 90×90mm 메모지 80매"
+  },
+  {
+    "id": 66,
+    "name": "마나 포션 에나멜 핀",
+    "price": 10900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/066-mana-potion-enamel-pin.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 28mm 하드 에나멜 핀 1개"
+  },
+  {
+    "id": 67,
+    "name": "마나 포션 벽시계",
+    "price": 21900,
+    "category": "리빙",
+    "imageUrl": "/images/products/067-mana-potion-wall-clock.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 지름 25cm 저소음 벽시계"
+  },
+  {
+    "id": 68,
+    "name": "마나 포션 노트북 스탠드",
+    "price": 17900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/068-mana-potion-laptop-stand.webp",
+    "description": "마나 포션 모티프가 일상에 작은 퀘스트를 더해요. 6단 높이 조절 알루미늄 스탠드"
+  },
+  {
+    "id": 69,
+    "name": "노란 별 방향키 세트",
+    "price": 17900,
+    "category": "키캡",
+    "imageUrl": "/images/products/069-yellow-star-arrow-key-set.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 방향키 4개 구성 PBT 세트"
+  },
+  {
+    "id": 70,
+    "name": "노란 별 장패드",
+    "price": 29900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/070-yellow-star-desk-mat.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 800×300mm 방수 원단과 고무 바닥"
+  },
+  {
+    "id": 71,
+    "name": "노란 별 미니 피규어",
+    "price": 19900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/071-yellow-star-mini-figure.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 높이 6cm PVC 피규어"
+  },
+  {
+    "id": 72,
+    "name": "노란 별 엽서 세트",
+    "price": 11900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/072-yellow-star-postcard-set.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 100×150mm 엽서 4장 구성"
+  },
+  {
+    "id": 73,
+    "name": "노란 별 머그컵",
+    "price": 22900,
+    "category": "리빙",
+    "imageUrl": "/images/products/073-yellow-star-mug.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 330ml 세라믹 머그컵"
+  },
+  {
+    "id": 74,
+    "name": "노란 별 케이블 홀더",
+    "price": 19900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/074-yellow-star-cable-holder.webp",
+    "description": "노란 별 감성으로 평범한 자리를 아케이드처럼. 실리콘 홀더 4개 구성"
+  },
+  {
+    "id": 75,
+    "name": "초승달 포인트 키캡 세트",
+    "price": 19900,
+    "category": "키캡",
+    "imageUrl": "/images/products/075-crescent-moon-accent-keycap-set.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 포인트 키캡 4개 구성"
+  },
+  {
+    "id": 76,
+    "name": "초승달 와이드 장패드",
+    "price": 31900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/076-crescent-moon-wide-desk-mat.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 900×400mm 미끄럼 방지 장패드"
+  },
+  {
+    "id": 77,
+    "name": "초승달 모니터 받침",
+    "price": 21900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/077-crescent-moon-monitor-riser.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 폭 52cm MDF·스틸 받침"
+  },
+  {
+    "id": 78,
+    "name": "초승달 아크릴 스탠드",
+    "price": 12900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/078-crescent-moon-acrylic-stand.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 높이 9cm 투명 아크릴 스탠드"
+  },
+  {
+    "id": 79,
+    "name": "초승달 콜드컵",
+    "price": 24900,
+    "category": "리빙",
+    "imageUrl": "/images/products/079-crescent-moon-cold-cup.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 500ml 아크릴 콜드컵"
+  },
+  {
+    "id": 80,
+    "name": "초승달 케이블 정리 클립",
+    "price": 21900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/080-crescent-moon-cable-clips.webp",
+    "description": "초승달 한 장면을 데스크 위에 가볍게 소환해요. 케이블 클립 6개 구성"
+  },
+  {
+    "id": 81,
+    "name": "우주선 투명 키캡",
+    "price": 21900,
+    "category": "키캡",
+    "imageUrl": "/images/products/081-spaceship-clear-keycap.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 체리 프로파일 호환 투명 레진 1키"
+  },
+  {
+    "id": 82,
+    "name": "우주선 마우스패드",
+    "price": 33900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/082-spaceship-mouse-pad.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 260×220mm 패브릭 마우스패드"
+  },
+  {
+    "id": 83,
+    "name": "우주선 클립 트레이",
+    "price": 23900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/083-spaceship-clip-tray.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 15×10cm 스틸 정리 트레이"
+  },
+  {
+    "id": 84,
+    "name": "우주선 아크릴 키링",
+    "price": 13900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/084-spaceship-acrylic-keyring.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 5cm 양면 UV 아크릴 키링"
+  },
+  {
+    "id": 85,
+    "name": "우주선 텀블러",
+    "price": 26900,
+    "category": "리빙",
+    "imageUrl": "/images/products/085-spaceship-tumbler.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 450ml 스테인리스 텀블러"
+  },
+  {
+    "id": 86,
+    "name": "우주선 충전 거치대",
+    "price": 23900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/086-spaceship-charging-stand.webp",
+    "description": "우주선 한 조각으로 손끝에 레트로 감성을. 알루미늄 거치대 1개"
+  },
+  {
+    "id": 87,
+    "name": "인베이더 메탈 키캡",
+    "price": 23900,
+    "category": "키캡",
+    "imageUrl": "/images/products/087-invader-metal-keycap.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 1u 알루미늄 키캡 1개"
+  },
+  {
+    "id": 88,
+    "name": "인베이더 손목 받침",
+    "price": 35000,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/088-invader-wrist-rest.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 360mm 메모리폼 손목 받침"
+  },
+  {
+    "id": 89,
+    "name": "인베이더 볼펜 세트",
+    "price": 24900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/089-invader-pen-set.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 0.5mm 볼펜 2개 구성"
+  },
+  {
+    "id": 90,
+    "name": "인베이더 스티커 팩",
+    "price": 14900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/090-invader-sticker-pack.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 리무버블 스티커 6장 구성"
+  },
+  {
+    "id": 91,
+    "name": "인베이더 코스터 세트",
+    "price": 28900,
+    "category": "리빙",
+    "imageUrl": "/images/products/091-invader-coaster-set.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 90mm 실리콘 코스터 2개"
+  },
+  {
+    "id": 92,
+    "name": "인베이더 폰 케이스",
+    "price": 24900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/092-invader-phone-case.webp",
+    "description": "인베이더 모티프가 일상에 작은 퀘스트를 더해요. 투명 TPU 범퍼 케이스"
+  },
+  {
+    "id": 93,
+    "name": "픽셀 고양이 아티산 키캡",
+    "price": 24900,
+    "category": "키캡",
+    "imageUrl": "/images/products/093-pixel-cat-artisan-keycap.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. 체리 프로파일 호환 레진 1키"
+  },
+  {
+    "id": 94,
+    "name": "픽셀 고양이 데스크 러그",
+    "price": 36900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/094-pixel-cat-desk-rug.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. 700×300mm 폴리에스터 펠트"
+  },
+  {
+    "id": 95,
+    "name": "픽셀 고양이 미니 무드등",
+    "price": 26900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/095-pixel-cat-mini-mood-lamp.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. USB-C 전원 아크릴 램프 1개"
+  },
+  {
+    "id": 96,
+    "name": "픽셀 고양이 금속 뱃지",
+    "price": 15900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/096-pixel-cat-metal-badge.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. 32mm 아연합금 에나멜 뱃지"
+  },
+  {
+    "id": 97,
+    "name": "픽셀 고양이 쿠션",
+    "price": 29900,
+    "category": "리빙",
+    "imageUrl": "/images/products/097-pixel-cat-cushion.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. 40×40cm 폴리에스터 쿠션"
+  },
+  {
+    "id": 98,
+    "name": "픽셀 고양이 헤드셋 거치대",
+    "price": 26900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/098-pixel-cat-headset-stand.webp",
+    "description": "픽셀 고양이 감성으로 평범한 자리를 아케이드처럼. 높이 25cm 헤드셋 스탠드"
+  },
+  {
+    "id": 99,
+    "name": "에메랄드 드래곤 ESC 키캡",
+    "price": 26900,
+    "category": "키캡",
+    "imageUrl": "/images/products/099-emerald-dragon-esc-keycap.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. 1u 규격 PBT 1키"
+  },
+  {
+    "id": 100,
+    "name": "에메랄드 드래곤 장패드",
+    "price": 38900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/100-emerald-dragon-desk-mat.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. 800×300mm 방수 원단과 고무 바닥"
+  },
+  {
+    "id": 101,
+    "name": "에메랄드 드래곤 펜꽂이",
+    "price": 28900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/101-emerald-dragon-pen-holder.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. 높이 10cm 스틸 펜꽂이"
+  },
+  {
+    "id": 102,
+    "name": "에메랄드 드래곤 에나멜 핀",
+    "price": 16900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/102-emerald-dragon-enamel-pin.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. 28mm 하드 에나멜 핀 1개"
+  },
+  {
+    "id": 103,
+    "name": "에메랄드 드래곤 미니 포스터",
+    "price": 31900,
+    "category": "리빙",
+    "imageUrl": "/images/products/103-emerald-dragon-mini-poster.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. A3 무광 아트지 포스터"
+  },
+  {
+    "id": 104,
+    "name": "에메랄드 드래곤 USB 허브",
+    "price": 28900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/104-emerald-dragon-usb-hub.webp",
+    "description": "에메랄드 드래곤 한 장면을 데스크 위에 가볍게 소환해요. USB 포트 4개 알루미늄 허브"
+  },
+  {
+    "id": 105,
+    "name": "마법서 스페이스바 키캡",
+    "price": 28900,
+    "category": "키캡",
+    "imageUrl": "/images/products/105-magic-book-spacebar-keycap.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 6.25u 규격 PBT 스페이스바"
+  },
+  {
+    "id": 106,
+    "name": "마법서 와이드 장패드",
+    "price": 39900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/106-magic-book-wide-desk-mat.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 900×400mm 미끄럼 방지 장패드"
+  },
+  {
+    "id": 107,
+    "name": "마법서 메모패드",
+    "price": 29900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/107-magic-book-memo-pad.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 90×90mm 메모지 80매"
+  },
+  {
+    "id": 108,
+    "name": "마법서 엽서 세트",
+    "price": 17900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/108-magic-book-postcard-set.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 100×150mm 엽서 4장 구성"
+  },
+  {
+    "id": 109,
+    "name": "마법서 무릎 담요",
+    "price": 33900,
+    "category": "리빙",
+    "imageUrl": "/images/products/109-magic-book-lap-blanket.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 100×70cm 극세사 담요"
+  },
+  {
+    "id": 110,
+    "name": "마법서 마우스 번지",
+    "price": 29900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/110-magic-book-mouse-bungee.webp",
+    "description": "마법서 한 조각으로 손끝에 레트로 감성을. 높이 11cm 실리콘 암 번지"
+  },
+  {
+    "id": 111,
+    "name": "황동 열쇠 방향키 세트",
+    "price": 29900,
+    "category": "키캡",
+    "imageUrl": "/images/products/111-brass-key-arrow-key-set.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 방향키 4개 구성 PBT 세트"
+  },
+  {
+    "id": 112,
+    "name": "황동 열쇠 마우스패드",
+    "price": 41900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/112-brass-key-mouse-pad.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 260×220mm 패브릭 마우스패드"
+  },
+  {
+    "id": 113,
+    "name": "황동 열쇠 미니 피규어",
+    "price": 31900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/113-brass-key-mini-figure.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 높이 6cm PVC 피규어"
+  },
+  {
+    "id": 114,
+    "name": "황동 열쇠 아크릴 스탠드",
+    "price": 18900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/114-brass-key-acrylic-stand.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 높이 9cm 투명 아크릴 스탠드"
+  },
+  {
+    "id": 115,
+    "name": "황동 열쇠 룸 슬리퍼",
+    "price": 35000,
+    "category": "리빙",
+    "imageUrl": "/images/products/115-brass-key-room-slippers.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 250mm 폼 쿠션 실내화"
+  },
+  {
+    "id": 116,
+    "name": "황동 열쇠 웹캠 커버 세트",
+    "price": 31900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/116-brass-key-webcam-cover-set.webp",
+    "description": "황동 열쇠 모티프가 일상에 작은 퀘스트를 더해요. 슬라이드 커버 3개 구성"
+  },
+  {
+    "id": 117,
+    "name": "레벨업 화살표 포인트 키캡 세트",
+    "price": 31900,
+    "category": "키캡",
+    "imageUrl": "/images/products/117-level-up-arrow-accent-keycap-set.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 포인트 키캡 4개 구성"
+  },
+  {
+    "id": 118,
+    "name": "레벨업 화살표 손목 받침",
+    "price": 43900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/118-level-up-arrow-wrist-rest.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 360mm 메모리폼 손목 받침"
+  },
+  {
+    "id": 119,
+    "name": "레벨업 화살표 모니터 받침",
+    "price": 33900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/119-level-up-arrow-monitor-riser.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 폭 52cm MDF·스틸 받침"
+  },
+  {
+    "id": 120,
+    "name": "레벨업 화살표 아크릴 키링",
+    "price": 19900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/120-level-up-arrow-acrylic-keyring.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 5cm 양면 UV 아크릴 키링"
+  },
+  {
+    "id": 121,
+    "name": "레벨업 화살표 미니 트레이",
+    "price": 36900,
+    "category": "리빙",
+    "imageUrl": "/images/products/121-level-up-arrow-mini-tray.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 24×16cm 멜라민 트레이"
+  },
+  {
+    "id": 122,
+    "name": "레벨업 화살표 케이블 슬리브",
+    "price": 33900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/122-level-up-arrow-cable-sleeve.webp",
+    "description": "레벨업 화살표 감성으로 평범한 자리를 아케이드처럼. 길이 1.5m 브레이드 슬리브"
+  },
+  {
+    "id": 123,
+    "name": "세이브 크리스털 투명 키캡",
+    "price": 33900,
+    "category": "키캡",
+    "imageUrl": "/images/products/123-save-crystal-clear-keycap.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 체리 프로파일 호환 투명 레진 1키"
+  },
+  {
+    "id": 124,
+    "name": "세이브 크리스털 데스크 러그",
+    "price": 45000,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/124-save-crystal-desk-rug.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 700×300mm 폴리에스터 펠트"
+  },
+  {
+    "id": 125,
+    "name": "세이브 크리스털 클립 트레이",
+    "price": 35000,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/125-save-crystal-clip-tray.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 15×10cm 스틸 정리 트레이"
+  },
+  {
+    "id": 126,
+    "name": "세이브 크리스털 스티커 팩",
+    "price": 2900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/126-save-crystal-sticker-pack.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 리무버블 스티커 6장 구성"
+  },
+  {
+    "id": 127,
+    "name": "세이브 크리스털 벽시계",
+    "price": 39000,
+    "category": "리빙",
+    "imageUrl": "/images/products/127-save-crystal-wall-clock.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 지름 25cm 저소음 벽시계"
+  },
+  {
+    "id": 128,
+    "name": "세이브 크리스털 노트북 스탠드",
+    "price": 35000,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/128-save-crystal-laptop-stand.webp",
+    "description": "세이브 크리스털 한 장면을 데스크 위에 가볍게 소환해요. 6단 높이 조절 알루미늄 스탠드"
+  },
+  {
+    "id": 129,
+    "name": "퀘스트 두루마리 메탈 키캡",
+    "price": 35000,
+    "category": "키캡",
+    "imageUrl": "/images/products/129-quest-scroll-metal-keycap.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 1u 알루미늄 키캡 1개"
+  },
+  {
+    "id": 130,
+    "name": "퀘스트 두루마리 장패드",
+    "price": 46900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/130-quest-scroll-desk-mat.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 800×300mm 방수 원단과 고무 바닥"
+  },
+  {
+    "id": 131,
+    "name": "퀘스트 두루마리 볼펜 세트",
+    "price": 37900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/131-quest-scroll-pen-set.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 0.5mm 볼펜 2개 구성"
+  },
+  {
+    "id": 132,
+    "name": "퀘스트 두루마리 금속 뱃지",
+    "price": 3900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/132-quest-scroll-metal-badge.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 32mm 아연합금 에나멜 뱃지"
+  },
+  {
+    "id": 133,
+    "name": "퀘스트 두루마리 머그컵",
+    "price": 7900,
+    "category": "리빙",
+    "imageUrl": "/images/products/133-quest-scroll-mug.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 330ml 세라믹 머그컵"
+  },
+  {
+    "id": 134,
+    "name": "퀘스트 두루마리 케이블 홀더",
+    "price": 37900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/134-quest-scroll-cable-holder.webp",
+    "description": "퀘스트 두루마리 한 조각으로 손끝에 레트로 감성을. 실리콘 홀더 4개 구성"
+  },
+  {
+    "id": 135,
+    "name": "보스 왕관 아티산 키캡",
+    "price": 37000,
+    "category": "키캡",
+    "imageUrl": "/images/products/135-boss-crown-artisan-keycap.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. 체리 프로파일 호환 레진 1키"
+  },
+  {
+    "id": 136,
+    "name": "보스 왕관 와이드 장패드",
+    "price": 49000,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/136-boss-crown-wide-desk-mat.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. 900×400mm 미끄럼 방지 장패드"
+  },
+  {
+    "id": 137,
+    "name": "보스 왕관 미니 무드등",
+    "price": 39900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/137-boss-crown-mini-mood-lamp.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. USB-C 전원 아크릴 램프 1개"
+  },
+  {
+    "id": 138,
+    "name": "보스 왕관 에나멜 핀",
+    "price": 4500,
+    "category": "굿즈",
+    "imageUrl": "/images/products/138-boss-crown-enamel-pin.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. 28mm 하드 에나멜 핀 1개"
+  },
+  {
+    "id": 139,
+    "name": "보스 왕관 콜드컵",
+    "price": 8900,
+    "category": "리빙",
+    "imageUrl": "/images/products/139-boss-crown-cold-cup.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. 500ml 아크릴 콜드컵"
+  },
+  {
+    "id": 140,
+    "name": "보스 왕관 케이블 정리 클립",
+    "price": 39900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/140-boss-crown-cable-clips.webp",
+    "description": "보스 왕관 모티프가 일상에 작은 퀘스트를 더해요. 케이블 클립 6개 구성"
+  },
+  {
+    "id": 141,
+    "name": "던전 횃불 ESC 키캡",
+    "price": 39000,
+    "category": "키캡",
+    "imageUrl": "/images/products/141-dungeon-torch-esc-keycap.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 1u 규격 PBT 1키"
+  },
+  {
+    "id": 142,
+    "name": "던전 횃불 마우스패드",
+    "price": 12900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/142-dungeon-torch-mouse-pad.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 260×220mm 패브릭 마우스패드"
+  },
+  {
+    "id": 143,
+    "name": "던전 횃불 펜꽂이",
+    "price": 42900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/143-dungeon-torch-pen-holder.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 높이 10cm 스틸 펜꽂이"
+  },
+  {
+    "id": 144,
+    "name": "던전 횃불 엽서 세트",
+    "price": 4900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/144-dungeon-torch-postcard-set.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 100×150mm 엽서 4장 구성"
+  },
+  {
+    "id": 145,
+    "name": "던전 횃불 텀블러",
+    "price": 9900,
+    "category": "리빙",
+    "imageUrl": "/images/products/145-dungeon-torch-tumbler.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 450ml 스테인리스 텀블러"
+  },
+  {
+    "id": 146,
+    "name": "던전 횃불 충전 거치대",
+    "price": 41900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/146-dungeon-torch-charging-stand.webp",
+    "description": "던전 횃불 감성으로 평범한 자리를 아케이드처럼. 알루미늄 거치대 1개"
+  },
+  {
+    "id": 147,
+    "name": "유령 스페이스바 키캡",
+    "price": 4900,
+    "category": "키캡",
+    "imageUrl": "/images/products/147-ghost-spacebar-keycap.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 6.25u 규격 PBT 스페이스바"
+  },
+  {
+    "id": 148,
+    "name": "유령 손목 받침",
+    "price": 14900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/148-ghost-wrist-rest.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 360mm 메모리폼 손목 받침"
+  },
+  {
+    "id": 149,
+    "name": "유령 메모패드",
+    "price": 45000,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/149-ghost-memo-pad.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 90×90mm 메모지 80매"
+  },
+  {
+    "id": 150,
+    "name": "유령 아크릴 스탠드",
+    "price": 5900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/150-ghost-acrylic-stand.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 높이 9cm 투명 아크릴 스탠드"
+  },
+  {
+    "id": 151,
+    "name": "유령 코스터 세트",
+    "price": 10900,
+    "category": "리빙",
+    "imageUrl": "/images/products/151-ghost-coaster-set.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 90mm 실리콘 코스터 2개"
+  },
+  {
+    "id": 152,
+    "name": "유령 폰 케이스",
+    "price": 43900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/152-ghost-phone-case.webp",
+    "description": "유령 한 장면을 데스크 위에 가볍게 소환해요. 투명 TPU 범퍼 케이스"
+  },
+  {
+    "id": 153,
+    "name": "돌 성채 방향키 세트",
+    "price": 5900,
+    "category": "키캡",
+    "imageUrl": "/images/products/153-stone-castle-arrow-key-set.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 방향키 4개 구성 PBT 세트"
+  },
+  {
+    "id": 154,
+    "name": "돌 성채 데스크 러그",
+    "price": 15900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/154-stone-castle-desk-rug.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 700×300mm 폴리에스터 펠트"
+  },
+  {
+    "id": 155,
+    "name": "돌 성채 미니 피규어",
+    "price": 47900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/155-stone-castle-mini-figure.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 높이 6cm PVC 피규어"
+  },
+  {
+    "id": 156,
+    "name": "돌 성채 아크릴 키링",
+    "price": 6900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/156-stone-castle-acrylic-keyring.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 5cm 양면 UV 아크릴 키링"
+  },
+  {
+    "id": 157,
+    "name": "돌 성채 쿠션",
+    "price": 12900,
+    "category": "리빙",
+    "imageUrl": "/images/products/157-stone-castle-cushion.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 40×40cm 폴리에스터 쿠션"
+  },
+  {
+    "id": 158,
+    "name": "돌 성채 헤드셋 거치대",
+    "price": 45000,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/158-stone-castle-headset-stand.webp",
+    "description": "돌 성채 한 조각으로 손끝에 레트로 감성을. 높이 25cm 헤드셋 스탠드"
+  },
+  {
+    "id": 159,
+    "name": "폭탄 포인트 키캡 세트",
+    "price": 6900,
+    "category": "키캡",
+    "imageUrl": "/images/products/159-bomb-accent-keycap-set.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. 포인트 키캡 4개 구성"
+  },
+  {
+    "id": 160,
+    "name": "폭탄 장패드",
+    "price": 17900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/160-bomb-desk-mat.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. 800×300mm 방수 원단과 고무 바닥"
+  },
+  {
+    "id": 161,
+    "name": "폭탄 모니터 받침",
+    "price": 49900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/161-bomb-monitor-riser.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. 폭 52cm MDF·스틸 받침"
+  },
+  {
+    "id": 162,
+    "name": "폭탄 스티커 팩",
+    "price": 7900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/162-bomb-sticker-pack.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. 리무버블 스티커 6장 구성"
+  },
+  {
+    "id": 163,
+    "name": "폭탄 미니 포스터",
+    "price": 14900,
+    "category": "리빙",
+    "imageUrl": "/images/products/163-bomb-mini-poster.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. A3 무광 아트지 포스터"
+  },
+  {
+    "id": 164,
+    "name": "폭탄 USB 허브",
+    "price": 46900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/164-bomb-usb-hub.webp",
+    "description": "폭탄 모티프가 일상에 작은 퀘스트를 더해요. USB 포트 4개 알루미늄 허브"
+  },
+  {
+    "id": 165,
+    "name": "구름 투명 키캡",
+    "price": 7900,
+    "category": "키캡",
+    "imageUrl": "/images/products/165-cloud-clear-keycap.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 체리 프로파일 호환 투명 레진 1키"
+  },
+  {
+    "id": 166,
+    "name": "구름 와이드 장패드",
+    "price": 19900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/166-cloud-wide-desk-mat.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 900×400mm 미끄럼 방지 장패드"
+  },
+  {
+    "id": 167,
+    "name": "구름 클립 트레이",
+    "price": 52900,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/167-cloud-clip-tray.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 15×10cm 스틸 정리 트레이"
+  },
+  {
+    "id": 168,
+    "name": "구름 금속 뱃지",
+    "price": 8900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/168-cloud-metal-badge.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 32mm 아연합금 에나멜 뱃지"
+  },
+  {
+    "id": 169,
+    "name": "구름 무릎 담요",
+    "price": 15900,
+    "category": "리빙",
+    "imageUrl": "/images/products/169-cloud-lap-blanket.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 100×70cm 극세사 담요"
+  },
+  {
+    "id": 170,
+    "name": "구름 마우스 번지",
+    "price": 49000,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/170-cloud-mouse-bungee.webp",
+    "description": "구름 감성으로 평범한 자리를 아케이드처럼. 높이 11cm 실리콘 암 번지"
+  },
+  {
+    "id": 171,
+    "name": "산호 버섯 메탈 키캡",
+    "price": 8900,
+    "category": "키캡",
+    "imageUrl": "/images/products/171-coral-mushroom-metal-keycap.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 1u 알루미늄 키캡 1개"
+  },
+  {
+    "id": 172,
+    "name": "산호 버섯 마우스패드",
+    "price": 21900,
+    "category": "데스크매트",
+    "imageUrl": "/images/products/172-coral-mushroom-mouse-pad.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 260×220mm 패브릭 마우스패드"
+  },
+  {
+    "id": 173,
+    "name": "산호 버섯 볼펜 세트",
+    "price": 55000,
+    "category": "데스크 소품",
+    "imageUrl": "/images/products/173-coral-mushroom-pen-set.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 0.5mm 볼펜 2개 구성"
+  },
+  {
+    "id": 174,
+    "name": "산호 버섯 에나멜 핀",
+    "price": 9900,
+    "category": "굿즈",
+    "imageUrl": "/images/products/174-coral-mushroom-enamel-pin.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 28mm 하드 에나멜 핀 1개"
+  },
+  {
+    "id": 175,
+    "name": "산호 버섯 룸 슬리퍼",
+    "price": 17900,
+    "category": "리빙",
+    "imageUrl": "/images/products/175-coral-mushroom-room-slippers.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 250mm 폼 쿠션 실내화"
+  },
+  {
+    "id": 176,
+    "name": "산호 버섯 웹캠 커버 세트",
+    "price": 5900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/176-coral-mushroom-webcam-cover-set.webp",
+    "description": "산호 버섯 한 장면을 데스크 위에 가볍게 소환해요. 슬라이드 커버 3개 구성"
+  },
+  {
+    "id": 177,
+    "name": "차원문 미니 트레이",
+    "price": 19900,
+    "category": "리빙",
+    "imageUrl": "/images/products/177-portal-mini-tray.webp",
+    "description": "차원문 한 조각으로 손끝에 레트로 감성을. 24×16cm 멜라민 트레이"
+  },
+  {
+    "id": 178,
+    "name": "차원문 케이블 슬리브",
+    "price": 6900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/178-portal-cable-sleeve.webp",
+    "description": "차원문 한 조각으로 손끝에 레트로 감성을. 길이 1.5m 브레이드 슬리브"
+  },
+  {
+    "id": 179,
+    "name": "미믹 상자 벽시계",
+    "price": 21900,
+    "category": "리빙",
+    "imageUrl": "/images/products/179-mimic-chest-wall-clock.webp",
+    "description": "미믹 상자 모티프가 일상에 작은 퀘스트를 더해요. 지름 25cm 저소음 벽시계"
+  },
+  {
+    "id": 180,
+    "name": "미믹 상자 노트북 스탠드",
+    "price": 7900,
+    "category": "테크 액세서리",
+    "imageUrl": "/images/products/180-mimic-chest-laptop-stand.webp",
+    "description": "미믹 상자 모티프가 일상에 작은 퀘스트를 더해요. 6단 높이 조절 알루미늄 스탠드"
+  }
+]
