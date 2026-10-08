@@ -19,7 +19,7 @@
 | GET | /api/products?category=&q=&sort=&page=&size= | 목록 (sort: `id/new/price_asc/price_desc`) | ✅ |
 | GET | /api/products/{id} | 상세 (없으면 404) | ✅ |
 | GET · POST · PATCH · DELETE | /api/cart, /api/cart/items/{productId} 🔒 | 장바구니 조회·담기(같은 상품은 수량 합산, 최대 99)·수량변경·삭제 — 응답은 모두 장바구니 전체 | ✅ |
-| GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록·찜·해제 | |
+| GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록(Page, 최근 찜한 순)·찜(이미 있으면 그대로)·해제 | ✅ |
 
 ## 주문 · CS · 호환성 — BE-B
 | 메서드 | 경로 | 설명 | 상태 |
