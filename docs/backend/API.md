@@ -23,7 +23,7 @@
 ## 주문 · CS · 호환성 — BE-B
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
-| POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 |  |
+| POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 | ✅ |
 | GET | /api/orders 🔒 | 내 주문 목록 |  |
 | GET | /api/orders/{id} 🔒 | 주문 상세 + 배송 타임라인 |  |
 | POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) |  |
