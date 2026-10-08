@@ -26,7 +26,9 @@
 | POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 | ✅ |
 | GET | /api/orders 🔒 | 내 주문 목록 | ✅ |
 | GET | /api/orders/{id} 🔒 | 주문 상세 + 배송 타임라인 | ✅ |
-| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) |  |
+| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) | ✅ |
+| POST | /api/dev/cancel-requests/{id}/approve | [로컬 전용] 취소 승인 → 주문 취소 완료 | ✅ |
+| POST | /api/dev/cancel-requests/{id}/reject | [로컬 전용] 취소 거절 → 신청 직전 상태로 복귀 | ✅ |
 | POST | /api/dev/orders/{id}/advance | [로컬 전용] 배송 단계 진행 | ✅ |
 | GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 |  |
 | POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) |  |
