@@ -4,5 +4,6 @@ from app.models.faq import Faq
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
 from app.models.user import User
+from app.models.wishlist import Wishlist
 
-__all__ = ["CartItem", "Category", "Faq", "Order", "OrderItem", "OrderStatusHistory", "Product", "User"]
+__all__ = ["CartItem", "Category", "Faq", "Order", "OrderItem", "OrderStatusHistory", "Product", "User", "Wishlist"]
