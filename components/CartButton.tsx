@@ -1,14 +1,28 @@
 "use client";
 
 import { useCart } from "@/components/CartProvider";
+import { useAuth } from "@/components/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { safeNextPath } from "@/utils/safeNextPath";
 
 // 헤더의 장바구니 아이콘 + 담은 개수 뱃지
 export default function CartButton() {
   const { count } = useCart();
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const [notice, setNotice] = useState(false);
 
   return (
-    <button
+    <div className="relative shrink-0"><button
       type="button"
+      disabled={loading}
+      onClick={() => {
+        if (!user) {
+          const next = safeNextPath(window.location.pathname + window.location.search + window.location.hash);
+          router.push(`/login?next=${encodeURIComponent(next)}`);
+        } else setNotice(!notice);
+      }}
       aria-label={count > 0 ? `장바구니, ${count}개 담김` : "장바구니"}
       className="relative grid size-10 place-items-center rounded-lg border border-line bg-white/5 transition-colors hover:border-violet/40"
     >
@@ -23,5 +37,8 @@ export default function CartButton() {
         </span>
       )}
     </button>
+      {/* TODO(#38): 장바구니 페이지로 연결 */}
+      {notice && user && <p role="status" className="absolute right-0 top-12 z-50 w-40 rounded-lg border border-line bg-panel p-3 text-sm text-sub">장바구니 화면은 준비 중이에요.</p>}
+    </div>
   );
 }
