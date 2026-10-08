@@ -60,6 +60,8 @@
 | GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
 | GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
 | GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (5명 이상만, `rank`·`isSample`) | ✅ |
-| GET · POST | /api/local/trades?region=&kind= 🔒(POST) | 거래·HAVE/WANT 글 (Prototype) |  |
-| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 지역 HAVE 매칭 (Mock 수준) |  |
-| GET | /api/local/wish-map?region= | 지역별 인기 찜 상품 익명 집계 (Prototype) |  |
+| GET · POST | /api/local/trades?region=&kind=&productId=&interestId= 🔒(POST) | 거래(`sell`)·교환(`have/want`) 글 (Prototype). 목록은 진행 중 글, 상위 지역은 하위 포함, 작성자 정보 없음, 샘플은 `isSample`. POST는 내 지역으로 작성 — 지역 미설정 400, have·sell 상태 미선택·연락처/정확한 장소 422, 같은 물건 진행 중 글 400 | ✅ |
+| GET | /api/local/trades/mine 🔒 | 내 글 (완료·숨김 포함) | ✅ |
+| PATCH | /api/local/trades/{id} 🔒 | 내 글 상태 `done`/`hidden` (남의 글 404) | ✅ |
+| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
+| GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만) | ✅ |

@@ -1,8 +1,10 @@
+from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import Field
+from pydantic import Field, StringConstraints
 
 from app.schemas.common import CamelModel
+from app.schemas.product import ProductOut
 
 InterestType = Literal["work", "character", "style", "product_type"]
 
@@ -58,3 +60,55 @@ class FandomRankOut(CamelModel):
     interest_type: str
     count: int
     is_sample: bool
+
+
+class TradePostIn(CamelModel):
+    kind: Literal["have", "want", "sell"]
+    item_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=60)] = Field(
+        examples=["오로치마루 키링"]
+    )
+    product_id: int | None = Field(default=None, description="PIXEL MART 상품이면 id (상품 이미지 참조·매칭)")
+    interest_id: int | None = Field(default=None, description="관련 취향 태그 id (예: 오로치마루) — 매칭에 사용")
+    condition: Literal["new", "like_new", "used"] | None = Field(default=None, description="have·sell은 필수")
+    price: Annotated[int, Field(ge=0, le=10_000_000)] | None = Field(default=None, description="희망 가격(원)")
+    trade_method: Literal["direct", "delivery", "both"] = "direct"
+    content: Annotated[str, StringConstraints(strip_whitespace=True, max_length=1000)] = ""
+
+
+class TradeStatusIn(CamelModel):
+    status: Literal["done", "hidden"]
+
+
+class TradePostOut(CamelModel):
+    """정책 10장의 노출 항목만 — 작성자 정보·연락처·정확한 장소는 없다"""
+
+    id: int
+    kind: str
+    status: str
+    item_name: str
+    condition: str | None
+    price: int | None
+    trade_method: str
+    content: str
+    product: ProductOut | None
+    interest: InterestOut | None
+    region_code: str
+    region_name: str
+    is_mine: bool
+    is_sample: bool
+    created_at: datetime
+
+
+class TradeMatchOut(CamelModel):
+    """내 WANT ↔ 이웃의 HAVE/SELL. 거리 대신 같은 생활권/같은 구로 표시, mutual이면 맞교환 후보"""
+
+    want: TradePostOut
+    offer: TradePostOut
+    proximity: Literal["same_zone", "same_district"]
+    mutual: bool
+
+
+class WishMapOut(CamelModel):
+    rank: int
+    product: ProductOut
+    count: int

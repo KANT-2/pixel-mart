@@ -48,6 +48,8 @@ Docker를 쓰면 `.env`의 `DATABASE_URL` 포트를 `5433`으로 바꿉니다.
 alembic upgrade head
 python -m scripts.seed
 ```
+- 시드에는 PIXEL LOCAL Cold Start용 **샘플**(덕력지도 집계 161칸, 거래글 7개)도 들어갑니다. 응답에 `isSample: true`로 표시되고, 실제 집계 참여자가 생긴 칸은 실제 값으로 바뀝니다.
+- 덕력지도·Wish Map은 **테스트 계정(`.test` 이메일, dev-login 기본값)을 집계에서 뺍니다.** 직접 숫자를 바꿔 보려면 dev-login 이메일을 `.test`가 아닌 주소로 쓰세요.
 
 ---
 

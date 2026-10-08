@@ -1,0 +1,64 @@
+[
+  {
+    "regionCode": "41135-01",
+    "kind": "have",
+    "itemName": "카카시 키링",
+    "interestId": 13,
+    "condition": "like_new",
+    "tradeMethod": "direct",
+    "content": "랜덤 굿즈 중복이라 교환 원해요."
+  },
+  {
+    "regionCode": "41135-01",
+    "kind": "want",
+    "itemName": "오로치마루 키링",
+    "interestId": 12,
+    "tradeMethod": "direct",
+    "content": "오로치마루 키링 구해요."
+  },
+  {
+    "regionCode": "41135-02",
+    "kind": "sell",
+    "itemName": "HP 하트 키캡",
+    "productId": 1,
+    "condition": "new",
+    "price": 8000,
+    "tradeMethod": "both",
+    "content": "미개봉이에요."
+  },
+  {
+    "regionCode": "41135-03",
+    "kind": "have",
+    "itemName": "오로치마루 키링",
+    "interestId": 12,
+    "condition": "used",
+    "tradeMethod": "direct",
+    "content": "카카시 키링이랑 바꾸고 싶어요."
+  },
+  {
+    "regionCode": "41135-03",
+    "kind": "want",
+    "itemName": "카카시 키링",
+    "interestId": 13,
+    "tradeMethod": "direct",
+    "content": ""
+  },
+  {
+    "regionCode": "11200-01",
+    "kind": "sell",
+    "itemName": "루비 하트 ESC 키캡",
+    "productId": 15,
+    "condition": "like_new",
+    "price": 4500,
+    "tradeMethod": "delivery",
+    "content": "택배 거래만 가능해요."
+  },
+  {
+    "regionCode": "11440-01",
+    "kind": "want",
+    "itemName": "슬라임 무드등",
+    "interestId": 14,
+    "tradeMethod": "both",
+    "content": "슬라임 관련 굿즈 모아요."
+  }
+]
