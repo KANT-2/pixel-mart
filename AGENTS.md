@@ -79,7 +79,7 @@ data/                      1차 과제 정적 데이터 (상품 폴백용으로 
 - **픽셀 아바타**: 사진 → Canvas로 축소(32×32) → 색 줄이기(16색) → 확대. **원본 사진은 서버로 보내지 않는다.** PNG data URL(50KB 이하)만 `PUT /api/users/me/avatar`
 - **데스크 꾸미기**: Snap Zone 방식(LEFT/CENTER/RIGHT/KEYBOARD/FRONT). 규칙(3~7개, DP 100 이하 등)은 화면에서 미리 보여 주되 **최종 판단은 `POST /api/desks/validate`** 결과를 따른다
 - **토너먼트 투표 화면**: 투표 종료 전 작성자 이름·상품 가격 숨김
-- **PIXEL LOCAL**: 위치 권한(GPS) 요청 금지, 동네 선택 UI만. 덕력지도는 집계 숫자만, 개인 핀 없음
+- **PIXEL LOCAL** (`docs/PIXEL_LOCAL_POLICY.md`, `docs/DUKRYEOK_MAP_POLICY.md`): 위치 권한(GPS) 요청 금지, 지역 선택 UI만. 덕력지도는 집계 숫자만(개인 핀·사용자 목록 X), 5명 미만은 "5명 미만"으로 표시, `isSample` 데이터는 "샘플" 표시, 빈 화면엔 다음 행동(상위 지역 보기·관련 상품·취향 등록) 제공
 - 실존 캐릭터·작품은 텍스트 태그만, 공식 이미지·로고 사용 금지
 
 ## 작업 방식
