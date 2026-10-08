@@ -32,3 +32,9 @@ class ProductOut(CamelModel):
             description=product.description,
             is_new=product.is_new,
         )
+
+
+class ProductWithWishOut(ProductOut):
+    """상품 목록·상세 응답 — 로그인 사용자가 찜했는지 함께 (비로그인은 항상 false)"""
+
+    is_wished: bool = False
