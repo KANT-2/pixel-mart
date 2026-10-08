@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routers import auth, cart, faqs, health, orders, products, wishlist
+from app.routers import auth, cart, faqs, health, local, orders, products, wishlist
 
 app = FastAPI(
     title="PIXEL MART API",
@@ -31,5 +31,6 @@ for router in (
     orders.router,
     orders.dev_router,
     wishlist.router,
+    local.router,
 ):
     app.include_router(router, prefix="/api")
