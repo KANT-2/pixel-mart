@@ -21,20 +21,20 @@
 | GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록·찜·해제 | |
 
 ## 주문 · CS · 호환성 — BE-B
-| 메서드 | 경로 | 설명 |
-| --- | --- | --- |
-| POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 |
-| GET | /api/orders 🔒 | 내 주문 목록 |
-| GET | /api/orders/{id} 🔒 | 주문 상세 + 배송 타임라인 |
-| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) |
-| POST | /api/dev/orders/{id}/advance | [로컬 전용] 배송 단계 진행 |
-| GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 |
-| POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) |
-| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) |
-| POST | /api/products/{id}/questions 🔒 | 문의 작성 |
-| GET | /api/faqs?category= | FAQ |
-| GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) |
-| GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) |
+| 메서드 | 경로 | 설명 | 상태 |
+| --- | --- | --- | --- |
+| POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 |  |
+| GET | /api/orders 🔒 | 내 주문 목록 |  |
+| GET | /api/orders/{id} 🔒 | 주문 상세 + 배송 타임라인 |  |
+| POST | /api/orders/{id}/cancel-requests 🔒 | 취소 신청 (배송 전만) |  |
+| POST | /api/dev/orders/{id}/advance | [로컬 전용] 배송 단계 진행 |  |
+| GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 |  |
+| POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) |  |
+| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) |  |
+| POST | /api/products/{id}/questions 🔒 | 문의 작성 |  |
+| GET | /api/faqs?category= | FAQ | ✅ |
+| GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) |  |
+| GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) |  |
 
 ## 데스크테리어 · 토너먼트 · 뱃지 — BE-C
 | 메서드 | 경로 | 설명 |
