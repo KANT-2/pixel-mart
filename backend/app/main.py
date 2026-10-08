@@ -13,6 +13,7 @@ from app.routers import (
     local_trades,
     orders,
     products,
+    reviews,
     users,
     wishlist,
 )
@@ -58,5 +59,6 @@ for router in (
     wishlist.router,
     local.router,
     local_trades.router,
+    reviews.router,
 ):
     app.include_router(router, prefix="/api")
