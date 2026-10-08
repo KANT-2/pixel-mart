@@ -55,10 +55,11 @@
 ## PIXEL LOCAL — BE-A (3단계)
 | 메서드 | 경로 | 설명 |
 | --- | --- | --- |
-| GET | /api/regions | 동네 목록 |
-| PUT | /api/users/me/local 🔒 | 내 동네·관심사·공개 여부 설정 |
-| GET | /api/interests?type=&q= | 작품·캐릭터 태그 검색 |
-| GET | /api/local/fandom?region=&interest= | 덕력지도 집계 (3명 미만 숨김) |
-| GET · POST | /api/local/trades?region=&kind= 🔒(POST) | HAVE/WANT 거래글 |
-| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 이웃 HAVE 매칭 |
-| GET | /api/local/wish-map?region= | 동네별 인기 찜 상품 집계 |
+| GET | /api/regions?parent= | 지역 목록 (시 › 구 › 동·생활권) |
+| PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여·공개 여부 설정 |
+| GET | /api/interests?type=&q= | 취향 태그 검색 (작품·캐릭터·스타일·상품 종류) |
+| GET | /api/local/fandom?region=&interest=&period= | 덕력지도 집계 — 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, `isSample` |
+| GET | /api/local/fandom/ranking?region= | 지역 인기 취향 순위 (최소 기준 충족 항목만) |
+| GET · POST | /api/local/trades?region=&kind= 🔒(POST) | 거래·HAVE/WANT 글 (Prototype) |
+| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 지역 HAVE 매칭 (Mock 수준) |
+| GET | /api/local/wish-map?region= | 지역별 인기 찜 상품 익명 집계 (Prototype) |
