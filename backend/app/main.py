@@ -22,5 +22,13 @@ app.add_middleware(
 )
 
 # 새 라우터는 여기에 한 줄씩 추가 (모든 API는 /api 로 시작)
-for router in (health.router, auth.router, products.router, faqs.router, cart.router, orders.router):
+for router in (
+    health.router,
+    auth.router,
+    products.router,
+    faqs.router,
+    cart.router,
+    orders.router,
+    orders.dev_router,
+):
     app.include_router(router, prefix="/api")

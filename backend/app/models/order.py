@@ -24,6 +24,9 @@ class Order(Base):
     items: Mapped[list["OrderItem"]] = relationship(
         back_populates="order", order_by="OrderItem.id", lazy="selectin", cascade="all, delete-orphan"
     )
+    history: Mapped[list["OrderStatusHistory"]] = relationship(
+        back_populates="order", order_by="OrderStatusHistory.id", lazy="selectin", cascade="all, delete-orphan"
+    )
 
 
 class OrderItem(Base):
@@ -38,3 +41,16 @@ class OrderItem(Base):
 
     order: Mapped[Order] = relationship(back_populates="items")
     product: Mapped[Product] = relationship(lazy="joined")
+
+
+class OrderStatusHistory(Base):
+    """배송 조회 타임라인 — 상태가 바뀔 때마다 한 줄씩 쌓는다"""
+
+    __tablename__ = "order_status_history"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), index=True)
+    status: Mapped[str] = mapped_column(String(20))
+    changed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    order: Mapped[Order] = relationship(back_populates="history")
