@@ -3,8 +3,8 @@ import { Suspense } from "react";
 import CategoryTabs from "@/components/CategoryTabs";
 import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/data/products";
-import { PAGE_SIZE, findCategoryBySlug } from "@/utils/products";
+import { getCategories, getProducts, PAGE_SIZE } from "@/lib/products";
+import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 
 export const metadata: Metadata = {
   title: "전체 상품 | PIXEL MART",
@@ -17,7 +17,7 @@ type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 export default function ProductsPage({ searchParams }: PageProps<"/products">) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-      <Suspense fallback={<ProductListSkeleton />}>
+      <Suspense fallback={<ProductSkeleton count={PAGE_SIZE} />}>
         <ProductList searchParams={searchParams} />
       </Suspense>
     </div>
@@ -28,14 +28,12 @@ async function ProductList({ searchParams }: { searchParams: SearchParams }) {
   const { category: categoryParam, page: pageParam } = await searchParams;
 
   // 없는 카테고리 slug면 전체 상품을 보여 줌
-  const category = findCategoryBySlug(typeof categoryParam === "string" ? categoryParam : undefined);
-  const filtered = category ? products.filter((product) => product.category === category.name) : products;
+  const categoryResult = await getCategories();
+  const category = categoryResult.data.find((item) => item.slug === categoryParam);
 
   // page가 숫자가 아니거나 범위를 벗어나면 1 ~ 마지막 페이지 안으로 맞춤
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const requested = Number(pageParam);
-  const currentPage = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), totalPages) : 1;
-  const pageItems = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const result = await getProducts(category?.slug, typeof pageParam === "string" ? Number(pageParam) : 1);
+  const { items: pageItems, page: currentPage, totalPages, total } = result.data;
 
   return (
     <>
@@ -43,11 +41,13 @@ async function ProductList({ searchParams }: { searchParams: SearchParams }) {
         <p className="mb-2 font-pixel text-xs tracking-widest text-mint">{category ? category.slug.toUpperCase() : "ALL ITEMS"}</p>
         <h1 className="text-3xl font-extrabold">{category ? category.name : "전체 상품"}</h1>
         <p className="mt-2 text-sm text-sub">
-          {category ? `${category.description} · ` : ""}총 {filtered.length}개 · {currentPage} / {totalPages} 페이지
+          {category ? `${category.description} · ` : ""}총 {total}개 · {currentPage} / {totalPages} 페이지
         </p>
       </header>
 
-      <CategoryTabs current={category?.slug} />
+      <CategoryTabs current={category?.slug} categories={categoryResult.data} />
+      {(result.fallback || categoryResult.fallback) && <ProductFallbackNotice />}
+      {pageItems.length === 0 && <EmptyProducts />}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {pageItems.map((product) => (
@@ -57,15 +57,5 @@ async function ProductList({ searchParams }: { searchParams: SearchParams }) {
 
       <Pagination currentPage={currentPage} totalPages={totalPages} category={category?.slug} />
     </>
-  );
-}
-
-function ProductListSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-      {Array.from({ length: PAGE_SIZE }, (_, index) => (
-        <div key={index} className="aspect-[3/4] animate-pulse rounded-2xl bg-panel" />
-      ))}
-    </div>
   );
 }

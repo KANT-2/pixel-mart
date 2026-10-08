@@ -1,12 +1,14 @@
 import Link from "next/link";
-import { categories } from "@/data/categories";
 import { products } from "@/data/products";
+import type { ApiCategory } from "@/types/api";
 
 interface CategoryTabsProps {
   current?: string; // 선택된 카테고리 slug (없으면 "전체")
+  categories: ApiCategory[];
 }
 
-export default function CategoryTabs({ current }: CategoryTabsProps) {
+export default function CategoryTabs({ current, categories }: CategoryTabsProps) {
+  // TODO(#16): API productCount로 교체
   const tabs = [
     { slug: undefined, name: "전체", count: products.length },
     ...categories.map((category) => ({
