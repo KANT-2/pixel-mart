@@ -58,8 +58,8 @@
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
 | GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
 | GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
-| GET | /api/local/fandom?region=&interest=&period= | 덕력지도 집계 — 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, `isSample` |  |
-| GET | /api/local/fandom/ranking?region= | 지역 인기 취향 순위 (최소 기준 충족 항목만) |  |
+| GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
+| GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (5명 이상만, `rank`·`isSample`) | ✅ |
 | GET · POST | /api/local/trades?region=&kind= 🔒(POST) | 거래·HAVE/WANT 글 (Prototype) |  |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 지역 HAVE 매칭 (Mock 수준) |  |
 | GET | /api/local/wish-map?region= | 지역별 인기 찜 상품 익명 집계 (Prototype) |  |

@@ -1,0 +1,807 @@
+[
+  {
+    "regionCode": "11200-01",
+    "interestId": 17,
+    "count": 8
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 13,
+    "count": 18
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 18,
+    "count": 1
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 55,
+    "count": 15
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 12,
+    "count": 4
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 11,
+    "count": 1
+  },
+  {
+    "regionCode": "11200-01",
+    "interestId": 52,
+    "count": 2
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 18,
+    "count": 1
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 74,
+    "count": 18
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 11,
+    "count": 2
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 14,
+    "count": 4
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 71,
+    "count": 24
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 52,
+    "count": 24
+  },
+  {
+    "regionCode": "11440-01",
+    "interestId": 72,
+    "count": 18
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 12,
+    "count": 15
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 53,
+    "count": 3
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 72,
+    "count": 6
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 18,
+    "count": 9
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 74,
+    "count": 3
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 14,
+    "count": 15
+  },
+  {
+    "regionCode": "11440-02",
+    "interestId": 71,
+    "count": 2
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 53,
+    "count": 8
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 15,
+    "count": 2
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 52,
+    "count": 15
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 55,
+    "count": 2
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 13,
+    "count": 18
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 11,
+    "count": 1
+  },
+  {
+    "regionCode": "11650-01",
+    "interestId": 14,
+    "count": 18
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 14,
+    "count": 18
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 51,
+    "count": 12
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 55,
+    "count": 8
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 52,
+    "count": 6
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 18,
+    "count": 4
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 17,
+    "count": 3
+  },
+  {
+    "regionCode": "11650-02",
+    "interestId": 72,
+    "count": 4
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 11,
+    "count": 6
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 53,
+    "count": 18
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 15,
+    "count": 2
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 52,
+    "count": 2
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 51,
+    "count": 15
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 17,
+    "count": 9
+  },
+  {
+    "regionCode": "11680-01",
+    "interestId": 72,
+    "count": 3
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 72,
+    "count": 15
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 17,
+    "count": 18
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 13,
+    "count": 8
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 51,
+    "count": 8
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 18,
+    "count": 8
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 12,
+    "count": 18
+  },
+  {
+    "regionCode": "11680-02",
+    "interestId": 11,
+    "count": 12
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 53,
+    "count": 24
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 72,
+    "count": 2
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 51,
+    "count": 1
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 11,
+    "count": 6
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 55,
+    "count": 24
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 15,
+    "count": 18
+  },
+  {
+    "regionCode": "11680-03",
+    "interestId": 71,
+    "count": 24
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 74,
+    "count": 8
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 51,
+    "count": 3
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 15,
+    "count": 18
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 18,
+    "count": 2
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 17,
+    "count": 12
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 12,
+    "count": 1
+  },
+  {
+    "regionCode": "11710-01",
+    "interestId": 72,
+    "count": 4
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 72,
+    "count": 2
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 15,
+    "count": 3
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 13,
+    "count": 12
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 14,
+    "count": 9
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 18,
+    "count": 15
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 53,
+    "count": 6
+  },
+  {
+    "regionCode": "11710-02",
+    "interestId": 51,
+    "count": 3
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 74,
+    "count": 4
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 18,
+    "count": 3
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 52,
+    "count": 2
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 15,
+    "count": 3
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 72,
+    "count": 3
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 17,
+    "count": 4
+  },
+  {
+    "regionCode": "28185-01",
+    "interestId": 53,
+    "count": 24
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 14,
+    "count": 1
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 12,
+    "count": 3
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 51,
+    "count": 9
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 53,
+    "count": 15
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 13,
+    "count": 8
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 15,
+    "count": 18
+  },
+  {
+    "regionCode": "28237-01",
+    "interestId": 52,
+    "count": 18
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 17,
+    "count": 24
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 13,
+    "count": 15
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 71,
+    "count": 9
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 52,
+    "count": 9
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 53,
+    "count": 9
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 12,
+    "count": 9
+  },
+  {
+    "regionCode": "41115-01",
+    "interestId": 51,
+    "count": 2
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 51,
+    "count": 12
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 55,
+    "count": 3
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 18,
+    "count": 2
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 12,
+    "count": 8
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 14,
+    "count": 18
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 11,
+    "count": 1
+  },
+  {
+    "regionCode": "41117-01",
+    "interestId": 53,
+    "count": 2
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 12,
+    "count": 2
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 53,
+    "count": 4
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 13,
+    "count": 18
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 52,
+    "count": 9
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 11,
+    "count": 3
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 17,
+    "count": 24
+  },
+  {
+    "regionCode": "41117-02",
+    "interestId": 74,
+    "count": 6
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 17,
+    "count": 12
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 53,
+    "count": 12
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 74,
+    "count": 12
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 51,
+    "count": 6
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 11,
+    "count": 2
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 72,
+    "count": 3
+  },
+  {
+    "regionCode": "41131-01",
+    "interestId": 55,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 71,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 17,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 74,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 15,
+    "count": 3
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 51,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 13,
+    "count": 1
+  },
+  {
+    "regionCode": "41135-01",
+    "interestId": 12,
+    "count": 12
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 15,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 55,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 11,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 74,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 52,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 17,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-02",
+    "interestId": 13,
+    "count": 24
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 14,
+    "count": 15
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 53,
+    "count": 12
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 74,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 71,
+    "count": 1
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 18,
+    "count": 1
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 55,
+    "count": 6
+  },
+  {
+    "regionCode": "41135-03",
+    "interestId": 52,
+    "count": 12
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 15,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 14,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 71,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 53,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 17,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 51,
+    "count": 12
+  },
+  {
+    "regionCode": "41135-04",
+    "interestId": 55,
+    "count": 4
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 17,
+    "count": 24
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 14,
+    "count": 8
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 51,
+    "count": 24
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 53,
+    "count": 2
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 55,
+    "count": 24
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 12,
+    "count": 2
+  },
+  {
+    "regionCode": "41463-01",
+    "interestId": 71,
+    "count": 9
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 72,
+    "count": 2
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 71,
+    "count": 9
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 14,
+    "count": 12
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 51,
+    "count": 9
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 13,
+    "count": 2
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 18,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-01",
+    "interestId": 17,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 13,
+    "count": 24
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 12,
+    "count": 8
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 74,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 53,
+    "count": 15
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 51,
+    "count": 15
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 71,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-02",
+    "interestId": 55,
+    "count": 1
+  }
+]
