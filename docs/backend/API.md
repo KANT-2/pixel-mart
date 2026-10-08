@@ -15,8 +15,8 @@
 | PATCH | /api/users/me 🔒 | 닉네임 변경 | |
 | PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB) | |
 | GET | /api/categories | 카테고리 6개 | ✅ |
-| GET | /api/products?category=&q=&sort=&page=&size= | 목록 (sort: `id/new/price_asc/price_desc`) | ✅ |
-| GET | /api/products/{id} | 상세 (없으면 404) | ✅ |
+| GET | /api/products?category=&q=&minPrice=&maxPrice=&isNew=&sort=&page=&size= | 목록 (category는 쉼표로 여러 개, sort: `id/new/price_asc/price_desc/popular`(찜 많은 순), 응답에 `isWished`) | ✅ |
+| GET | /api/products/{id} | 상세 (없으면 404, 응답에 `isWished`) | ✅ |
 | GET · POST · PATCH · DELETE | /api/cart, /api/cart/items/{productId} 🔒 | 장바구니 조회·담기(같은 상품은 수량 합산, 최대 99)·수량변경·삭제 — 응답은 모두 장바구니 전체 | ✅ |
 | GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록(Page, 최근 찜한 순)·찜(이미 있으면 그대로)·해제 | ✅ |
 
