@@ -1,0 +1,140 @@
+[
+  {
+    "id": 1,
+    "type": "work",
+    "name": "나루토",
+    "parentId": null
+  },
+  {
+    "id": 2,
+    "type": "work",
+    "name": "레트로 RPG",
+    "parentId": null
+  },
+  {
+    "id": 3,
+    "type": "work",
+    "name": "픽셀 게임",
+    "parentId": null
+  },
+  {
+    "id": 4,
+    "type": "work",
+    "name": "던전 크롤러",
+    "parentId": null
+  },
+  {
+    "id": 11,
+    "type": "character",
+    "name": "나루토",
+    "parentId": 1
+  },
+  {
+    "id": 12,
+    "type": "character",
+    "name": "오로치마루",
+    "parentId": 1
+  },
+  {
+    "id": 13,
+    "type": "character",
+    "name": "카카시",
+    "parentId": 1
+  },
+  {
+    "id": 14,
+    "type": "character",
+    "name": "슬라임",
+    "parentId": 2
+  },
+  {
+    "id": 15,
+    "type": "character",
+    "name": "용사",
+    "parentId": 2
+  },
+  {
+    "id": 16,
+    "type": "character",
+    "name": "마왕",
+    "parentId": 2
+  },
+  {
+    "id": 17,
+    "type": "character",
+    "name": "고스트",
+    "parentId": 3
+  },
+  {
+    "id": 18,
+    "type": "character",
+    "name": "미믹",
+    "parentId": 4
+  },
+  {
+    "id": 51,
+    "type": "style",
+    "name": "Retro",
+    "parentId": null
+  },
+  {
+    "id": 52,
+    "type": "style",
+    "name": "Cute",
+    "parentId": null
+  },
+  {
+    "id": 53,
+    "type": "style",
+    "name": "Neon",
+    "parentId": null
+  },
+  {
+    "id": 54,
+    "type": "style",
+    "name": "Dark",
+    "parentId": null
+  },
+  {
+    "id": 55,
+    "type": "style",
+    "name": "RPG",
+    "parentId": null
+  },
+  {
+    "id": 71,
+    "type": "product_type",
+    "name": "키캡",
+    "parentId": null
+  },
+  {
+    "id": 72,
+    "type": "product_type",
+    "name": "데스크매트",
+    "parentId": null
+  },
+  {
+    "id": 73,
+    "type": "product_type",
+    "name": "데스크 소품",
+    "parentId": null
+  },
+  {
+    "id": 74,
+    "type": "product_type",
+    "name": "굿즈",
+    "parentId": null
+  },
+  {
+    "id": 75,
+    "type": "product_type",
+    "name": "리빙",
+    "parentId": null
+  },
+  {
+    "id": 76,
+    "type": "product_type",
+    "name": "테크 액세서리",
+    "parentId": null
+  }
+]

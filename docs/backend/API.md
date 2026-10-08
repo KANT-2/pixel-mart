@@ -56,13 +56,13 @@
 | GET | /api/users/me/badges 🔒 | 내 뱃지 |
 
 ## PIXEL LOCAL — BE-A (3단계)
-| 메서드 | 경로 | 설명 |
-| --- | --- | --- |
-| GET | /api/regions?parent= | 지역 목록 (시 › 구 › 동·생활권) |
-| PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여·공개 여부 설정 |
-| GET | /api/interests?type=&q= | 취향 태그 검색 (작품·캐릭터·스타일·상품 종류) |
-| GET | /api/local/fandom?region=&interest=&period= | 덕력지도 집계 — 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, `isSample` |
-| GET | /api/local/fandom/ranking?region= | 지역 인기 취향 순위 (최소 기준 충족 항목만) |
-| GET · POST | /api/local/trades?region=&kind= 🔒(POST) | 거래·HAVE/WANT 글 (Prototype) |
-| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 지역 HAVE 매칭 (Mock 수준) |
-| GET | /api/local/wish-map?region= | 지역별 인기 찜 상품 익명 집계 (Prototype) |
+| 메서드 | 경로 | 설명 | 상태 |
+| --- | --- | --- | --- |
+| GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
+| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
+| GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
+| GET | /api/local/fandom?region=&interest=&period= | 덕력지도 집계 — 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, `isSample` |  |
+| GET | /api/local/fandom/ranking?region= | 지역 인기 취향 순위 (최소 기준 충족 항목만) |  |
+| GET · POST | /api/local/trades?region=&kind= 🔒(POST) | 거래·HAVE/WANT 글 (Prototype) |  |
+| GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 지역 HAVE 매칭 (Mock 수준) |  |
+| GET | /api/local/wish-map?region= | 지역별 인기 찜 상품 익명 집계 (Prototype) |  |

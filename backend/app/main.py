@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
-from app.routers import auth, cancel_requests, cart, faqs, health, orders, products, users, wishlist
+from app.routers import auth, cancel_requests, cart, faqs, health, local, orders, products, users, wishlist
 
 app = FastAPI(
     title="PIXEL MART API",
@@ -44,5 +44,6 @@ for router in (
     cancel_requests.dev_router,
     users.router,
     wishlist.router,
+    local.router,
 ):
     app.include_router(router, prefix="/api")

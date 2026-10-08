@@ -1,0 +1,248 @@
+[
+  {
+    "code": "11",
+    "level": "sido",
+    "parentCode": null,
+    "name": "서울특별시"
+  },
+  {
+    "code": "28",
+    "level": "sido",
+    "parentCode": null,
+    "name": "인천광역시"
+  },
+  {
+    "code": "41110",
+    "level": "sido",
+    "parentCode": null,
+    "name": "수원시"
+  },
+  {
+    "code": "41130",
+    "level": "sido",
+    "parentCode": null,
+    "name": "성남시"
+  },
+  {
+    "code": "41460",
+    "level": "sido",
+    "parentCode": null,
+    "name": "용인시"
+  },
+  {
+    "code": "11200",
+    "level": "sigungu",
+    "parentCode": "11",
+    "name": "성동구"
+  },
+  {
+    "code": "11200-01",
+    "level": "zone",
+    "parentCode": "11200",
+    "name": "성수동"
+  },
+  {
+    "code": "11440",
+    "level": "sigungu",
+    "parentCode": "11",
+    "name": "마포구"
+  },
+  {
+    "code": "11440-01",
+    "level": "zone",
+    "parentCode": "11440",
+    "name": "홍대·합정"
+  },
+  {
+    "code": "11440-02",
+    "level": "zone",
+    "parentCode": "11440",
+    "name": "연남동"
+  },
+  {
+    "code": "11650",
+    "level": "sigungu",
+    "parentCode": "11",
+    "name": "서초구"
+  },
+  {
+    "code": "11650-01",
+    "level": "zone",
+    "parentCode": "11650",
+    "name": "반포동"
+  },
+  {
+    "code": "11650-02",
+    "level": "zone",
+    "parentCode": "11650",
+    "name": "강남역"
+  },
+  {
+    "code": "11680",
+    "level": "sigungu",
+    "parentCode": "11",
+    "name": "강남구"
+  },
+  {
+    "code": "11680-01",
+    "level": "zone",
+    "parentCode": "11680",
+    "name": "역삼동"
+  },
+  {
+    "code": "11680-02",
+    "level": "zone",
+    "parentCode": "11680",
+    "name": "삼성동"
+  },
+  {
+    "code": "11680-03",
+    "level": "zone",
+    "parentCode": "11680",
+    "name": "신사동"
+  },
+  {
+    "code": "11710",
+    "level": "sigungu",
+    "parentCode": "11",
+    "name": "송파구"
+  },
+  {
+    "code": "11710-01",
+    "level": "zone",
+    "parentCode": "11710",
+    "name": "잠실"
+  },
+  {
+    "code": "11710-02",
+    "level": "zone",
+    "parentCode": "11710",
+    "name": "문정동"
+  },
+  {
+    "code": "28185",
+    "level": "sigungu",
+    "parentCode": "28",
+    "name": "연수구"
+  },
+  {
+    "code": "28185-01",
+    "level": "zone",
+    "parentCode": "28185",
+    "name": "송도"
+  },
+  {
+    "code": "28237",
+    "level": "sigungu",
+    "parentCode": "28",
+    "name": "부평구"
+  },
+  {
+    "code": "28237-01",
+    "level": "zone",
+    "parentCode": "28237",
+    "name": "부평역"
+  },
+  {
+    "code": "41115",
+    "level": "sigungu",
+    "parentCode": "41110",
+    "name": "팔달구"
+  },
+  {
+    "code": "41115-01",
+    "level": "zone",
+    "parentCode": "41115",
+    "name": "인계동"
+  },
+  {
+    "code": "41117",
+    "level": "sigungu",
+    "parentCode": "41110",
+    "name": "영통구"
+  },
+  {
+    "code": "41117-01",
+    "level": "zone",
+    "parentCode": "41117",
+    "name": "광교"
+  },
+  {
+    "code": "41117-02",
+    "level": "zone",
+    "parentCode": "41117",
+    "name": "영통동"
+  },
+  {
+    "code": "41131",
+    "level": "sigungu",
+    "parentCode": "41130",
+    "name": "수정구"
+  },
+  {
+    "code": "41131-01",
+    "level": "zone",
+    "parentCode": "41131",
+    "name": "신흥동"
+  },
+  {
+    "code": "41135",
+    "level": "sigungu",
+    "parentCode": "41130",
+    "name": "분당구"
+  },
+  {
+    "code": "41135-01",
+    "level": "zone",
+    "parentCode": "41135",
+    "name": "판교"
+  },
+  {
+    "code": "41135-02",
+    "level": "zone",
+    "parentCode": "41135",
+    "name": "정자동"
+  },
+  {
+    "code": "41135-03",
+    "level": "zone",
+    "parentCode": "41135",
+    "name": "서현동"
+  },
+  {
+    "code": "41135-04",
+    "level": "zone",
+    "parentCode": "41135",
+    "name": "야탑동"
+  },
+  {
+    "code": "41463",
+    "level": "sigungu",
+    "parentCode": "41460",
+    "name": "기흥구"
+  },
+  {
+    "code": "41463-01",
+    "level": "zone",
+    "parentCode": "41463",
+    "name": "보정동"
+  },
+  {
+    "code": "41465",
+    "level": "sigungu",
+    "parentCode": "41460",
+    "name": "수지구"
+  },
+  {
+    "code": "41465-01",
+    "level": "zone",
+    "parentCode": "41465",
+    "name": "죽전"
+  },
+  {
+    "code": "41465-02",
+    "level": "zone",
+    "parentCode": "41465",
+    "name": "동천동"
+  }
+]
