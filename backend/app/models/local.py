@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String, func
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -39,3 +39,14 @@ class UserInterest(Base):
     )
     # 덕력지도 집계 기간(최근 30일·90일) 필터용 — 취향을 고른 시각
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class FandomSample(Base):
+    """Cold Start용 Mock 집계 — 실제 사용자 데이터가 없는 칸만 채우고 응답에 isSample로 표시"""
+
+    __tablename__ = "fandom_samples"
+    __table_args__ = (CheckConstraint("count >= 0", name="count"),)
+
+    region_code: Mapped[str] = mapped_column(ForeignKey("regions.code", ondelete="CASCADE"), primary_key=True)
+    interest_id: Mapped[int] = mapped_column(ForeignKey("interests.id", ondelete="CASCADE"), primary_key=True)
+    count: Mapped[int] = mapped_column(Integer)

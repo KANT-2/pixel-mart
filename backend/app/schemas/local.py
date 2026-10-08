@@ -36,3 +36,25 @@ class LocalProfileOut(CamelModel):
     interests: list[InterestOut]
     fandom_opt_in: bool
     profile_public: bool
+
+
+class FandomOut(CamelModel):
+    """덕력지도 한 칸 — 지역 × 취향 인원. 사용자 목록·이름·위치는 절대 포함하지 않는다"""
+
+    region_code: str
+    region_name: str
+    interest_id: int
+    interest: str
+    interest_type: str
+    count: int | None = Field(description="5명 미만이면 null")
+    below_threshold: bool = Field(description="true면 화면에 '5명 미만'으로 표시")
+    is_sample: bool = Field(description="true면 Cold Start용 샘플 데이터 — 화면에 '샘플' 표시")
+
+
+class FandomRankOut(CamelModel):
+    rank: int
+    interest_id: int
+    interest: str
+    interest_type: str
+    count: int
+    is_sample: bool

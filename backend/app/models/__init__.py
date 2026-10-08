@@ -2,7 +2,7 @@
 from app.models.cancel_request import CancelRequest
 from app.models.cart import CartItem
 from app.models.faq import Faq
-from app.models.local import Interest, Region, UserInterest
+from app.models.local import FandomSample, Interest, Region, UserInterest
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
 from app.models.user import User
@@ -12,6 +12,7 @@ __all__ = [
     "CancelRequest",
     "CartItem",
     "Category",
+    "FandomSample",
     "Faq",
     "Interest",
     "Order",
