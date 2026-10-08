@@ -31,8 +31,8 @@
 | POST | /api/dev/cancel-requests/{id}/approve | [로컬 전용] 취소 승인 → 주문 취소 완료 | ✅ |
 | POST | /api/dev/cancel-requests/{id}/reject | [로컬 전용] 취소 거절 → 신청 직전 상태로 복귀 | ✅ |
 | POST | /api/dev/orders/{id}/advance | [로컬 전용] 배송 단계 진행 | ✅ |
-| GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 |  |
-| POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) |  |
+| GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 | ✅ |
+| POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) | ✅ |
 | GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) |  |
 | POST | /api/products/{id}/questions 🔒 | 문의 작성 |  |
 | GET | /api/faqs?category= | FAQ | ✅ |
