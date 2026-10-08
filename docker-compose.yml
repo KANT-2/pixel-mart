@@ -1,0 +1,16 @@
+# 로컬 개발용 PostgreSQL (설치형 PostgreSQL이 없을 때만 사용)
+# 실행: docker compose up -d   →  backend/.env 의 DATABASE_URL 포트를 5433으로
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: pixelmart
+      POSTGRES_PASSWORD: pixelmart
+      POSTGRES_DB: pixelmart
+    ports:
+      - "5433:5432"
+    volumes:
+      - pixelmart-db:/var/lib/postgresql
+
+volumes:
+  pixelmart-db:
