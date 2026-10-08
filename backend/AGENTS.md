@@ -67,7 +67,7 @@ tests/test_<기능>.py 테스트
 ### 설계 원칙 (임의로 바꾸지 말 것 — `docs/backend/ARCHITECTURE.md`)
 - 로그인: FastAPI가 구글 OAuth 직접 처리 → `pm_session` httpOnly 쿠키(JWT). NextAuth 사용 안 함
 - 픽셀 아바타: 변환은 프론트(Canvas). 서버는 PNG data URL만 저장(50KB 이하). **얼굴 원본 사진을 서버에 받지 않는다**
-- PIXEL LOCAL: **GPS·정확한 위치 저장 금지**, 동네(시·군·구) 직접 선택, 집계는 **3명 미만 숨김**, 공개는 opt-in
+- PIXEL LOCAL: **GPS·정확한 위치 저장 금지**, 지역(시 › 구 › 동·생활권) 직접 선택, 집계는 **사용자 수 기준, 5명 미만은 숫자 비공개**, 공개는 opt-in (`docs/PIXEL_LOCAL_POLICY.md`, `docs/DUKRYEOK_MAP_POLICY.md`)
 - 작품·캐릭터는 텍스트 태그만. 공식 이미지·로고, 실존 브랜드·캐릭터 이름의 **판매 상품** 생성 금지
 - 주문은 결제 없는 가상 주문. 리뷰는 배송 완료 상품만
 - 토너먼트 규칙(상품 3~7개, DP ≤ 100, 중복 금지, 카테고리 제한, Zone, 투표 제한)은 **서버에서 검사**

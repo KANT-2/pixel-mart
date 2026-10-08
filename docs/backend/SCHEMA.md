@@ -70,8 +70,8 @@ erDiagram
 ## PIXEL LOCAL (BE-A, 3단계)
 | 테이블 | 주요 컬럼 | 비고 |
 | --- | --- | --- |
-| regions | code PK (행정구역 코드), sido, sigungu, name | Mock 시드 (예: 수도권 시·군·구) |
+| regions | code PK, level(`sido/sigungu/zone`), parent_code FK, name | Mock 시드 — 시 › 구 › 동·생활권 Zone(예: 성남시 › 분당구 › 판교) |
 | interests | id, type(`work/character/genre/collection`), name, parent_id | 작품 > 캐릭터 계층, 텍스트 태그만 |
 | user_interests | user_id FK, interest_id FK · PK | |
 | trade_posts | id, user_id FK, region_code FK, kind(`have/want`), product_id FK nullable, title, content, status(`open/done/hidden`), created_at | HAVE/WANT 매칭 |
-| (집계) | `region_code × interest_id` 인원 수 — 3명 미만 숨김 | 뷰 또는 쿼리로 계산 |
+| (집계) | `region_code × interest_id` **사용자 수**(중복 제거) — 5명 미만은 숫자 비공개 | 뷰 또는 쿼리로 계산, 상위 지역은 하위 합산 |

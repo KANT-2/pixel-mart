@@ -58,7 +58,7 @@
 | GET | /api/regions | 동네 목록 |
 | PUT | /api/users/me/local 🔒 | 내 동네·관심사·공개 여부 설정 |
 | GET | /api/interests?type=&q= | 작품·캐릭터 태그 검색 |
-| GET | /api/local/fandom?region=&interest= | 덕력지도 집계 (3명 미만 숨김) |
+| GET | /api/local/fandom?region=&interest= | 덕력지도 집계 (5명 미만은 숫자 대신 `belowThreshold: true`) |
 | GET · POST | /api/local/trades?region=&kind= 🔒(POST) | HAVE/WANT 거래글 |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 이웃 HAVE 매칭 |
 | GET | /api/local/wish-map?region= | 동네별 인기 찜 상품 집계 |
