@@ -2,10 +2,11 @@
 
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String, Text, false, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
+from app.models.product import Product
 
 
 class Region(Base):
@@ -50,3 +51,34 @@ class FandomSample(Base):
     region_code: Mapped[str] = mapped_column(ForeignKey("regions.code", ondelete="CASCADE"), primary_key=True)
     interest_id: Mapped[int] = mapped_column(ForeignKey("interests.id", ondelete="CASCADE"), primary_key=True)
     count: Mapped[int] = mapped_column(Integer)
+
+
+class TradePost(Base):
+    """거래(sell)·교환(have/want) 글 — 연락처·정확한 장소는 남기지 않고 당사자끼리 정한다 (Prototype)"""
+
+    __tablename__ = "trade_posts"
+    __table_args__ = (
+        CheckConstraint("kind IN ('have', 'want', 'sell')", name="kind"),
+        CheckConstraint("condition IN ('new', 'like_new', 'used')", name="condition"),
+        CheckConstraint("trade_method IN ('direct', 'delivery', 'both')", name="trade_method"),
+        CheckConstraint("status IN ('open', 'done', 'hidden')", name="status"),
+        CheckConstraint("price >= 0", name="price"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    region_code: Mapped[str] = mapped_column(ForeignKey("regions.code"), index=True)
+    kind: Mapped[str] = mapped_column(String(10))
+    product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id", ondelete="SET NULL"), index=True)
+    interest_id: Mapped[int | None] = mapped_column(ForeignKey("interests.id", ondelete="SET NULL"), index=True)
+    item_name: Mapped[str] = mapped_column(String(60))
+    condition: Mapped[str | None] = mapped_column(String(10))
+    price: Mapped[int | None] = mapped_column(Integer)
+    trade_method: Mapped[str] = mapped_column(String(10), default="direct")
+    content: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String(10), default="open", server_default="open")
+    is_sample: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    product: Mapped[Product | None] = relationship(lazy="joined")
+    interest: Mapped[Interest | None] = relationship(lazy="joined")
