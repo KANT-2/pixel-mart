@@ -12,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import insert
 
 from app.core.db import SessionLocal, engine
-from app.models import Category, Product
+from app.models import Category, Faq, Product
 
 SEED_DIR = Path(__file__).resolve().parent.parent / "seed"
 
@@ -24,6 +24,7 @@ def load(name: str) -> list[dict]:
 async def main() -> None:
     categories = load("categories.json")
     products = load("products.json")
+    faqs = load("faqs.json")
     slug_by_name = {c["name"]: c["slug"] for c in categories}
 
     async with SessionLocal() as db:
@@ -49,10 +50,15 @@ async def main() -> None:
         await db.execute(
             text("SELECT setval(pg_get_serial_sequence('products', 'id'), (SELECT MAX(id) FROM products))")
         )
+        for order, f in enumerate(faqs):
+            values = {**f, "sort_order": order}
+            stmt = insert(Faq).values(**values)
+            await db.execute(stmt.on_conflict_do_update(index_elements=[Faq.id], set_=values))
+        await db.execute(text("SELECT setval(pg_get_serial_sequence('faqs', 'id'), (SELECT MAX(id) FROM faqs))"))
         await db.commit()
 
     await engine.dispose()
-    print(f"시드 완료: 카테고리 {len(categories)}개, 상품 {len(products)}개")
+    print(f"시드 완료: 카테고리 {len(categories)}개, 상품 {len(products)}개, FAQ {len(faqs)}개")
 
 
 if __name__ == "__main__":

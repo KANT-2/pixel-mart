@@ -1,7 +1,7 @@
 """add cart_items
 
 Revision ID: 352a3f14b894
-Revises: 0001_init
+Revises: 83ddc494104f
 Create Date: 2026-10-08 16:21:09.940975
 """
 
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "352a3f14b894"
-down_revision: str | None = "0001_init"
+down_revision: str | None = "83ddc494104f"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
