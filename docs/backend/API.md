@@ -10,8 +10,8 @@
 | POST | /api/auth/dev-login | [로컬 전용] 이메일로 로그인 | ✅ |
 | POST | /api/auth/logout | 로그아웃 (쿠키 삭제) | ✅ |
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
-| GET | /api/auth/google/login | 구글 로그인 시작 | |
-| GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 | |
+| GET | /api/auth/google/login | 구글 로그인 시작 (키 없으면 503) | ✅ |
+| GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 (실패 시 `/?loginError=google`) | ✅ |
 | PATCH | /api/users/me 🔒 | 닉네임 변경 | |
 | PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB) | |
 | GET | /api/categories | 카테고리 6개 | ✅ |
