@@ -35,8 +35,9 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", close); };
   }, [open]);
 
-  const duplicates = new Set(interests.filter((item, _, all) => all.filter((other) => other.name === item.name).length > 1).map((item) => item.id));
-  const name = (item: ApiInterest) => duplicates.has(item.id) ? interestLabel(item) : item.name;
+  // 화면에는 이름만, 종류(캐릭터·작품 등)는 툴팁·스크린리더 이름으로
+  const name = (item: ApiInterest) => item.name;
+  const full = (item: ApiInterest) => interestLabel(item);
   const current = interests.find((item) => item.id === selected);
   const chips = [...quick.slice(0, 5)];
   if (current && !chips.some((item) => item.id === current.id)) chips.push(current);
@@ -48,7 +49,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
     <div role="group" aria-label="취향 필터" className="flex flex-wrap items-center gap-2">
       <button type="button" onClick={() => pick(null)} aria-pressed={selected === null} className={`${chip} ${chipState}`}>전체 · 동네 인기 취향</button>
       {chips.map((item) => <button key={item.id} type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
-        className={`${chip} ${chipState}`}>{name(item)}</button>)}
+        title={full(item)} aria-label={full(item)} className={`${chip} ${chipState}`}>{name(item)}</button>)}
       <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls={panelId}
         className={`${chip} border-frame bg-panel-2 text-ink hover:border-violet`}>
         <span aria-hidden="true">🔍 </span>취향 찾기{interests.length ? ` · ${interests.length}` : ""}
@@ -65,7 +66,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
       </div>
       <ul className="mt-3 grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3">
         {list.map((item) => <li key={item.id}>
-          <button type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
+          <button type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id} title={full(item)} aria-label={full(item)}
             className="w-full truncate rounded-md border-2 border-frame bg-night px-2.5 py-2 text-left text-sm hover:border-violet aria-pressed:border-lime aria-pressed:text-lime">
             {name(item)}
           </button>

@@ -83,6 +83,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
           <p className="mb-6 text-3xl font-extrabold text-lime">{formatPrice(product.price)}</p>
           <p className="mb-8 leading-relaxed text-sub">{product.description}</p>
 
+          <p className="mb-2 font-pixel text-xs tracking-widest text-violet">▶ ITEM STATS</p>
           <dl className="mb-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 pixel-panel p-5 text-sm">
             <dt className="text-dim">배송</dt>
             <dd>3만원 이상 무료배송 · 평일 오후 2시 이전 주문 시 당일 출고</dd>
@@ -94,7 +95,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
             <AddToCartButton productId={product.id} />
             <Link
               href="/products"
-              className="grid place-items-center rounded-lg border border-line px-6 py-3 font-bold text-sub transition-colors hover:border-violet/40 hover:text-ink"
+              className="btn-pixel grid place-items-center px-6 py-3 font-bold text-sub hover:text-ink"
             >
               목록으로
             </Link>

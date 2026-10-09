@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
 import HeroStage from "@/components/hero/HeroStage";
 import WorldMapTeaser from "@/components/home/WorldMapTeaser";
-import { getCategories, getProducts } from "@/lib/products";
+import { getProducts } from "@/lib/products";
 import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 
 // 카테고리가 골고루 보이도록 고른 추천 상품
@@ -22,20 +22,6 @@ async function RecommendedProducts() {
       )}
     </>
   );
-}
-
-// 카테고리 바로가기 — 카테고리 이름과 맞는 16×16 픽셀 아이콘 (tools/gen_category_icons.py)
-async function CategoryTiles() {
-  const { data } = await getCategories();
-  return <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-    {data.map((category) => <li key={category.slug}>
-      <Link href={`/products?category=${category.slug}`} className="btn-pixel group flex min-h-12 items-center gap-2.5 px-3 py-2">
-        {/* eslint-disable-next-line @next/next/no-img-element -- 작은 픽셀 SVG를 보간 없이 표시 */}
-        <img src={`/images/category-${category.slug}.svg`} alt="" width={32} height={32} className="size-8 shrink-0 [image-rendering:pixelated] transition-transform duration-150 group-hover:-translate-y-0.5" />
-        <span className="truncate text-sm font-bold">{category.name}</span>
-      </Link>
-    </li>)}
-  </ul>;
 }
 
 function SectionTitle({ quest, title, href }: { quest: string; title: string; href?: string }) {
@@ -89,14 +75,6 @@ export default function Home() {
 
         <Suspense fallback={<ProductSkeleton />}>
           <RecommendedProducts />
-        </Suspense>
-      </section>
-
-      {/* 카테고리 바로가기 */}
-      <section className="mx-auto max-w-6xl px-4 pb-14 md:px-8">
-        <SectionTitle quest="INVENTORY" title="장착할 아이템 · 카테고리 바로가기" />
-        <Suspense fallback={<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{Array.from({ length: 6 }, (_, i) => <div key={i} className="h-12 animate-pulse rounded-md bg-panel" />)}</div>}>
-          <CategoryTiles />
         </Suspense>
       </section>
 

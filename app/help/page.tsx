@@ -25,7 +25,7 @@ export default function HelpPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 md:px-8 md:py-14">
       <header className="mb-8">
-        <p className="mb-3 font-pixel text-xs tracking-widest text-mint">HELP DESK</p>
+        <p className="stage-kicker mb-3 font-pixel text-xs tracking-widest text-mint">HELP DESK</p>
         <h1 className="text-3xl font-extrabold md:text-4xl">무엇이 궁금하세요?</h1>
         <p className="mt-3 text-sm leading-relaxed text-sub">자주 묻는 질문에서 필요한 안내를 찾아보세요.</p>
       </header>
@@ -36,12 +36,12 @@ export default function HelpPage() {
 
       <section aria-label="다른 도움이 필요하세요?" className="mt-12 grid gap-4 sm:grid-cols-2">
         <Link href="/products" className="pixel-panel p-5 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">
-          <p className="mb-3 font-pixel text-xs text-mint">ITEM GUIDE</p>
+          <p className="stage-kicker mb-3 font-pixel text-xs text-mint">ITEM GUIDE</p>
           <h2 className="font-bold">상품 Q&A는 상품 상세에서</h2>
           <p className="mt-2 text-sm text-sub">궁금한 아이템을 찾아보세요 <span aria-hidden="true">→</span></p>
         </Link>
         <Link href="/mypage/orders" className="pixel-panel p-5 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">
-          <p className="mb-3 font-pixel text-xs text-mint">MY ITEMS</p>
+          <p className="stage-kicker mb-3 font-pixel text-xs text-mint">MY ITEMS</p>
           <h2 className="font-bold">주문·배송 확인은 마이페이지에서</h2>
           <p className="mt-2 text-sm text-sub">주문 내역 확인하기 <span aria-hidden="true">→</span></p>
         </Link>

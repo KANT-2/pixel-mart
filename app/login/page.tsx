@@ -12,7 +12,7 @@ async function LoginContent({ searchParams }: Pick<PageProps<"/login">, "searchP
 
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return <section className="mx-auto w-full max-w-md px-4 py-12 sm:py-20">
-    <p className="mb-3 font-pixel text-xs tracking-widest text-mint">WELCOME, PLAYER</p>
+    <p className="stage-kicker mb-3 font-pixel text-xs tracking-widest text-mint">WELCOME, PLAYER</p>
     <h1 className="text-3xl font-extrabold">로그인</h1>
     <p className="mb-8 mt-3 text-sm text-sub">로그인이 필요한 기능을 이용하려면 먼저 로그인해 주세요.</p>
     <Suspense fallback={<div role="status" aria-label="로그인 화면 준비 중" className="h-80 animate-pulse rounded-xl bg-panel" />}>
