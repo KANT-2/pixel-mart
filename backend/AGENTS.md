@@ -22,6 +22,7 @@ uvicorn app.main:app --reload --port 8000   # 서버
 alembic revision --autogenerate -m "add orders"   # 모델 변경 후 마이그레이션 생성
 alembic upgrade head                          # 마이그레이션 적용
 python -m scripts.seed                        # 상품·카테고리 시드 (재실행 안전)
+python -m scripts.seed_demo                   # (선택) 선물하기 시연용 데모 이웃·WANT 글 (재실행 안전)
 ruff check . && ruff format .                 # 린트·포맷
 pytest                                        # 테스트
 ```

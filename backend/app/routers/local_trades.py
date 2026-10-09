@@ -4,7 +4,7 @@ from math import ceil
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from app.deps import CurrentUser, DbSession, OptionalUser
 from app.models import Interest, Product, TradePost, User, Wishlist, WishSample
@@ -23,7 +23,7 @@ from app.schemas.product import ProductOut
 from app.services import local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, rollup
 from app.services.regions import RegionTree, load_tree
-from app.services.trade_rules import contains_private_info, normalize, same_item
+from app.services.trade_rules import DEMO_EMAIL_DOMAIN, contains_private_info, normalize, same_item
 
 router = APIRouter(prefix="/local", tags=["local"])
 
@@ -44,14 +44,15 @@ def post_out(post: TradePost, tree: RegionTree, viewer_id: int | None) -> TradeP
         region_name=tree.full_name(post.region_code),
         is_mine=post.user_id == viewer_id,
         is_sample=post.is_sample,
+        is_demo=post.author.email.endswith(DEMO_EMAIL_DOMAIN),
         created_at=post.created_at,
         author=author_out(post),
     )
 
 
 def author_out(post: TradePost) -> TradeAuthorOut | None:
-    """위시맵 닉네임 공개에 동의한 사람의 WANT 글만 작성자를 보여 준다 (샘플 글은 항상 익명)"""
-    if post.kind != "want" or post.is_sample or not post.author.nickname_public:
+    """닉네임 공개에 동의한 사람의 글(위시·HAVE·SELL)만 작성자를 보여 준다 (샘플 글은 항상 익명)"""
+    if post.is_sample or not post.author.nickname_public:
         return None
     return TradeAuthorOut(nickname=post.author.nickname, avatar_url=post.author.avatar_url)
 
@@ -70,12 +71,21 @@ async def list_trades(
     db: DbSession,
     viewer: OptionalUser,
     region: Annotated[str | None, Query(max_length=12)] = None,
-    kind: Literal["have", "want", "sell"] | None = None,
+    kind: Annotated[
+        list[Literal["have", "want", "sell"]] | None,
+        Query(description="글 종류, 여러 개면 kind=have&kind=sell (거래·교환 탭은 위시(want) 제외)"),
+    ] = None,
     product_id: Annotated[int | None, Query(alias="productId")] = None,
     interest_id: Annotated[int | None, Query(alias="interestId")] = None,
+    q: Annotated[
+        str | None,
+        Query(
+            min_length=1, max_length=40, description="물건 이름·연결 상품 이름·설명 일부 (사거나 팔고 싶은 물건 찾기)"
+        ),
+    ] = None,
     nickname: Annotated[
         str | None,
-        Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 WANT 글만"),
+        Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 글만"),
     ] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     size: Annotated[int, Query(ge=1, le=60)] = 12,
@@ -86,17 +96,28 @@ async def list_trades(
         if region not in tree.by_code:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "존재하지 않는 지역입니다.")
         filters.append(TradePost.region_code.in_(subtree(tree, region)))
-    if kind is not None:
-        filters.append(TradePost.kind == kind)
+    if kind:
+        filters.append(TradePost.kind.in_(kind))
     if product_id is not None:
         filters.append(TradePost.product_id == product_id)
     if interest_id is not None:
         filters.append(TradePost.interest_id == interest_id)
+    if q is not None and q.strip():
+        pattern = like_pattern(q.strip())
+        product_ids = select(Product.id).where(Product.name.ilike(pattern, escape="\\"))
+        filters.append(
+            or_(
+                TradePost.item_name.ilike(pattern, escape="\\"),
+                TradePost.content.ilike(pattern, escape="\\"),
+                TradePost.product_id.in_(product_ids),
+            )
+        )
     if nickname is not None and nickname.strip():
         author_ids = select(User.id).where(
             User.nickname_public.is_(True), User.nickname.ilike(like_pattern(nickname.strip()), escape="\\")
         )
-        filters += [TradePost.kind == "want", TradePost.is_sample.is_(False), TradePost.user_id.in_(author_ids)]
+        # 글 종류는 kind로 따로 거른다 (거래·교환 탭은 HAVE·SELL, 위시맵은 want)
+        filters += [TradePost.is_sample.is_(False), TradePost.user_id.in_(author_ids)]
 
     total = await db.scalar(select(func.count()).select_from(TradePost).where(*filters)) or 0
     posts = await db.scalars(

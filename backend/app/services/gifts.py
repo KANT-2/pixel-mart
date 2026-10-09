@@ -32,6 +32,11 @@ async def send_gift(
         raise GiftError(400, "내 글에는 선물할 수 없습니다.")
     if post.is_sample:
         raise GiftError(400, "샘플 글에는 선물할 수 없습니다.")
+    # 선물은 이웃이 위시한 PIXEL MART 상품 그대로만 (상품이 연결되지 않은 글에는 선물할 수 없다)
+    if post.product_id is None:
+        raise GiftError(400, "PIXEL MART 상품을 구하는 글에만 선물할 수 있습니다.")
+    if product_id != post.product_id:
+        raise GiftError(400, "이웃이 구하는 상품만 선물할 수 있습니다.")
     product = await db.get(Product, product_id)
     if product is None:
         raise GiftError(404, "상품을 찾을 수 없습니다.")

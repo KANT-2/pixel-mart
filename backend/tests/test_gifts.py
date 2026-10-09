@@ -97,7 +97,9 @@ async def test_send_and_both_boxes_stay_anonymous(users):
         ("have", {}, 400),
         ("sample", {}, 400),
         ("hidden", {}, 404),
-        ("open", {"productId": 999999}, 404),
+        ("open", {"productId": 999999}, 400),  # 구하는 상품이 아님
+        ("open", {"productId": PRODUCT + 1}, 400),
+        ("no-product", {}, 400),
         ("open", {"message": "010-1234-5678로 연락 주세요"}, 422),
         ("open", {"quantity": 0}, 422),
         ("open", {"quantity": 10}, 422),
@@ -107,6 +109,9 @@ async def test_send_rules(users, setup, body_patch, status):
     recipient = await users("gift-recipient@pixelmart.test")
     sender = await users("gift-sender@pixelmart.test")
     post_id = await want_post(sender if setup == "own" else recipient)
+    if setup == "no-product":
+        async with engine.begin() as conn:
+            await conn.execute(text("UPDATE trade_posts SET product_id = NULL WHERE id = :i"), {"i": post_id})
     if setup == "have":
         async with engine.begin() as conn:
             await conn.execute(

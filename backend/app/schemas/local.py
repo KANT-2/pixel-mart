@@ -30,7 +30,7 @@ class LocalProfileIn(CamelModel):
     fandom_opt_in: bool = Field(default=False, description="덕력지도 등 지역 익명 집계에 참여")
     profile_public: bool = Field(default=False, description="선택한 취향을 다른 사용자에게 공개")
     map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시 (5명 이상 지역에서만)")
-    nickname_public: bool = Field(default=False, description="위시맵 WANT 글에 닉네임·아바타 표시, 닉네임 검색 허용")
+    nickname_public: bool = Field(default=False, description="내 거래·위시 글에 닉네임·아바타 표시, 닉네임 검색 허용")
 
 
 class LocalProfileOut(CamelModel):
@@ -94,7 +94,7 @@ class TradeStatusIn(CamelModel):
 
 
 class TradeAuthorOut(CamelModel):
-    """위시맵 닉네임 공개에 동의한 작성자의 WANT 글에만 붙는다 (id·이메일·지역 상세 없음)"""
+    """닉네임 공개에 동의한 작성자의 글에만 붙는다 (id·이메일·지역 상세 없음)"""
 
     nickname: str
     avatar_url: str | None
@@ -117,8 +117,11 @@ class TradePostOut(CamelModel):
     region_name: str
     is_mine: bool
     is_sample: bool
+    is_demo: bool = Field(default=False, description="시연용 데모 이웃의 글 — 화면에 '데모 이웃' 표시")
     created_at: datetime
-    author: TradeAuthorOut | None = Field(default=None, description="WANT 글 + 작성자가 닉네임 공개에 동의했을 때만")
+    author: TradeAuthorOut | None = Field(
+        default=None, description="작성자가 닉네임 공개에 동의했을 때만 (샘플 글 제외)"
+    )
 
 
 class WishWantsOut(CamelModel):

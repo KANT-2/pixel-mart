@@ -72,7 +72,7 @@ async def wants(c: AsyncClient, **params) -> list[dict]:
     return res.json()["items"]
 
 
-async def test_author_only_for_opted_in_want_posts(users):
+async def test_author_only_for_opted_in_authors(users):
     hidden = await users("숨은픽셀")
     shown = await users("공개픽셀", public=True)
     await post(hidden)
@@ -82,7 +82,7 @@ async def test_author_only_for_opted_in_want_posts(users):
     rows = (await shown.get("/api/local/trades", params={"region": "WSW"})).json()["items"]
     by_id = {r["id"]: r["author"] for r in rows}
     assert by_id[shown_want] == {"nickname": "공개픽셀", "avatarUrl": None}
-    assert by_id[shown_have] is None  # HAVE·SELL은 계속 익명
+    assert by_id[shown_have] == {"nickname": "공개픽셀", "avatarUrl": None}  # 동의하면 HAVE·SELL도
     assert "숨은픽셀" not in json.dumps(rows)
 
 
@@ -93,6 +93,11 @@ async def test_nickname_search_matches_only_opted_in_authors(users):
 
     assert [r["author"]["nickname"] for r in await wants(viewer, nickname="픽셀곰")] == ["픽셀곰"]
     assert await wants(viewer, nickname="%") == []  # LIKE 와일드카드는 글자 그대로
+    # 거래·교환 탭: 동의한 이웃의 HAVE·SELL도 닉네임으로 찾는다
+    seller = await users("픽셀상인", public=True)
+    have = await post(seller, kind="have", name="교환할 키캡", product=None)
+    res = await viewer.get("/api/local/trades", params=[("nickname", "픽셀상인"), ("kind", "have"), ("kind", "sell")])
+    assert [r["id"] for r in res.json()["items"]] == [have]
     res = await viewer.get("/api/local/trades", params={"nickname": "x" * 31})
     assert res.status_code == 422
 
@@ -125,3 +130,36 @@ async def test_get_single_trade_hides_closed_posts_from_others(users):
     assert (await other.get(f"/api/local/trades/{post_id}")).status_code == 404
     assert (await owner.get(f"/api/local/trades/{post_id}")).status_code == 200
     assert (await other.get("/api/local/trades/99999999")).status_code == 404
+
+
+async def test_item_keyword_search(users):
+    """사거나 팔고 싶은 물건을 이름으로 — 물건 이름·연결 상품 이름·설명에서 찾는다"""
+    c = await users("검색러")
+    named = await post(c, name="반짝이 키링 구해요", product=None)
+    by_product = await post(c, name="그거", product=PRODUCT)  # 상품 이름으로만 찾을 수 있는 글
+    seller = await post(c, kind="sell", name="중고 장패드", product=None)
+
+    async def ids(q):
+        res = await c.get("/api/local/trades", params={"region": "WSW", "q": q})
+        assert res.status_code == 200, res.text
+        return {r["id"] for r in res.json()["items"]}
+
+    assert await ids("키링") == {named}
+    product_name = (await c.get(f"/api/local/trades/{by_product}")).json()["product"]["name"]
+    assert by_product in await ids(product_name[:3])
+    assert await ids("장패드") >= {seller}
+    assert await ids("%") == set()  # 와일드카드는 글자 그대로
+
+
+async def test_trades_filter_by_several_kinds(users):
+    """거래·교환 탭은 HAVE·SELL만 (위시는 위시맵 탭) — kind를 여러 번 넘긴다"""
+    c = await users("종류러")
+    have = await post(c, kind="have", name="교환할 키링", product=None)
+    sell = await post(c, kind="sell", name="팔 장패드", product=None)
+    wish = await post(c, name="구하는 무드등", product=None)
+    res = await c.get("/api/local/trades", params=[("region", "WSW"), ("kind", "have"), ("kind", "sell")])
+    ids = {r["id"] for r in res.json()["items"]}
+    assert {have, sell} <= ids and wish not in ids
+    one = await c.get("/api/local/trades", params={"region": "WSW", "kind": "want"})
+    assert {r["id"] for r in one.json()["items"]} == {wish}
+    assert (await c.get("/api/local/trades", params={"kind": "nope"})).status_code == 422
