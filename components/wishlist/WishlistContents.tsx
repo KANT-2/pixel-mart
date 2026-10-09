@@ -99,7 +99,7 @@ function WishlistGrid({ page, items }: WishlistGridProps) {
         className={`rounded-lg border border-line bg-panel px-4 py-2 text-sm font-semibold disabled:opacity-50 ${focusClass}`}>목록 새로고침</button>
     </div>
     <p className="mb-6 text-sm leading-relaxed text-sub">해제한 아이템은 이 화면에 잠시 남아요. 하트를 다시 누르면 복구할 수 있어요.</p>
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {pageItems.map(({ product }) => <li key={product.id} className="min-w-0">
         <ProductCard product={product} muted={!wishedIds.has(product.id)} />
         <p className="mt-2 min-h-10 px-1 text-xs leading-5 text-sub" aria-live="polite">
@@ -118,7 +118,7 @@ export function WishlistSkeleton() {
   return <div role="status" aria-label="찜한 아이템 불러오는 중">
     <span className="sr-only">찜한 아이템을 불러오고 있어요.</span>
     <div className="mb-6 h-10 w-40 animate-pulse rounded-lg bg-panel" />
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {[0, 1, 2, 3].map((key) => <div key={key} className="aspect-[3/4] animate-pulse rounded-2xl bg-panel" />)}
     </div>
   </div>;

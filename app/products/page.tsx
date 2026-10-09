@@ -88,7 +88,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
           <Link href="/products" className="mt-6 inline-block rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">필터 초기화</Link>
         </section>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
           {items.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
       )}

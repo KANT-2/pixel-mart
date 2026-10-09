@@ -4,7 +4,7 @@ interface ProductSkeletonProps {
 
 export function ProductSkeleton({ count = 4 }: ProductSkeletonProps) {
   return (
-    <div role="status" aria-label="상품을 불러오는 중" className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div role="status" aria-label="상품을 불러오는 중" className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: count }, (_, index) => (
         <div key={index} className="aspect-[3/4] animate-pulse rounded-2xl bg-panel" />
       ))}
