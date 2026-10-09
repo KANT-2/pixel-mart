@@ -60,7 +60,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
   return (
     <>
       <header className="mb-6">
-        <p className="mb-2 font-pixel text-xs tracking-widest text-mint">{category ? category.slug.toUpperCase() : "ALL ITEMS"}</p>
+        <p className="stage-kicker mb-2 font-pixel text-xs tracking-widest text-mint">{category ? category.slug.toUpperCase() : "ALL ITEMS"}</p>
         <h1 className="text-3xl font-extrabold">{category ? category.name : "전체 상품"}</h1>
         <p className="mt-2 break-words text-sm text-sub" aria-live="polite">
           {query.q ? `‘${query.q}’ 검색 결과 ${total}개` : `총 ${total}개`} · {page} / {totalPages} 페이지

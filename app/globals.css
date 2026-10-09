@@ -94,6 +94,11 @@ html {
     box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 1px 0 var(--color-shadow);
   }
 
+  /* 페이지 머리 라벨 — 퀘스트 표시 */
+  .stage-kicker::before {
+    content: "▶ ";
+  }
+
   /* 움푹 들어간 입력 칸 */
   .pixel-input {
     border: 2px solid var(--color-frame);
