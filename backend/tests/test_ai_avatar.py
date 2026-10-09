@@ -222,6 +222,25 @@ async def test_cloudflare_errors(client, cloudflare, upstream, status, message):
     assert "cf-token" not in res.text and "allocation" not in res.text and "boom" not in res.text
 
 
+async def test_cloudflare_retries_false_positive_safety_flag(client, cloudflare):
+    """출력 안전 필터(3030)는 시드에 따라 오탐 — 다른 시드로 다시 시도한다"""
+    await login(client)
+    flagged = httpx.Response(400, json={"errors": [{"code": 3030, "message": "flagged"}], "success": False})
+    answers = iter([flagged, httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})])
+    cloudflare(lambda request: next(answers))
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
+    assert res.status_code == 200
+    seeds = [r.content.split(b'name="seed"\r\n\r\n')[1].split(b"\r\n")[0] for r in cloudflare.calls]
+    assert len(seeds) == 2 and seeds[0] != seeds[1]
+
+
+async def test_cloudflare_gives_up_after_three_flags(client, cloudflare):
+    await login(client)
+    cloudflare(lambda request: httpx.Response(400, json={"errors": [{"code": 3030}], "success": False}))
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
+    assert res.status_code == 422 and len(cloudflare.calls) == 3
+
+
 def test_image_mime():
     assert ai_avatar.image_mime("/9j/4AAQ") == "image/jpeg"
     assert ai_avatar.image_mime(PIXEL) == "image/png"

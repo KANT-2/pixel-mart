@@ -9,6 +9,7 @@
 
 import base64
 import binascii
+import secrets
 import time
 from collections import defaultdict, deque
 
@@ -37,7 +38,7 @@ PROMPT = (
     "no anti-aliasing, no blur, no text, no frame, no shadow. "
     "Background: one flat solid magenta color (#FF00FF) everywhere outside the sprite. "
     "Center the sprite and show the whole body. "
-    "Keep it friendly and all-ages; never sexualize or make it violent."
+    "Keep it friendly and all-ages."
 )
 
 
@@ -163,16 +164,37 @@ async def _gemini(mime: str, encoded: str, client: httpx.AsyncClient | None) -> 
     return f"data:{out_mime};base64,{data}"
 
 
+FLAGGED = 3030  # Cloudflare 출력 안전 필터 — 같은 입력도 시드에 따라 오탐이 나서 다른 시드로 다시 시도
+CLOUDFLARE_ATTEMPTS = 3
+
+
+def _error_codes(response: httpx.Response) -> set[int]:
+    try:
+        errors = response.json().get("errors") or []
+    except (ValueError, AttributeError):
+        return set()
+    return {e.get("code") for e in errors if isinstance(e, dict)}
+
+
 async def _cloudflare(mime: str, encoded: str, client: httpx.AsyncClient | None) -> str:
     url = CLOUDFLARE_URL.format(account=settings.cloudflare_account_id, model=settings.cloudflare_image_model)
+    photo = base64.b64decode(encoded)
     extension = mime.split("/")[1]
-    response = await _post(
-        client,
-        url,
-        headers={"Authorization": f"Bearer {settings.cloudflare_api_token}"},
-        data={"prompt": PROMPT, "width": str(OUTPUT_SIDE), "height": str(OUTPUT_SIDE)},
-        files={"input_image_0": (f"photo.{extension}", base64.b64decode(encoded), mime)},
-    )
+    for _ in range(CLOUDFLARE_ATTEMPTS):
+        response = await _post(
+            client,
+            url,
+            headers={"Authorization": f"Bearer {settings.cloudflare_api_token}"},
+            data={
+                "prompt": PROMPT,
+                "width": str(OUTPUT_SIDE),
+                "height": str(OUTPUT_SIDE),
+                "seed": str(secrets.randbelow(2**31)),
+            },
+            files={"input_image_0": (f"photo.{extension}", photo, mime)},
+        )
+        if response.status_code != 400 or FLAGGED not in _error_codes(response):
+            break
     if response.status_code == 429:
         raise AiAvatarError(429, "오늘 AI 무료 사용량을 다 썼어요. 내일 다시 시도하거나 픽셀 캔버스로 만들어 보세요.")
     if response.status_code in (400, 413):
