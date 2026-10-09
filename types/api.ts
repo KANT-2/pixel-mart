@@ -139,6 +139,7 @@ export interface ApiLocalProfile {
   fandomOptIn: boolean;
   profilePublic: boolean;
   mapAvatarOptIn: boolean;
+  nicknamePublic?: boolean;
 }
 
 export interface LocalProfileInput {
@@ -147,6 +148,7 @@ export interface LocalProfileInput {
   fandomOptIn: boolean;
   profilePublic: boolean;
   mapAvatarOptIn?: boolean;
+  nicknamePublic?: boolean;
 }
 
 /** 덕력지도 아바타 핀 — 동의한 이웃의 아바타만, 5명 미만은 비공개 (id·닉네임 없음) */
@@ -211,6 +213,8 @@ export interface ApiTradePost {
   isMine: boolean;
   isSample: boolean;
   createdAt: string;
+  /** 위시맵 닉네임 공개에 동의한 사람의 WANT 글에만 (그 외 null) */
+  author?: { nickname: string; avatarUrl: string | null } | null;
 }
 
 export interface ApiTradeMatch {
@@ -219,6 +223,9 @@ export interface ApiTradeMatch {
   proximity: TradeProximity;
   mutual: boolean;
 }
+
+/** 위시맵 지역 블록 하나의 진행 중 WANT 글 수 (하위 지역 포함) */
+export interface ApiWishWants { regionCode: string; count: number; images: (string | null)[]; sample: boolean; }
 
 export interface ApiWishMapItem { rank: number; product: ApiProduct; count: number; isSample?: boolean; }
 
