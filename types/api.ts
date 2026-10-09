@@ -39,3 +39,8 @@ export interface ApiCart {
   totalQuantity: number;
   totalPrice: number;
 }
+
+export interface ApiWishlistItem {
+  product: ApiProduct;
+  createdAt: string;
+}

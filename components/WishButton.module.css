@@ -1,0 +1,13 @@
+.pulse {
+  animation: wish-pop 240ms steps(2, end) 1;
+}
+
+@keyframes wish-pop {
+  0%, 100% { transform: scale(1); }
+  40% { transform: scale(1.2) translateY(-2px); }
+  70% { transform: scale(0.95); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse { animation: none; }
+}
