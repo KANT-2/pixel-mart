@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import CartButton from "@/components/CartButton";
 import HeaderShortcuts from "@/components/HeaderShortcuts";
-import HeaderSearch from "@/components/HeaderSearch";
 import UserMenu from "@/components/UserMenu";
 import HeaderNav, { HeaderNavFallback } from "@/components/HeaderNav";
 
@@ -23,11 +22,6 @@ export default function Header() {
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
           <HeaderShortcuts />
           <CartButton />
-          <div className="h-10 w-10 shrink-0 lg:w-48 xl:w-56">
-            <Suspense fallback={<div role="status" aria-label="검색창 불러오는 중" className="h-full w-full animate-pulse rounded-lg bg-panel" />}>
-              <HeaderSearch />
-            </Suspense>
-          </div>
           <UserMenu compact />
         </div>
       </div>
