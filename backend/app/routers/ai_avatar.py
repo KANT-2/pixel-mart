@@ -9,12 +9,12 @@ router = APIRouter(prefix="/avatars", tags=["users"])
 
 @router.get("/ai", response_model=AiAvatarStatusOut, summary="AI 픽셀 아바타 사용 가능 여부·제공자 (동의 문구용)")
 async def ai_avatar_status():
-    name = ai_avatar.provider()
+    enabled = ai_avatar.is_configured()
     return AiAvatarStatusOut(
-        enabled=name is not None,
-        provider=name,
-        provider_name=ai_avatar.PROVIDER_NAMES.get(name) if name else None,
-        max_photo_side=ai_avatar.max_photo_side(name),
+        enabled=enabled,
+        provider="cloudflare" if enabled else None,
+        provider_name=ai_avatar.PROVIDER_NAME if enabled else None,
+        max_photo_side=ai_avatar.CLOUDFLARE_MAX_SIDE,
     )
 
 

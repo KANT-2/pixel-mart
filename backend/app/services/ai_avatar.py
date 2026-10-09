@@ -1,6 +1,6 @@
 """AI 픽셀 아바타 — 사진을 이미지 모델에 넘겨 픽셀아트 스프라이트로 다시 그린다.
 
-제공자: Cloudflare Workers AI(FLUX.2 klein, 무료 일일 할당)를 기본으로, 키가 없으면 Gemini.
+제공자: Cloudflare Workers AI(FLUX.2 klein, 무료 일일 할당). 키가 없으면 AI 만들기만 꺼진다.
 
 사진은 요청 처리 동안 메모리에서만 쓰고 저장·로그하지 않는다 (정책: docs/AVATAR_POLICY.md).
 결과 이미지도 저장하지 않고 돌려주며, 브라우저가 픽셀 격자로 정리한 뒤
@@ -17,13 +17,11 @@ import httpx
 
 from app.core.config import settings
 
-INTERACTIONS_URL = "https://generativelanguage.googleapis.com/v1beta/interactions"
 CLOUDFLARE_URL = "https://api.cloudflare.com/client/v4/accounts/{account}/ai/run/{model}"
 # FLUX.2 klein은 참고 이미지가 512x512보다 작아야 한다 — 브라우저가 긴 변을 이 크기로 줄여 보낸다
 CLOUDFLARE_MAX_SIDE = 504
-GEMINI_MAX_SIDE = 1024
 OUTPUT_SIDE = 512  # 브라우저가 48칸 격자로 다시 줄이므로 크게 받을 필요가 없다(무료 할당 절약)
-PROVIDER_NAMES = {"cloudflare": "Cloudflare Workers AI", "gemini": "Google Gemini"}
+PROVIDER_NAME = "Cloudflare Workers AI"
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_PHOTO_BYTES = 4 * 1024 * 1024
 TIMEOUT_SECONDS = 90
@@ -42,17 +40,8 @@ PROMPT = (
 )
 
 
-def provider() -> str | None:
-    """설정된 제공자 — Cloudflare 값이 있으면 cloudflare, 아니면 Gemini 키가 있으면 gemini, 둘 다 없으면 None"""
-    if settings.cloudflare_account_id and settings.cloudflare_api_token:
-        return "cloudflare"
-    if settings.gemini_api_key:
-        return "gemini"
-    return None
-
-
-def max_photo_side(name: str | None) -> int:
-    return CLOUDFLARE_MAX_SIDE if name == "cloudflare" else GEMINI_MAX_SIDE
+def is_configured() -> bool:
+    return bool(settings.cloudflare_account_id and settings.cloudflare_api_token)
 
 
 class AiAvatarError(Exception):
@@ -100,21 +89,6 @@ def decode_photo(data_url: str) -> tuple[str, str]:
     return mime, encoded
 
 
-def find_image(payload: object) -> tuple[str, str] | None:
-    """응답 JSON 어디에 있든 첫 이미지 블록({type: image, data})을 찾는다 (steps·output_image 형식 모두)"""
-    if isinstance(payload, dict):
-        if payload.get("type") == "image" and isinstance(payload.get("data"), str):
-            return payload.get("mime_type") or payload.get("mimeType") or "image/png", payload["data"]
-        for value in payload.values():
-            if found := find_image(value):
-                return found
-    elif isinstance(payload, list):
-        for value in payload:
-            if found := find_image(value):
-                return found
-    return None
-
-
 def image_mime(data: str) -> str:
     """base64 앞부분으로 형식 판별 (PNG·JPEG·WebP)"""
     if data.startswith("iVBOR"):
@@ -141,27 +115,6 @@ async def _post(client: httpx.AsyncClient | None, url: str, **kwargs) -> httpx.R
     finally:
         if own_client:
             await client.aclose()
-
-
-async def _gemini(mime: str, encoded: str, client: httpx.AsyncClient | None) -> str:
-    body = {
-        "model": settings.gemini_image_model,
-        "input": [{"type": "text", "text": PROMPT}, {"type": "image", "mime_type": mime, "data": encoded}],
-        "response_format": {"type": "image", "aspect_ratio": "1:1", "image_size": "1K"},
-    }
-    headers = {"x-goog-api-key": settings.gemini_api_key, "Content-Type": "application/json"}
-    response = await _post(client, INTERACTIONS_URL, json=body, headers=headers)
-    if response.status_code == 429:
-        raise AiAvatarError(429, "AI 사용량이 많아요. 잠시 후 다시 시도해 주세요.")
-    if response.status_code >= 400:
-        # 응답 본문(키·사진 포함 가능성)은 로그·메시지에 남기지 않는다
-        raise AiAvatarError(502, FAILED)
-    found = find_image(response.json())
-    if found is None:
-        # 안전 필터 차단·인식 실패 등 이미지가 없는 응답
-        raise AiAvatarError(422, CANNOT_DRAW)
-    out_mime, data = found
-    return f"data:{out_mime};base64,{data}"
 
 
 FLAGGED = 3030  # Cloudflare 출력 안전 필터 — 같은 입력도 시드에 따라 오탐이 나서 다른 시드로 다시 시도
@@ -215,10 +168,7 @@ async def _cloudflare(mime: str, encoded: str, client: httpx.AsyncClient | None)
 
 async def generate_pixel_avatar(photo_data_url: str, client: httpx.AsyncClient | None = None) -> str:
     """사진 → 픽셀아트 이미지 data URL. 사진·결과는 저장하지 않는다"""
-    name = provider()
-    if name is None:
+    if not is_configured():
         raise AiAvatarError(503, NOT_CONFIGURED)
     mime, encoded = decode_photo(photo_data_url)
-    if name == "cloudflare":
-        return await _cloudflare(mime, encoded, client)
-    return await _gemini(mime, encoded, client)
+    return await _cloudflare(mime, encoded, client)
