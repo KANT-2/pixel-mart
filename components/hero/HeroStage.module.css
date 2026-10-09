@@ -49,8 +49,18 @@
 }
 
 .avatar {
-  width: 75%;
+  /* 슬라임 자리 안에 비율 그대로 — 세로가 길면 세로, 가로가 길면 가로에 맞춘다 */
+  width: 100%;
   height: 100%;
+  object-position: center bottom;
+}
+
+.avatarLarge {
+  /* 면적 2배(한 변 √2배)까지, 발밑은 바닥에 맞춘다 */
+  flex-shrink: 0;
+  align-self: flex-end;
+  width: 141%;
+  height: 141%;
 }
 
 .slime {

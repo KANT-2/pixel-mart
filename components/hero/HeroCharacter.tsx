@@ -9,6 +9,8 @@ export default function HeroCharacter() {
   const { user, loading } = useAuth();
   const [jump, setJump] = useState(0);
   const [speaking, setSpeaking] = useState(false);
+  // 큰 아바타(긴 쪽 640)는 슬라임 면적의 2배까지 — 한 변 약 1.41배
+  const [large, setLarge] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => () => {
@@ -34,7 +36,8 @@ export default function HeroCharacter() {
         <span className={`${styles.characterBody} ${styles.bob}`}>
           <span key={jump} className={`${styles.characterBody} ${jump > 0 ? styles.jump : ""}`}>
             {user?.avatarUrl ? (
-              <PixelAvatar src={user.avatarUrl} alt="내 픽셀 아바타" className={styles.avatar} />
+              <PixelAvatar src={user.avatarUrl} alt="내 픽셀 아바타" className={`${styles.avatar} ${large ? styles.avatarLarge : ""}`}
+                onLoad={(event) => setLarge(Math.max(event.currentTarget.naturalWidth, event.currentTarget.naturalHeight) >= 640)} />
             ) : (
               // 투명 픽셀 SVG를 무대 좌표에 그대로 표시합니다.
               // eslint-disable-next-line @next/next/no-img-element
