@@ -1,0 +1,143 @@
+.stage {
+  position: relative;
+  isolation: isolate;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  background: var(--color-panel);
+}
+
+.background {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.layer {
+  position: absolute;
+  height: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.characterSlot {
+  position: absolute;
+  left: 31%;
+  top: 44.333%;
+  width: 28%;
+  height: 28%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.characterSlot:focus-visible {
+  outline: 3px solid var(--color-mint);
+  outline-offset: 8px;
+}
+
+.characterBody {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.avatar {
+  width: 75%;
+  height: 100%;
+}
+
+.slime {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.bob {
+  animation: bob 1.4s steps(2) infinite;
+}
+
+.star {
+  animation: twinkle 2.4s steps(2) infinite;
+}
+
+.coin {
+  animation: spin 1.2s steps(2) infinite;
+}
+
+.emptyHeart {
+  opacity: 0.3;
+}
+
+.jump {
+  animation: jump 0.6s steps(2) 1;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 2;
+  top: 22%;
+  left: 7%;
+  visibility: hidden;
+  margin: 0;
+  padding: 8px 10px;
+  border: 3px solid var(--color-mint);
+  background: var(--color-night);
+  color: var(--color-mint);
+  font-family: var(--font-pixel);
+  font-size: clamp(0.625rem, 1vw, 0.8rem);
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.bubble::after {
+  position: absolute;
+  right: -9px;
+  bottom: 8px;
+  width: 9px;
+  height: 9px;
+  background: var(--color-mint);
+  content: "";
+}
+
+.bubbleVisible {
+  visibility: visible;
+}
+
+.motionBoundary[data-motion-state="paused"] * {
+  animation-play-state: paused !important;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6%); }
+}
+
+@keyframes spin {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.4); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+@keyframes jump {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motionBoundary * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

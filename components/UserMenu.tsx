@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ApiError } from "@/lib/api";
+import PixelAvatar from "@/components/avatar/PixelAvatar";
 
 export default function UserMenu() {
   const { user, loading, pending, error, refresh, logout } = useAuth();
@@ -41,9 +42,12 @@ export default function UserMenu() {
         <button ref={trigger} type="button" aria-expanded={open} aria-controls={panelId}
           aria-label={`${user.nickname} 사용자 메뉴`} onClick={() => setOpen(!open)}
           className="flex h-10 w-full items-center gap-1.5 rounded-lg border border-line bg-panel px-2 text-sm">
-          {/* eslint-disable-next-line @next/next/no-img-element -- 사용자 아바타와 기존 픽셀 SVG를 그대로 표시 */}
-          <img src={user.avatarUrl && user.avatarUrl !== failedAvatar ? user.avatarUrl : "/images/slime-keyring.svg"}
-            onError={() => { if (user.avatarUrl) setFailedAvatar(user.avatarUrl); }} alt="" className="size-6 shrink-0 rounded object-cover" />
+          {user.avatarUrl && user.avatarUrl !== failedAvatar ? (
+            <PixelAvatar src={user.avatarUrl} onError={() => setFailedAvatar(user.avatarUrl)} className="size-6 shrink-0" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- 기존 픽셀 스프라이트 재사용
+            <img src="/images/hero-slime.svg" alt="" className="size-6 shrink-0 object-contain" />
+          )}
           <span className="min-w-0 flex-1 truncate">{user.nickname}</span><span aria-hidden="true">▾</span>
         </button>
       ) : (

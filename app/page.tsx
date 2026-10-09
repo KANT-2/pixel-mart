@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
+import HeroStage from "@/components/hero/HeroStage";
 import { getProducts } from "@/lib/products";
 import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 
@@ -54,12 +55,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* eslint-disable-next-line @next/next/no-img-element -- 과제 권장: 설정 없이 쓰는 일반 img */}
-        <img
-          src="/images/hero-scene.svg"
-          alt="성벽 위에서 검과 보물상자 옆에 서 있는 초록 슬라임"
-          className="aspect-[4/3] w-full rounded-2xl border border-line object-cover"
-        />
+        <HeroStage />
       </section>
 
       {/* 추천 상품 */}

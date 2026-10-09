@@ -13,6 +13,7 @@ interface AuthContextValue {
   login: (email: string, nickname?: string) => Promise<void>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
+  updateUser: (nextUser: ApiUser) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -25,6 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const sequence = useRef(0);
   const mutating = useRef(false);
   const { resetCart } = useCart();
+
+  const updateUser = useCallback((nextUser: ApiUser) => {
+    // 로그아웃 중이거나 다른 사용자의 오래된 저장 응답이면 반영하지 않습니다.
+    if (mutating.current) return;
+    ++sequence.current;
+    setUser((current) => current?.id === nextUser.id ? nextUser : current);
+  }, []);
 
   const refresh = useCallback((signal?: AbortSignal): Promise<void> => {
     if (mutating.current) return Promise.resolve();
@@ -88,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [resetCart]);
 
-  return <AuthContext.Provider value={{ user, loading, pending, error, login, logout, refresh }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, pending, error, login, logout, refresh, updateUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
