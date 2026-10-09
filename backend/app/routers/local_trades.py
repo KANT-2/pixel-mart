@@ -71,7 +71,10 @@ async def list_trades(
     db: DbSession,
     viewer: OptionalUser,
     region: Annotated[str | None, Query(max_length=12)] = None,
-    kind: Literal["have", "want", "sell"] | None = None,
+    kind: Annotated[
+        list[Literal["have", "want", "sell"]] | None,
+        Query(description="글 종류, 여러 개면 kind=have&kind=sell (거래·교환 탭은 위시(want) 제외)"),
+    ] = None,
     product_id: Annotated[int | None, Query(alias="productId")] = None,
     interest_id: Annotated[int | None, Query(alias="interestId")] = None,
     q: Annotated[
@@ -93,8 +96,8 @@ async def list_trades(
         if region not in tree.by_code:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "존재하지 않는 지역입니다.")
         filters.append(TradePost.region_code.in_(subtree(tree, region)))
-    if kind is not None:
-        filters.append(TradePost.kind == kind)
+    if kind:
+        filters.append(TradePost.kind.in_(kind))
     if product_id is not None:
         filters.append(TradePost.product_id == product_id)
     if interest_id is not None:

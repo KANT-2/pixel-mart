@@ -144,3 +144,17 @@ async def test_item_keyword_search(users):
     assert by_product in await ids(product_name[:3])
     assert await ids("장패드") >= {seller}
     assert await ids("%") == set()  # 와일드카드는 글자 그대로
+
+
+async def test_trades_filter_by_several_kinds(users):
+    """거래·교환 탭은 HAVE·SELL만 (위시는 위시맵 탭) — kind를 여러 번 넘긴다"""
+    c = await users("종류러")
+    have = await post(c, kind="have", name="교환할 키링", product=None)
+    sell = await post(c, kind="sell", name="팔 장패드", product=None)
+    wish = await post(c, name="구하는 무드등", product=None)
+    res = await c.get("/api/local/trades", params=[("region", "WSW"), ("kind", "have"), ("kind", "sell")])
+    ids = {r["id"] for r in res.json()["items"]}
+    assert {have, sell} <= ids and wish not in ids
+    one = await c.get("/api/local/trades", params={"region": "WSW", "kind": "want"})
+    assert {r["id"] for r in one.json()["items"]} == {wish}
+    assert (await c.get("/api/local/trades", params={"kind": "nope"})).status_code == 422
