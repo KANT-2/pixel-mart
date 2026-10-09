@@ -24,9 +24,10 @@ class ReviewOut(CamelModel):
     content: str
     nickname: str
     created_at: datetime
+    is_mine: bool = False  # 로그인한 사용자가 쓴 리뷰면 true (삭제 버튼 표시용)
 
     @classmethod
-    def from_model(cls, review: Review) -> "ReviewOut":
+    def from_model(cls, review: Review, viewer_id: int | None = None) -> "ReviewOut":
         return cls(
             id=review.id,
             product_id=review.product_id,
@@ -34,6 +35,7 @@ class ReviewOut(CamelModel):
             content=review.content,
             nickname=review.user.nickname,
             created_at=review.created_at,
+            is_mine=viewer_id is not None and review.user_id == viewer_id,
         )
 
 

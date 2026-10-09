@@ -53,6 +53,19 @@ async def create_review(db: AsyncSession, user: User, product_id: int, body: Rev
     return await db.scalar(select(Review).where(Review.id == review.id).execution_options(populate_existing=True))
 
 
+async def get_user_review(db: AsyncSession, user: User, product_id: int, review_id: int) -> Review | None:
+    """이 상품에 달린 '내' 리뷰 — 남의 리뷰·다른 상품의 리뷰는 None (존재 여부를 숨긴다)"""
+    return await db.scalar(
+        select(Review).where(Review.id == review_id, Review.product_id == product_id, Review.user_id == user.id)
+    )
+
+
+async def delete_review(db: AsyncSession, review: Review) -> None:
+    """리뷰 삭제 — 지우면 같은 상품에 다시 작성할 수 있다"""
+    await db.delete(review)
+    await db.commit()
+
+
 async def list_reviews(
     db: AsyncSession, product_id: int, page: int, size: int
 ) -> tuple[list[Review], int, float | None]:

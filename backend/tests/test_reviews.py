@@ -192,3 +192,57 @@ async def test_invalid_input_is_422_and_nothing_saved(client, payload):
     await buy(client, "review1@pixelmart.test")
     assert (await client.post(url(), json=payload)).status_code == 422
     assert (await client.get(url())).json()["total"] == 0
+
+
+# ---- 내 리뷰 표시 · 삭제 ----
+async def test_is_mine_only_for_the_author(client):
+    await buy(client, "review1@pixelmart.test")
+    created = (await client.post(url(), json=review())).json()
+    assert created["isMine"] is True
+    assert (await client.get(url())).json()["items"][0]["isMine"] is True
+
+    await login(client, "review2@pixelmart.test")  # 다른 사람
+    assert (await client.get(url())).json()["items"][0]["isMine"] is False
+    await client.post("/api/auth/logout")  # 비로그인
+    assert (await client.get(url())).json()["items"][0]["isMine"] is False
+
+
+async def test_delete_own_review_then_can_write_again(client):
+    await buy(client, "review1@pixelmart.test")
+    review_id = (await client.post(url(), json=review(5, "지울 리뷰"))).json()["id"]
+
+    res = await client.delete(f"{url()}/{review_id}")
+    assert res.status_code == 200
+    assert res.json()["message"] == "리뷰를 삭제했습니다."
+    body = (await client.get(url())).json()
+    assert body["total"] == 0
+    assert body["averageRating"] is None
+
+    again = await client.post(url(), json=review(3, "다시 씀"))  # 배송 완료 이력은 그대로라 다시 작성 가능
+    assert again.status_code == 201
+
+
+async def test_delete_requires_login(client):
+    await buy(client, "review1@pixelmart.test")
+    review_id = (await client.post(url(), json=review())).json()["id"]
+    await client.post("/api/auth/logout")
+    assert (await client.delete(f"{url()}/{review_id}")).status_code == 401
+
+
+async def test_cannot_delete_others_review_and_it_stays(client):
+    await buy(client, "review1@pixelmart.test")
+    review_id = (await client.post(url(), json=review())).json()["id"]
+
+    await login(client, "review2@pixelmart.test")
+    res = await client.delete(f"{url()}/{review_id}")
+    assert res.status_code == 404
+    assert res.json()["detail"] == "리뷰를 찾을 수 없습니다."
+    assert (await client.get(url())).json()["total"] == 1
+
+
+async def test_delete_with_wrong_product_or_unknown_id_is_404(client):
+    await buy(client, "review1@pixelmart.test")
+    review_id = (await client.post(url(), json=review())).json()["id"]
+    assert (await client.delete(f"{url(OTHER)}/{review_id}")).status_code == 404
+    assert (await client.delete(f"{url()}/999999")).status_code == 404
+    assert (await client.get(url())).json()["total"] == 1
