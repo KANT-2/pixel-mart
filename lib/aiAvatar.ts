@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { keyOutMagenta, opaqueBounds, snapToGrid, type PixelGridData } from "@/utils/pixelCanvas";
+import { keyOutBackground, opaqueBounds, snapToGrid, type PixelGridData } from "@/utils/pixelCanvas";
 import { despeckle, quantizeColors } from "@/utils/pixelate";
 import type { ApiAiAvatarStatus } from "@/types/api";
 
@@ -46,7 +46,7 @@ export async function requestAiAvatar(photo: string, signal?: AbortSignal): Prom
   return result.image;
 }
 
-/** AI가 그린 큰 이미지 → 배경(마젠타) 제거 → 캐릭터만 잘라 픽셀 격자로 → 색 16개로 정리 */
+/** AI가 그린 큰 이미지 → 테두리에서 이어진 단색 배경 제거(투명) → 캐릭터만 잘라 픽셀 격자로 → 색 16개로 정리 */
 export async function aiImageToGrid(image: string, longCells = 48): Promise<PixelGridData> {
   const element = await loadImage(image);
   const canvas = document.createElement("canvas");
@@ -56,7 +56,7 @@ export async function aiImageToGrid(image: string, longCells = 48): Promise<Pixe
   if (!context) throw new Error("이 브라우저에서는 이미지를 처리할 수 없어요.");
   context.drawImage(element, 0, 0);
   const data = context.getImageData(0, 0, canvas.width, canvas.height);
-  const keyed = keyOutMagenta(data.data);
+  const keyed = keyOutBackground(data.data, canvas.width, canvas.height);
   const bounds = opaqueBounds(keyed, canvas.width, canvas.height);
   if (!bounds) throw new Error("캐릭터를 찾지 못했어요. 다른 사진으로 다시 만들어 보세요.");
   const grid = snapToGrid(keyed, canvas.width, bounds, longCells);
