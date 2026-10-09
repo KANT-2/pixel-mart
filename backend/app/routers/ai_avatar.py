@@ -1,10 +1,21 @@
 from fastapi import APIRouter, HTTPException
 
 from app.deps import CurrentUser
-from app.schemas.ai_avatar import AiAvatarIn, AiAvatarOut
+from app.schemas.ai_avatar import AiAvatarIn, AiAvatarOut, AiAvatarStatusOut
 from app.services import ai_avatar
 
 router = APIRouter(prefix="/avatars", tags=["users"])
+
+
+@router.get("/ai", response_model=AiAvatarStatusOut, summary="AI 픽셀 아바타 사용 가능 여부·제공자 (동의 문구용)")
+async def ai_avatar_status():
+    name = ai_avatar.provider()
+    return AiAvatarStatusOut(
+        enabled=name is not None,
+        provider=name,
+        provider_name=ai_avatar.PROVIDER_NAMES.get(name) if name else None,
+        max_photo_side=ai_avatar.max_photo_side(name),
+    )
 
 
 @router.post("/ai", response_model=AiAvatarOut, summary="사진으로 AI 픽셀 아바타 만들기 (동의 필수, 저장 안 함)")
