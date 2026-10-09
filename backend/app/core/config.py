@@ -15,13 +15,10 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
     google_client_id: str = ""
     google_client_secret: str = ""
-    # AI 픽셀 아바타 — Cloudflare Workers AI(무료 일일 할당) 키가 있으면 그것을, 없으면 Gemini를 쓴다.
-    # 둘 다 없으면 AI 만들기만 꺼지고 나머지 기능은 그대로
+    # AI 픽셀 아바타 — Cloudflare Workers AI(무료 일일 할당). 값이 없으면 AI 만들기만 꺼지고 나머지 기능은 그대로
     cloudflare_account_id: str = ""
     cloudflare_api_token: str = ""
     cloudflare_image_model: str = "@cf/black-forest-labs/flux-2-klein-4b"
-    gemini_api_key: str = ""
-    gemini_image_model: str = "gemini-nano-banana-2.1"
     ai_avatar_per_hour: int = 10
 
     @property
