@@ -9,7 +9,7 @@ import RegionSelector from "@/components/local/RegionSelector";
 import FandomResults from "@/components/local/FandomResults";
 import { LocalError, LocalSkeleton, localInput } from "@/components/local/LocalStates";
 import { localApi } from "@/lib/local";
-import { FANDOM_PERIODS, localHref, parseLocalQuery } from "@/utils/local";
+import { FANDOM_PERIODS, interestLabel, localHref, parseLocalQuery } from "@/utils/local";
 import type { FandomPeriod } from "@/types/api";
 
 export default function FandomExplorer() {
@@ -39,7 +39,7 @@ export default function FandomExplorer() {
           {FANDOM_PERIODS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
         </select></label>
         <label htmlFor="local-interest" className="min-w-0 text-sm font-semibold">궁금한 취향<select id="local-interest" aria-label="궁금한 취향" value={interest?.id ?? ""} disabled={interests.loading || Boolean(interests.error)} onChange={(event) => navigate(selected?.code ?? null, query.period, event.target.value ? Number(event.target.value) : null)} className={`${localInput} mt-2`}>
-          <option value="">{interests.loading ? "취향 불러오는 중" : "전체 취향"}</option>{interests.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          <option value="">{interests.loading ? "취향 불러오는 중" : "전체 취향"}</option>{interests.data?.map((item) => <option key={item.id} value={item.id}>{interestLabel(item)}</option>)}
         </select></label>
       </div>
       {interests.error && <div className="mt-4"><LocalError message={interests.error} onRetry={() => void interests.refresh()} busy={interests.loading} /></div>}

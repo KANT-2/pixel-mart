@@ -1,5 +1,7 @@
 import { api } from "@/lib/api";
 import type { ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
+import type { ApiProduct, ApiTradePost, ApiTradeMatch, ApiWishMapItem, Page, TradeInput } from "@/types/api";
+import type { TradeQuery } from "@/utils/localTrades";
 
 const options = (signal?: AbortSignal): RequestInit => ({
   cache: "no-store", signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000),
@@ -17,6 +19,13 @@ export const localApi = {
     api.get<ApiFandom[]>(`/local/fandom?${query({ region, period, interest, limit: 200 })}`, options(signal)),
   ranking: (region: string, period: FandomPeriod, signal?: AbortSignal) =>
     api.get<ApiFandomRank[]>(`/local/fandom/ranking?${query({ region, period, limit: 10 })}`, options(signal)),
+  trades: (filters: TradeQuery, signal?: AbortSignal) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: filters.region || undefined, kind: filters.kind, productId: filters.productId, interestId: filters.interestId, page: filters.page, size: 12 })}`, options(signal)),
+  myTrades: (signal?: AbortSignal) => api.get<ApiTradePost[]>("/local/trades/mine", options(signal)),
+  createTrade: (input: TradeInput, signal?: AbortSignal) => api.post<ApiTradePost>("/local/trades", input, options(signal)),
+  tradeStatus: (id: number, status: "done" | "hidden", signal?: AbortSignal) => api.patch<ApiTradePost>(`/local/trades/${id}`, { status }, options(signal)),
+  matches: (signal?: AbortSignal) => api.get<ApiTradeMatch[]>("/local/trades/matches", options(signal)),
+  wishMap: (region: string, signal?: AbortSignal) => api.get<ApiWishMapItem[]>(`/local/wish-map?${query({ region, limit: 10 })}`, options(signal)),
+  searchProducts: (q: string, signal?: AbortSignal) => api.get<Page<ApiProduct>>(`/products?${query({ q: [...q.trim()].slice(0, 50).join(""), page: 1, size: 6 })}`, options(signal)),
 };
 
 export async function loadRegionCatalog(signal: AbortSignal): Promise<ApiRegion[]> {

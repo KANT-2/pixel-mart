@@ -1,0 +1,54 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useLocalSelection } from "@/components/local/useLocalSelection";
+import { useLocalResource } from "@/components/local/useLocalResource";
+import RegionSelector from "@/components/local/RegionSelector";
+import TradeCard from "@/components/local/TradeCard";
+import Pagination from "@/components/Pagination";
+import { LocalError, LocalSkeleton, localButton, localInput } from "@/components/local/LocalStates";
+import { localApi } from "@/lib/local";
+import { changeTradeQuery, parseTradeQuery, tradeHref, tradeProximity, tradeQueryParams, TRADE_KINDS, type TradeQuery } from "@/utils/localTrades";
+import type { ApiRegion, TradeKind } from "@/types/api";
+
+export default function TradesBoard() {
+  const params = useSearchParams(), router = useRouter();
+  const query = parseTradeQuery(params);
+  const selection = useLocalSelection(query);
+  const { catalog, profile, selected, loading, invalid } = selection;
+  if (catalog.error) return <LocalError message={catalog.error} onRetry={() => void catalog.refresh()} />;
+  if (loading || !catalog.data) return <LocalSkeleton label="거래 게시판 준비 중" />;
+  const effective = { ...query, region: selected?.code ?? null, hasRegion: true };
+  function change(patch: Partial<TradeQuery>) { router.push(tradeHref(changeTradeQuery(effective, patch)), { scroll: false }); }
+  return <div className="space-y-6">
+    {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택할 수 있어요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
+    <section aria-label="게시판 필터" className="space-y-4 rounded-xl border border-line bg-panel p-5">
+      <RegionSelector regions={catalog.data} value={selected?.code ?? null} onChange={(region) => change({ region })} />
+      {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
+      <label className="block max-w-xs text-sm font-semibold">글 종류<select aria-label="글 종류 필터" value={query.kind ?? ""} onChange={(event) => change({ kind: event.target.value as TradeKind || undefined })} className={`${localInput} mt-2`}><option value="">전체</option>{TRADE_KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
+      {(query.productId || query.interestId) && <div className="flex flex-wrap gap-2">{query.productId && <button type="button" onClick={() => change({ productId: undefined })} className={localButton}>연결 상품 조건 해제 ×</button>}{query.interestId && <button type="button" onClick={() => change({ interestId: undefined })} className={localButton}>취향 조건 해제 ×</button>}</div>}
+      <p className="text-xs text-dim">{selected ? "선택한 지역의 하위 지역까지 둘러봐요." : "전체 지역의 진행 중인 글을 둘러봐요."} 글은 저장된 내 동네로 작성돼요.</p>
+    </section>
+    <TradesResults key={tradeHref(effective)} query={effective} regions={catalog.data} ownRegion={profile.data?.region?.code ?? null} />
+  </div>;
+}
+interface TradesResultsProps { query: TradeQuery; regions: ApiRegion[]; ownRegion: string | null; }
+function TradesResults({ query, regions, ownRegion }: TradesResultsProps) {
+  const router = useRouter();
+  const load = useCallback((signal: AbortSignal) => localApi.trades(query, signal), [query]);
+  const result = useLocalResource(load);
+  const last = result.data?.totalPages ?? query.page;
+  useEffect(() => { if (result.data && query.page > last) router.replace(tradeHref({ ...query, page: Math.max(1, last) }), { scroll: false }); }, [result.data, query, last, router]);
+  if (result.loading || (result.data && query.page > last)) return <LocalSkeleton label="거래글 불러오는 중" />;
+  if (result.error) return <LocalError message={result.error} onRetry={() => void result.refresh()} />;
+  if (!result.data) return null;
+  const data = result.data;
+  return data.items.length ? <><p className="text-sm text-sub">진행 중인 글 {data.total}개 · 최신순</p>
+    <ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} /></li>)}</ul>
+    <Pagination currentPage={data.page} totalPages={data.totalPages} basePath="/local/trades" query={tradeQueryParams(query).toString()} />
+  </> : <div className="rounded-xl border border-line bg-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 구하는 물건을 남겨 보세요.</p>
+    <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=want" className={localButton}>WANT 글쓰기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
+  </div>;
+}
