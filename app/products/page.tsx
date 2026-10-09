@@ -36,9 +36,9 @@ export default function ProductsPage({ searchParams }: PageProps<"/products">) {
 async function ProductQueryBoundary({ searchParams }: ProductQueryProps) {
   const raw = await searchParams;
   const query = normalizeProductQuery(raw);
-  // API를 기다리기 전에 경계를 교체해 이전 조건의 상품이 남지 않게 합니다.
+  // 조건을 바꿔도 경계를 새로 만들지 않아, 새 결과가 준비될 때까지 지금 화면을 두었다가 한 번에 바꿉니다 (깜빡임 없음).
   return (
-    <Suspense key={productQueryParams(query).toString()} fallback={<ProductSkeleton count={PAGE_SIZE} />}>
+    <Suspense fallback={<ProductSkeleton count={PAGE_SIZE} />}>
       <ProductResults query={query} raw={raw} />
     </Suspense>
   );

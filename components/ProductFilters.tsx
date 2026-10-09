@@ -63,7 +63,7 @@ export default function ProductFilters({ query }: ProductFiltersProps) {
 
 
   const priceActive = query.minPrice !== undefined || query.maxPrice !== undefined;
-  const toolButton = "inline-flex h-10 shrink-0 items-center gap-1.5 btn-pixel px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime aria-expanded:border-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet";
+  const toolButton = "inline-flex h-10 shrink-0 items-center gap-1.5 btn-pixel toggle-outline px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime aria-expanded:border-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet";
 
   return (
     <section aria-label="상품 검색 및 필터" aria-busy={pending} className="mb-6 min-w-0">
