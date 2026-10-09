@@ -23,6 +23,8 @@ interface PixelMapProps {
   seedKey: string;
   onSelect: (code: string) => void;
   label: string;
+  /** 인원 표시 없이 이름만 (메인 미리보기) */
+  namesOnly?: boolean;
 }
 
 // 게임 맵 팔레트 — 서비스 지역 블록은 풀밭 계열, 나머지는 어두운 땅·바다
@@ -95,7 +97,7 @@ function decorations(rows: string[], seed: number) {
 
 const percent = (value: number, total: number) => `${(value / total) * 100}%`;
 
-export default function PixelMap({ view, blocks, selected, seedKey, onSelect, label }: PixelMapProps) {
+export default function PixelMap({ view, blocks, selected, seedKey, onSelect, label, namesOnly = false }: PixelMapProps) {
   const rows = useMemo(() => decodeView(view), [view]);
   const cells = useMemo(() => blockCells(rows, view.legend.length), [rows, view.legend.length]);
   const labels = useMemo(() => cells.map((list) => labelCell(list, rows)), [cells, rows]);
@@ -141,10 +143,10 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
       const block = blockByCode.get(code);
       if (!cell || !block) return null;
       return <button key={code} type="button" className={styles.label} aria-pressed={selected === code} onClick={() => onSelect(code)}
-        aria-label={`${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}명` : " · 소수의 이웃"}${block.sample ? " · 샘플 데이터" : ""}`}
+        aria-label={namesOnly ? `${block.name} 지도로 이동` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}명` : " · 소수의 이웃"}${block.sample ? " · 샘플 데이터" : ""}`}
         style={{ left: percent(cell[0] + 0.5, view.cols), top: percent(cell[1] + 0.5, view.rows) }}>
         <span className={`${styles.labelName} font-pixel`}>{block.name}</span>
-        {block.count ? <span className={styles.labelCount}>{block.count}</span> : <span className={styles.labelFew}>·</span>}
+        {!namesOnly && (block.count ? <span className={styles.labelCount}>{block.count}</span> : <span className={styles.labelFew}>·</span>)}
         {block.sample && <span aria-hidden="true" className="text-violet">*</span>}
       </button>;
     })}

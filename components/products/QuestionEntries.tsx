@@ -5,7 +5,7 @@ interface QuestionEntriesProps { items: QuestionView[]; }
 
 export default function QuestionEntries({ items }: QuestionEntriesProps) {
   return <ul aria-label="상품 질문 목록" className="space-y-3">
-    {items.map((question) => <li key={question.id} className="min-w-0 rounded-xl border border-line bg-panel p-5 sm:p-6">
+    {items.map((question) => <li key={question.id} className="min-w-0 pixel-panel p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
         <span className={`rounded border px-2 py-1 ${question.answered ? "border-mint/30 text-mint" : "border-line text-dim"}`}>{question.answered ? "답변 완료" : "답변 대기"}</span>
         <time dateTime={question.createdAt} className="text-dim">{formatDate(question.createdAt)}</time>

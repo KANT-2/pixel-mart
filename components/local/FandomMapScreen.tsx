@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import InterestFilter from "@/components/local/InterestFilter";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import { useLocalResource } from "@/components/local/useLocalResource";
@@ -11,11 +12,10 @@ import { LocalError, localButton, localInput } from "@/components/local/LocalSta
 import { loadMapBlocks } from "@/lib/fandomMapData";
 import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
-import { interestLabel, interestProductHref, localHref, localSettingsHref, parseLocalQuery } from "@/utils/local";
+import { interestProductHref, localHref, localSettingsHref, parseLocalQuery } from "@/utils/local";
 import { viewCodeFor, viewTrail } from "@/utils/localMap";
-import type { ApiFandomRank, ApiInterest, ApiRegion } from "@/types/api";
+import type { ApiFandomRank, ApiRegion } from "@/types/api";
 
-const chip = "shrink-0 rounded-full border-2 px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
 
 export default function FandomMapScreen() {
   const params = useSearchParams();
@@ -52,6 +52,10 @@ export default function FandomMapScreen() {
     else go(selected === code ? viewCode || "" : code); // 생활권은 선택/해제
   };
   const trail = viewTrail(viewCode, catalog);
+  // 칩은 내 취향, 없으면 지금 지도에서 인기 있는 취향 몇 개만 — 나머지는 '취향 찾기'에서
+  const saved = profile.data?.interests ?? [];
+  const popularNames = [...new Set((blocks.data ?? []).map((block) => block.topInterest).filter(Boolean))];
+  const quickInterests = saved.length ? saved : (interests.data ?? []).filter((item) => popularNames.includes(item.name)).slice(0, 5);
   const interestName = interests.data?.find((item) => item.id === query.interest)?.name;
 
   return <section className="mx-auto max-w-6xl px-4 pb-10 pt-3 md:px-8 md:pt-4">
@@ -73,16 +77,8 @@ export default function FandomMapScreen() {
     </div>
     {locator.message && <p role="status" className="mb-3 text-xs text-sub">{locator.message}</p>}
 
-    <div role="group" aria-label="취향 필터" className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:px-0">
-      <button type="button" onClick={() => go(focus ?? "", null)} aria-pressed={query.interest === null}
-        className={`${chip} border-line text-sub aria-pressed:border-lime aria-pressed:bg-lime aria-pressed:text-lime-ink`}>전체 · 동네 인기 취향</button>
-      {(interests.data ?? []).map((item: ApiInterest, _, all) => {
-        const duplicate = all.filter((other) => other.name === item.name).length > 1;
-        return <button key={item.id} type="button" onClick={() => go(focus ?? "", item.id)} aria-pressed={query.interest === item.id}
-          className={`${chip} border-line text-sub aria-pressed:border-lime aria-pressed:bg-lime aria-pressed:text-lime-ink`}>
-          {duplicate ? interestLabel(item) : item.name}</button>;
-      })}
-    </div>
+    <InterestFilter interests={interests.data ?? []} quick={quickInterests} selected={query.interest}
+      onSelect={(id) => go(focus ?? "", id)} />
 
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="mx-auto w-full" style={{ maxWidth: `calc((100dvh - 15rem) * ${view.cols / view.rows})` }}>
@@ -115,7 +111,7 @@ function RegionSearch({ regions, onPick }: RegionSearchProps) {
       autoComplete="off" role="combobox" aria-expanded={matches.length > 0} aria-controls="region-search-list"
       onKeyDown={(event) => { if (event.key === "Enter" && matches[0]) { event.preventDefault(); pick(matches[0].code); } if (event.key === "Escape") setText(""); }}
       className={localInput} />
-    {matches.length > 0 && <ul id="region-search-list" role="listbox" className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-lg border border-line bg-panel shadow-xl">
+    {matches.length > 0 && <ul id="region-search-list" role="listbox" className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden pixel-panel">
       {matches.map((region) => <li key={region.code} role="option" aria-selected={false}>
         <button type="button" onClick={() => pick(region.code)} className="block w-full px-3 py-2 text-left text-sm hover:bg-panel-2">{region.fullName}</button>
       </li>)}

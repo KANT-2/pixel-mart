@@ -7,13 +7,13 @@ export function TradeNotice() {
 }
 interface TradeLoginProps { next: string; }
 export function TradeLogin({ next }: TradeLoginProps) {
-  return <div className="rounded-xl border border-line bg-panel p-8 text-center"><h2 className="text-xl font-bold">로그인하고 내 거래·교환을 시작해 보세요</h2>
+  return <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">로그인하고 내 거래·교환을 시작해 보세요</h2>
     <p className="mt-3 text-sm text-sub">게시판과 Wish Map은 로그인 없이 둘러볼 수 있어요.</p>
     <Link href={`/login?next=${encodeURIComponent(safeNextPath(next))}`} className={`${localButton} mt-5`}>로그인</Link>
   </div>;
 }
 export function TradeRegionPrompt() {
-  return <div className="rounded-xl border border-line bg-panel p-8 text-center"><h2 className="text-xl font-bold">먼저 내 지역을 설정해 주세요.</h2>
+  return <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">먼저 내 지역을 설정해 주세요.</h2>
     <p className="mt-3 text-sm text-sub">글은 내 동네 설정에 저장한 지역으로 등록돼요.</p><Link href="/local/settings" className={`${localButton} mt-5`}>내 동네 설정</Link>
   </div>;
 }

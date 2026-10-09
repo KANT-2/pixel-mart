@@ -12,7 +12,7 @@ export default function TradeCard({ post, proximity = null, actions }: TradeCard
   // 응답이 확장돼도 작성자·계정·장소 필드를 카드로 넘겨 펼치지 않습니다.
   const itemName = containsContact(post.itemName) ? "연락처가 포함된 물건명은 표시하지 않아요" : post.itemName;
   const content = containsContact(post.content) ? "연락처가 포함된 내용은 표시하지 않아요." : post.content;
-  return <article aria-label={itemName} className="flex h-full min-w-0 flex-col rounded-xl border border-line bg-panel p-5">
+  return <article aria-label={itemName} className="flex h-full min-w-0 flex-col pixel-panel p-5">
     <div className="mb-4 flex flex-wrap gap-2 text-xs"><span className="rounded border border-violet/40 px-2 py-1 text-violet">{TRADE_KINDS.find((item) => item.value === post.kind)?.label}</span>
       <span className="rounded bg-panel-2 px-2 py-1 text-sub">{TRADE_STATUSES[post.status]}</span>
       {post.isSample && <span className="rounded border border-violet/40 px-2 py-1 text-violet">샘플 데이터</span>}

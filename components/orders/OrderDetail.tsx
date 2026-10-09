@@ -131,7 +131,7 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
         <div className="min-w-0 space-y-6">
           <OrderProgress order={order} />
-          <section aria-labelledby="ordered-items-title" className="overflow-hidden rounded-2xl border border-line bg-panel">
+          <section aria-labelledby="ordered-items-title" className="overflow-hidden pixel-panel">
             <h2 id="ordered-items-title" className="px-5 pt-5 text-lg font-extrabold sm:px-6">주문한 아이템</h2>
             <ul className="divide-y divide-line px-5 sm:px-6">
               {order.items.map((item) => <li key={item.product.id} className="flex items-start gap-4 py-5">
@@ -145,7 +145,7 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
                   <p className="mt-2 text-xs leading-relaxed text-sub">{formatPrice(item.unitPrice)} · {item.quantity}개</p>
                   <p className="mt-2 text-sm font-extrabold">{formatPrice(item.subtotal)}</p>
                   {order.status === "delivered" && <>
-                    <Link href={`/products/${item.product.id}#reviews`} className={`mt-3 inline-flex rounded-lg border border-line bg-panel-2 px-3 py-2 text-xs font-bold text-mint ${focusClass}`}>리뷰 쓰기</Link>
+                    <Link href={`/products/${item.product.id}#reviews`} className={`mt-3 inline-flex btn-pixel px-3 py-2 text-xs font-bold text-mint ${focusClass}`}>리뷰 쓰기</Link>
                   </>}
                 </div>
               </li>)}
@@ -156,10 +156,10 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
           {process.env.NODE_ENV === "development" && canAdvanceOrder(order.status) && !cancellationAccepted && <section className="rounded-xl border border-violet/30 bg-panel p-5">
             <p className="text-sm font-bold text-violet">개발용 · 배송 시연</p>
             <p className="mt-2 text-xs leading-relaxed text-sub">로컬 데모 주문의 배송을 다음 단계로 진행해요.</p>
-            <button type="button" disabled={blocked} onClick={() => { void mutate("advance"); }} className={`mt-4 rounded-lg border border-line bg-panel-2 px-4 py-3 text-sm font-bold disabled:opacity-50 ${focusClass}`}>{pending ? "처리 중…" : "다음 배송 단계로"}</button>
+            <button type="button" disabled={blocked} onClick={() => { void mutate("advance"); }} className={`mt-4 btn-pixel px-4 py-3 text-sm font-bold disabled:opacity-50 ${focusClass}`}>{pending ? "처리 중…" : "다음 배송 단계로"}</button>
           </section>}
         </div>
-        <aside aria-label="주문 배송지와 합계" className="min-w-0 rounded-2xl border border-line bg-panel p-5 lg:sticky lg:top-28">
+        <aside aria-label="주문 배송지와 합계" className="min-w-0 pixel-panel p-5 lg:sticky lg:top-28">
           <h2 className="text-lg font-extrabold">배송지</h2>
           <dl className="mt-5 space-y-4 text-sm">
             <div><dt className="text-sub">받는 사람</dt><dd className="mt-1 break-words font-semibold">{order.recipientName}</dd></div>
@@ -170,6 +170,6 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
         </aside>
       </div>
     </>}
-    <Link href="/mypage/orders" className={`inline-flex rounded-lg border border-line bg-panel px-5 py-3 text-sm font-bold ${focusClass}`}>← 주문 내역으로</Link>
+    <Link href="/mypage/orders" className={`inline-flex btn-pixel px-5 py-3 text-sm font-bold ${focusClass}`}>← 주문 내역으로</Link>
   </div>;
 }

@@ -23,10 +23,10 @@ export default function CartItemRow({ item, disabled = false }: CartItemRowProps
     finally { setDeleting(false); }
   }
 
-  return <li className="rounded-2xl border border-line bg-panel p-4 md:p-5">
+  return <li className="pixel-panel p-4 md:p-5">
     <article aria-label={`${product.name} 장바구니 상품`}>
       <div className="flex gap-4">
-        <Link href={`/products/${product.id}`} className="w-20 shrink-0 self-start overflow-hidden rounded-lg border border-line bg-panel-2 sm:w-24" aria-label={`${product.name} 상세 보기`}>
+        <Link href={`/products/${product.id}`} className="w-20 shrink-0 self-start overflow-hidden btn-pixel sm:w-24" aria-label={`${product.name} 상세 보기`}>
           {/* eslint-disable-next-line @next/next/no-img-element -- 상품 API 이미지 주소를 최적화 설정 없이 표시합니다. */}
           <img src={product.imageUrl} alt={product.name} className="aspect-square w-full object-cover" />
         </Link>

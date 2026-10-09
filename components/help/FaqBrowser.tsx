@@ -104,11 +104,11 @@ export default function FaqBrowser({ items, fallback }: FaqBrowserProps) {
 
   return (
     <div ref={container}>
-      {fallback && <p role="status" className="mb-6 rounded-xl border border-line bg-panel p-4 text-sm leading-relaxed text-sub">최신 FAQ를 불러오지 못해 기본 안내를 보여드리고 있어요. 잠시 후 새로고침해 주세요.</p>}
-      <form role="search" aria-label="FAQ 검색" onSubmit={(event) => event.preventDefault()} className="mb-5 rounded-2xl border border-line bg-panel p-4 sm:p-5">
+      {fallback && <p role="status" className="mb-6 pixel-panel p-4 text-sm leading-relaxed text-sub">최신 FAQ를 불러오지 못해 기본 안내를 보여드리고 있어요. 잠시 후 새로고침해 주세요.</p>}
+      <form role="search" aria-label="FAQ 검색" onSubmit={(event) => event.preventDefault()} className="mb-5 pixel-panel p-4 sm:p-5">
         <label htmlFor="faq-search" className="mb-2 block text-sm font-semibold text-sub">질문·답변 검색</label>
         <div className="relative">
-          <input ref={input} id="faq-search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 rounded-lg border border-line bg-night py-3 pr-12 pl-3 text-sm outline-none placeholder:text-dim focus-visible:ring-2 focus-visible:ring-violet [&::-webkit-search-cancel-button]:appearance-none" />
+          <input ref={input} id="faq-search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 pixel-input py-3 pr-12 pl-3 text-sm outline-none placeholder:text-dim focus-visible:ring-2 focus-visible:ring-violet [&::-webkit-search-cancel-button]:appearance-none" />
           {search && <button type="button" aria-label="검색어 지우기" onClick={() => { changeSearch(""); input.current?.focus(); }} className="absolute inset-y-0 right-0 w-11 rounded-lg text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet"><span aria-hidden="true">×</span></button>}
         </div>
       </form>
@@ -127,9 +127,9 @@ export default function FaqBrowser({ items, fallback }: FaqBrowserProps) {
           {visible.map((faq) => <FaqItem key={faq.id} faq={faq} query={search} open={openIds.has(faq.id)} onOpenChange={changeOpen} />)}
         </div>
       ) : (
-        <div className="rounded-2xl border border-line bg-panel p-8 text-center">
+        <div className="pixel-panel p-8 text-center">
           <p className="break-words font-semibold">{search.trim() ? `‘${search.trim()}’에 맞는 질문이 없어요` : "아직 등록된 질문이 없어요"}</p>
-          {search.trim() && <button type="button" onClick={() => { changeSearch(""); input.current?.focus(); }} className="mt-4 min-h-11 rounded-lg border border-line bg-panel-2 px-5 text-sm font-semibold text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">검색 초기화</button>}
+          {search.trim() && <button type="button" onClick={() => { changeSearch(""); input.current?.focus(); }} className="mt-4 min-h-11 btn-pixel px-5 text-sm font-semibold text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">검색 초기화</button>}
         </div>
       )}
     </div>

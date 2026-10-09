@@ -19,8 +19,8 @@ const sortLabels: Record<ProductQuery["sort"], string> = {
   price_asc: "낮은 가격순",
   price_desc: "높은 가격순",
 };
-const fieldClass = "min-w-0 rounded-lg border border-line bg-night px-3 py-2.5 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-violet";
-const secondaryClass = "min-h-11 rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm font-semibold text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet";
+const fieldClass = "min-w-0 pixel-input px-3 py-2.5 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-violet";
+const secondaryClass = "min-h-11 btn-pixel px-3 py-2 text-sm font-semibold text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet";
 
 export default function ProductFilters({ query, categories }: ProductFiltersProps) {
   const router = useRouter();
@@ -73,7 +73,7 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
   if (query.new) chips.push({ label: "NEW만 보기", patch: { new: undefined } });
 
   return (
-    <section aria-label="상품 검색 및 필터" aria-busy={pending} className="mb-6 min-w-0 rounded-2xl border border-line bg-panel p-4 sm:p-5">
+    <section aria-label="상품 검색 및 필터" aria-busy={pending} className="mb-6 min-w-0 pixel-panel p-4 sm:p-5">
       <fieldset disabled={pending} className="min-w-0 disabled:opacity-70">
       <form role="search" aria-label="상품 검색" onSubmit={submitSearch} className="flex min-w-0 gap-2">
         <div className="relative min-w-0 flex-1">
@@ -95,7 +95,7 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
             }}>×</button>
           )}
         </div>
-        <button type="submit" className="min-h-11 shrink-0 rounded-lg bg-lime px-4 text-sm font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">검색</button>
+        <button type="submit" className="min-h-11 shrink-0 btn-lime px-4 text-sm font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">검색</button>
       </form>
 
       <button type="button" aria-expanded={expanded} aria-controls={`${id}-filters`} className={`${secondaryClass} mt-3 flex w-full items-center justify-between sm:hidden`} onClick={() => setExpanded(!expanded)}>
@@ -136,7 +136,7 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
       {chips.length > 0 && (
         <div aria-label="적용된 필터" className="mt-4 flex min-w-0 flex-wrap items-center gap-2 border-t border-line pt-4">
           {chips.map((chip) => (
-            <Link key={Object.keys(chip.patch)[0]} href={productHref(changeProductQuery(query, chip.patch))} scroll={false} aria-label={`${chip.label} 필터 해제`} className="inline-flex min-h-10 max-w-full items-center gap-2 rounded-lg border border-line bg-panel-2 px-3 py-2 text-xs text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
+            <Link key={Object.keys(chip.patch)[0]} href={productHref(changeProductQuery(query, chip.patch))} scroll={false} aria-label={`${chip.label} 필터 해제`} className="inline-flex min-h-10 max-w-full items-center gap-2 btn-pixel px-3 py-2 text-xs text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
               <span className="max-w-56 truncate" title={chip.label}>{chip.label}</span><span aria-hidden="true" className="text-base">×</span>
             </Link>
           ))}

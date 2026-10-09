@@ -54,7 +54,7 @@ export default function AddToCartButton({ productId }: AddToCartButtonProps) {
       {currentQuantity > 0 && <p className="pb-2 text-xs text-dim">이미 {currentQuantity}개 담았어요 · {remaining}개 더 담을 수 있어요</p>}
     </div>}
     <button type="button" onClick={() => { void handleClick(); }} disabled={disabled}
-      className="w-full rounded-lg bg-lime px-6 py-4 font-extrabold text-lime-ink shadow-lg shadow-lime/20 transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
+      className="w-full btn-lime px-6 py-4 font-extrabold text-lime-ink disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">
       {adding ? "담는 중…" : "장바구니 담기"}
     </button>
     {remaining <= 0 && <p role="status" className="mt-3 text-sm text-sub">최대 수량을 담았어요</p>}

@@ -67,7 +67,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="aspect-square w-full rounded-2xl border border-line bg-panel object-cover"
+            className="aspect-square w-full pixel-panel object-cover"
           />
           {product.isNew && (
             <span className="absolute left-4 top-4 rounded bg-violet px-2.5 py-1 font-pixel text-sm text-night">NEW</span>
@@ -83,7 +83,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
           <p className="mb-6 text-3xl font-extrabold text-lime">{formatPrice(product.price)}</p>
           <p className="mb-8 leading-relaxed text-sub">{product.description}</p>
 
-          <dl className="mb-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-xl border border-line bg-panel p-5 text-sm">
+          <dl className="mb-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 pixel-panel p-5 text-sm">
             <dt className="text-dim">배송</dt>
             <dd>3만원 이상 무료배송 · 평일 오후 2시 이전 주문 시 당일 출고</dd>
             <dt className="text-dim">상품 번호</dt>

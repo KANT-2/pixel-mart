@@ -6,7 +6,7 @@ import PixelAvatar from "./PixelAvatar";
 
 export default function AvatarShortcut() {
   const { user, loading } = useAuth();
-  return <Link href="/mypage/avatar" className="mb-6 flex items-center gap-4 rounded-xl border border-line bg-panel p-5 text-left">
+  return <Link href="/mypage/avatar" className="mb-6 flex items-center gap-4 pixel-panel p-5 text-left">
     {loading ? <span className="size-16 shrink-0 animate-pulse bg-panel-2" /> : user?.avatarUrl ? (
       <PixelAvatar src={user.avatarUrl} className="size-16 shrink-0" />
     ) : (

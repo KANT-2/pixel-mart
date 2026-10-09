@@ -45,7 +45,7 @@ export default function QuantityInput({ value, onChange, label, max = 99, disabl
 
   return <div>
     <label htmlFor={id} className="mb-2 block text-sm text-dim">수량</label>
-    <div className="inline-flex overflow-hidden rounded-lg border border-line bg-night">
+    <div className="inline-flex overflow-hidden pixel-input">
       <button type="button" aria-label={`${label} 1개 줄이기`} disabled={disabled || stepValue <= 1}
         onPointerDown={(event) => event.preventDefault()} onClick={() => step(-1)} className={buttonClass}>−</button>
       <input id={id} type="text" inputMode="numeric" autoComplete="off" aria-label={label}

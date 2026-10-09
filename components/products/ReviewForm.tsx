@@ -64,7 +64,7 @@ function AccountReviewForm({ productId, onCreated, deleting = false }: ReviewFor
   if (expired) return <FeedbackLogin section="reviews" />;
   if (submitted) return <p role="status" className="rounded-xl border border-mint/30 bg-panel p-5 text-sm text-mint">리뷰를 등록했어요.</p>;
   const disabled = busy || authPending || deleting;
-  return <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-panel p-5 sm:p-6">
+  return <form onSubmit={submit} noValidate className="pixel-panel p-5 sm:p-6">
     <h3 className="text-lg font-bold">리뷰 쓰기</h3>
     <p className="mt-2 text-xs leading-relaxed text-sub">배송 완료한 상품에 한 번만 작성할 수 있어요. 작성 가능 여부는 등록할 때 확인해요.</p>
     <fieldset disabled={disabled} className="mt-5">
@@ -78,10 +78,10 @@ function AccountReviewForm({ productId, onCreated, deleting = false }: ReviewFor
       {errors.rating && <p id={`${id}-rating-error`} role="alert" className="mt-2 text-sm text-pink">{errors.rating}</p>}
     </fieldset>
     <label htmlFor={`${id}-content`} className="mb-2 mt-5 block text-sm font-semibold">리뷰 내용</label>
-    <textarea id={`${id}-content`} rows={4} maxLength={500} value={content} disabled={disabled} onChange={(event) => { setContent(event.target.value); setErrors((current) => ({ ...current, content: undefined })); }} aria-invalid={Boolean(errors.content)} aria-describedby={`${id}-count${errors.content ? ` ${id}-content-error` : ""}`} placeholder="사용해 본 느낌을 남겨 주세요." className="w-full min-w-0 resize-y rounded-lg border border-line bg-night p-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
+    <textarea id={`${id}-content`} rows={4} maxLength={500} value={content} disabled={disabled} onChange={(event) => { setContent(event.target.value); setErrors((current) => ({ ...current, content: undefined })); }} aria-invalid={Boolean(errors.content)} aria-describedby={`${id}-count${errors.content ? ` ${id}-content-error` : ""}`} placeholder="사용해 본 느낌을 남겨 주세요." className="w-full min-w-0 resize-y pixel-input p-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
     <p id={`${id}-count`} className="mt-1 text-right text-xs text-dim">{Array.from(content).length} / 500자</p>
     {errors.content && <p id={`${id}-content-error`} role="alert" className="mt-2 text-sm text-pink">{errors.content}</p>}
     {error && <p role="alert" className="mt-3 text-sm text-pink">{error}</p>}
-    <button disabled={disabled} type="submit" className="mt-4 min-h-11 rounded-lg bg-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "등록 중…" : "리뷰 등록"}</button>
+    <button disabled={disabled} type="submit" className="mt-4 min-h-11 btn-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "등록 중…" : "리뷰 등록"}</button>
   </form>;
 }

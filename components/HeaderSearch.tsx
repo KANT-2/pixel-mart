@@ -19,7 +19,7 @@ function SearchIcon() {
 
 function SearchForm({ query, onSubmit, inputRef, className = "" }: SearchFormProps) {
   return <form role="search" aria-label="헤더 상품 검색" onSubmit={onSubmit}
-    className={`h-10 min-w-0 items-center rounded-lg border border-line bg-panel focus-within:ring-2 focus-within:ring-violet ${className}`}>
+    className={`h-10 min-w-0 items-center pixel-input focus-within:ring-2 focus-within:ring-violet ${className}`}>
     <input ref={inputRef} name="q" type="search" aria-label="상품 검색어" placeholder="상품 검색" maxLength={50}
       defaultValue={query} className="h-full min-w-0 flex-1 rounded-lg bg-transparent px-3 text-sm text-ink outline-none placeholder:text-dim" />
     <button type="submit" aria-label="상품 검색 실행"
@@ -78,13 +78,13 @@ export default function HeaderSearch() {
     <SearchForm key={`desktop:${formKey}`} query={query} onSubmit={submit} className="hidden w-full lg:flex" />
     <button ref={trigger} type="button" aria-label="상품 검색 열기" aria-expanded={open} aria-controls={panelId}
       onClick={() => open ? close() : setOpen(true)}
-      className="grid size-10 place-items-center rounded-lg border border-line bg-panel text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet lg:hidden">
+      className="grid size-10 place-items-center btn-pixel text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet lg:hidden">
       <SearchIcon />
     </button>
     {open && <div id={panelId} className="absolute inset-x-4 top-3 z-60 flex h-10 gap-2 bg-night md:inset-x-8 lg:hidden">
       <SearchForm key={`mobile:${formKey}`} query={query} inputRef={mobileInput} onSubmit={submit} className="flex flex-1" />
       <button type="button" aria-label="상품 검색 닫기" onClick={close}
-        className="grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-panel text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
+        className="grid size-10 shrink-0 place-items-center btn-pixel text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
         <span aria-hidden="true" className="text-xl">×</span>
       </button>
     </div>}

@@ -30,17 +30,17 @@ export default function CancelRequestForm({ busy, onSubmit }: CancelRequestFormP
     setConfirmedReason(validated.value);
   };
 
-  return <section aria-labelledby={`${id}-title`} className="rounded-2xl border border-line bg-panel p-5 sm:p-6">
+  return <section aria-labelledby={`${id}-title`} className="pixel-panel p-5 sm:p-6">
     <h2 id={`${id}-title`} className="text-lg font-extrabold">주문 취소</h2>
     <p className="mt-2 text-sm leading-relaxed text-sub">배송이 시작되기 전에는 취소를 신청할 수 있어요.</p>
-    {!open ? <button type="button" disabled={busy} onClick={() => setOpen(true)} className={`mt-5 rounded-lg border border-line bg-panel-2 px-5 py-3 text-sm font-bold disabled:opacity-50 ${focusClass}`}>취소 신청</button> :
+    {!open ? <button type="button" disabled={busy} onClick={() => setOpen(true)} className={`mt-5 btn-pixel px-5 py-3 text-sm font-bold disabled:opacity-50 ${focusClass}`}>취소 신청</button> :
       <form onSubmit={prepare} noValidate className="mt-5 space-y-4">
         <div>
           <label htmlFor={`${id}-reason`} className="mb-2 block text-sm font-semibold">취소 사유</label>
           <textarea id={`${id}-reason`} value={reason} maxLength={200} rows={3} disabled={busy || confirmedReason !== null}
             aria-invalid={Boolean(error)} aria-describedby={`${id}-count${error ? ` ${id}-error` : ""}`}
             onChange={(event) => { setReason(event.target.value); setError(null); }} placeholder="취소 사유를 1~200자로 알려 주세요."
-            className={`block w-full resize-y rounded-lg border border-line bg-night px-3 py-3 text-sm leading-relaxed text-ink placeholder:text-dim disabled:opacity-70 ${focusClass}`} />
+            className={`block w-full resize-y pixel-input px-3 py-3 text-sm leading-relaxed text-ink placeholder:text-dim disabled:opacity-70 ${focusClass}`} />
           <p id={`${id}-count`} className="mt-2 text-right text-xs text-dim">{Array.from(reason).length} / 200자</p>
           {error && <p id={`${id}-error`} role="alert" className="mt-2 text-sm text-pink">{error}</p>}
         </div>

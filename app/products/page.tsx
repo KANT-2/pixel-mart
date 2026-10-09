@@ -75,7 +75,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
       )}
 
       {items.length === 0 ? (
-        <section className="rounded-2xl border border-line bg-panel px-5 py-12 text-center">
+        <section className="pixel-panel px-5 py-12 text-center">
           <h2 className="text-xl font-bold">다른 키워드로 찾아보세요</h2>
           <p className="mt-2 text-sm text-sub">가격 범위를 넓히거나 다른 카테고리의 아이템을 만나보세요.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
@@ -85,7 +85,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
               </Link>
             ))}
           </div>
-          <Link href="/products" className="mt-6 inline-block rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">필터 초기화</Link>
+          <Link href="/products" className="mt-6 inline-block btn-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">필터 초기화</Link>
         </section>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">

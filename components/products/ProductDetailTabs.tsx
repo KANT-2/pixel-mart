@@ -57,7 +57,7 @@ function DetailTabs({ productId, children }: ProductDetailTabsProps) {
         {tab === "info" ? "상품정보" : tab === "reviews" ? <>리뷰<span className="mt-1 block min-h-4 text-[11px] font-normal">{snapshot.data ? `★ ${snapshot.data.averageRating?.toFixed(1) ?? "—"} · ${snapshot.data.total}개` : snapshot.error ? "조회 실패" : "불러오는 중"}</span></> : <>Q&A{questions.mode === "demo" && <span className="mt-1 block text-[11px] font-normal text-violet">데모 데이터</span>}</>}
       </button>)}
     </div>
-    <div id="info" role="tabpanel" aria-labelledby={`product-${productId}-tab-info`} tabIndex={0} hidden={active !== "info"} className="rounded-xl border border-line bg-panel p-5 focus-visible:outline-2 focus-visible:outline-mint sm:p-6">{children}</div>
+    <div id="info" role="tabpanel" aria-labelledby={`product-${productId}-tab-info`} tabIndex={0} hidden={active !== "info"} className="pixel-panel p-5 focus-visible:outline-2 focus-visible:outline-mint sm:p-6">{children}</div>
     <div id="reviews" role="tabpanel" aria-labelledby={`product-${productId}-tab-reviews`} tabIndex={0} hidden={active !== "reviews"} className="focus-visible:outline-2 focus-visible:outline-mint"><ReviewsPanel productId={productId} snapshot={snapshot} load={reviews.load} /></div>
     <div id="qna" role="tabpanel" aria-labelledby={`product-${productId}-tab-qna`} tabIndex={0} hidden={active !== "qna"} className="focus-visible:outline-2 focus-visible:outline-mint"><QuestionsPanel productId={productId} /></div>
   </section>;
