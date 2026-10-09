@@ -24,21 +24,15 @@ async function RecommendedProducts() {
   );
 }
 
-// 카테고리 = 게임 인벤토리 슬롯 (기존 픽셀 스프라이트 재사용)
-const SLOT_SPRITES: Record<string, string> = {
-  keycap: "/images/hero-coin.svg", deskmat: "/images/hero-chest.svg", desk: "/images/hero-sword.svg",
-  goods: "/images/hero-heart.svg", living: "/images/hero-star.svg", tech: "/images/logo-invader.svg",
-};
-
-async function InventorySlots() {
+// 카테고리 바로가기 — 카테고리 이름과 맞는 16×16 픽셀 아이콘 (tools/gen_category_icons.py)
+async function CategoryTiles() {
   const { data } = await getCategories();
-  return <ul className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-    {data.map((category, index) => <li key={category.slug}>
-      <Link href={`/products?category=${category.slug}`} className="btn-pixel group flex aspect-square flex-col items-center justify-center gap-2 p-2 text-center">
-        <span className="font-pixel text-[10px] text-dim">{String(index + 1).padStart(2, "0")}</span>
+  return <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+    {data.map((category) => <li key={category.slug}>
+      <Link href={`/products?category=${category.slug}`} className="btn-pixel group flex min-h-12 items-center gap-2.5 px-3 py-2">
         {/* eslint-disable-next-line @next/next/no-img-element -- 작은 픽셀 SVG를 보간 없이 표시 */}
-        <img src={SLOT_SPRITES[category.slug] ?? "/images/hero-star.svg"} alt="" className="h-8 w-8 object-contain [image-rendering:pixelated] transition-transform duration-150 group-hover:-translate-y-1 sm:h-10 sm:w-10" />
-        <span className="text-xs font-bold sm:text-sm">{category.name}</span>
+        <img src={`/images/category-${category.slug}.svg`} alt="" width={32} height={32} className="size-8 shrink-0 [image-rendering:pixelated] transition-transform duration-150 group-hover:-translate-y-0.5" />
+        <span className="truncate text-sm font-bold">{category.name}</span>
       </Link>
     </li>)}
   </ul>;
@@ -58,7 +52,7 @@ export default function Home() {
   return (
     <>
       {/* 히어로 배너 */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-2 md:px-8 md:py-20">
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-8 pt-10 md:grid-cols-2 md:px-8 md:pb-12 md:pt-14">
         <div>
           <p className="mb-4 flex items-center gap-2 font-pixel text-sm tracking-widest text-mint">
             <span className="size-2 bg-mint" />
@@ -89,20 +83,20 @@ export default function Home() {
         <HeroStage />
       </section>
 
-      {/* 카테고리 인벤토리 */}
-      <section className="mx-auto max-w-6xl px-4 pb-14 md:px-8">
-        <SectionTitle quest="INVENTORY" title="장착할 아이템 고르기" />
-        <Suspense fallback={<div className="grid grid-cols-3 gap-3 sm:grid-cols-6">{Array.from({ length: 6 }, (_, i) => <div key={i} className="aspect-square animate-pulse rounded-md bg-panel" />)}</div>}>
-          <InventorySlots />
-        </Suspense>
-      </section>
-
       {/* 추천 상품 */}
       <section className="mx-auto max-w-6xl px-4 pb-14 md:px-8">
         <SectionTitle quest="QUEST · RECOMMENDED" title="추천 아이템" href="/products" />
 
         <Suspense fallback={<ProductSkeleton />}>
           <RecommendedProducts />
+        </Suspense>
+      </section>
+
+      {/* 카테고리 바로가기 */}
+      <section className="mx-auto max-w-6xl px-4 pb-14 md:px-8">
+        <SectionTitle quest="INVENTORY" title="장착할 아이템 · 카테고리 바로가기" />
+        <Suspense fallback={<div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">{Array.from({ length: 6 }, (_, i) => <div key={i} className="h-12 animate-pulse rounded-md bg-panel" />)}</div>}>
+          <CategoryTiles />
         </Suspense>
       </section>
 
