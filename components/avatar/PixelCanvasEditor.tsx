@@ -138,8 +138,9 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
   const template = (rows: string[], palette: Record<string, string>) => commit(stamp(createGrid(grid.cols, grid.rows), rows, palette), grid);
   const toolButton = "btn-pixel min-h-10 px-3 py-1.5 text-sm font-bold aria-pressed:border-lime aria-pressed:text-lime";
 
-  return <div className="grid gap-5 lg:grid-cols-[auto_minmax(0,1fr)]">
-    <div className="pixel-panel w-fit max-w-full self-start overflow-auto p-3">
+  // 편집기 자체 폭으로 배치 — 넓으면 오른쪽에 고정 폭 도구 칸, 좁으면 캔버스 아래로 (글자가 끊기지 않게)
+  return <div className="@container"><div className="grid gap-5 @3xl:grid-cols-[minmax(0,1fr)_18rem]">
+    <div className="pixel-panel w-fit max-w-full self-start justify-self-center overflow-auto p-3">
       <canvas ref={canvas} role="img" aria-label={`픽셀 캔버스 ${grid.cols}×${grid.rows}${isEmpty(grid) ? " (비어 있음)" : ""}`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
         className={`block max-w-full touch-none [image-rendering:pixelated] ${disabled ? "opacity-60" : "cursor-crosshair"}`} />
@@ -166,7 +167,7 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
           </label>
         </div>
       </fieldset>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 @md:grid-cols-2 @3xl:grid-cols-1">
         <label className="text-sm font-bold">캔버스 크기
           <select disabled={disabled} value={`${grid.cols}x${grid.rows}`} onChange={(event) => { const [c, r] = event.target.value.split("x").map(Number); resize(c, r); }}
             className="pixel-input mt-2 block min-h-11 w-full px-3 text-sm">
@@ -177,11 +178,11 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
         <div className="text-sm font-bold">템플릿
           <div className="mt-2 flex flex-wrap gap-2">
             <button type="button" disabled={disabled} onClick={() => template(SLIME, SLIME_PAL)} className={toolButton}>슬라임</button>
-            <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className={toolButton}>기본 캐릭터</button>
+            <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className={`${toolButton} whitespace-nowrap`}>기본 캐릭터</button>
           </div>
         </div>
       </div>
       <p className="text-xs leading-relaxed text-dim">크기를 바꾸면 새 캔버스로 시작해요 (되돌리기 가능). 단축키: B 펜 · E 지우개 · G 채우기 · I 스포이드 · M 대칭 · Ctrl+Z 되돌리기</p>
     </div>
-  </div>;
+  </div></div>;
 }
