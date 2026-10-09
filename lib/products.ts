@@ -3,6 +3,7 @@ import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import { ApiError, serverFetch } from "@/lib/api";
 import type { ApiCategory, ApiProduct, Page } from "@/types/api";
+import { normalizeProductQuery, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
 export const PAGE_SIZE = 12;
 
@@ -25,10 +26,17 @@ export const getCategories = cache(async (): Promise<ProductResult<ApiCategory[]
   }
 });
 
-export async function getProducts(category?: string, page = 1, size = PAGE_SIZE): Promise<ProductResult<Page<ApiProduct>>> {
-  const requested = Number.isSafeInteger(page) && page > 0 ? page : 1;
-  const params = new URLSearchParams({ page: String(requested), size: String(size), sort: "id" });
-  if (category) params.set("category", category);
+export async function getProducts(options: Partial<ProductQuery> & { size?: number } = {}): Promise<ProductResult<Page<ApiProduct>>> {
+  const query = normalizeProductQuery(productQueryParams(options));
+  const requested = query.page;
+  const requestedSize = options.size ?? PAGE_SIZE;
+  const size = Number.isInteger(requestedSize) && requestedSize >= 1 && requestedSize <= 60 ? requestedSize : PAGE_SIZE;
+  const params = productQueryParams(query);
+  params.delete("new");
+  if (query.new) params.set("isNew", "true");
+  params.set("page", String(requested));
+  params.set("size", String(size));
+  params.set("sort", query.sort);
   try {
     let data = await serverFetch<Page<ApiProduct>>(`/products?${params}`);
     if (requested > data.totalPages) {
@@ -37,7 +45,21 @@ export async function getProducts(category?: string, page = 1, size = PAGE_SIZE)
     }
     return { data, fallback: false };
   } catch {
-    const filtered = category ? fallbackProducts.filter((product) => product.categorySlug === category) : fallbackProducts;
+    const keyword = query.q?.toLowerCase();
+    const filtered = fallbackProducts.filter((product) =>
+      (!query.category || product.categorySlug === query.category)
+      && (!keyword || product.name.toLowerCase().includes(keyword) || product.description.toLowerCase().includes(keyword))
+      && (query.minPrice === undefined || product.price >= query.minPrice)
+      && (query.maxPrice === undefined || product.price <= query.maxPrice)
+      && (!query.new || product.isNew),
+    );
+    filtered.sort((a, b) => {
+      if (query.sort === "new") return Number(b.isNew) - Number(a.isNew) || b.id - a.id;
+      if (query.sort === "price_asc") return a.price - b.price || a.id - b.id;
+      if (query.sort === "price_desc") return b.price - a.price || a.id - b.id;
+      // 정적 데이터에는 전체 찜 개수가 없어 인기순도 기본순으로 표시합니다.
+      return a.id - b.id;
+    });
     const totalPages = Math.max(1, Math.ceil(filtered.length / size));
     const current = Math.min(requested, totalPages);
     return {

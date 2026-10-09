@@ -9,7 +9,7 @@ import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/compone
 const recommendedIds = [1, 3, 5, 8];
 
 async function RecommendedProducts() {
-  const result = await getProducts(undefined, 1, 60);
+  const result = await getProducts({ size: 60 });
   const recommended = result.data.items.filter((product) => recommendedIds.includes(product.id));
   return (
     <>

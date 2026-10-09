@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { products } from "@/data/products";
 import type { ApiCategory } from "@/types/api";
+import { changeProductQuery, productHref, type ProductQuery } from "@/utils/productQuery";
 
 interface CategoryTabsProps {
   current?: string; // 선택된 카테고리 slug (없으면 "전체")
   categories: ApiCategory[];
+  query?: ProductQuery;
 }
 
-export default function CategoryTabs({ current, categories }: CategoryTabsProps) {
+export default function CategoryTabs({ current, categories, query }: CategoryTabsProps) {
   // TODO(#16): API productCount로 교체
   const tabs = [
     { slug: undefined, name: "전체", count: products.length },
@@ -26,7 +28,7 @@ export default function CategoryTabs({ current, categories }: CategoryTabsProps)
           return (
             <li key={tab.name}>
               <Link
-                href={tab.slug ? `/products?category=${tab.slug}` : "/products"}
+                href={query ? productHref(changeProductQuery(query, { category: tab.slug })) : tab.slug ? `/products?category=${tab.slug}` : "/products"}
                 aria-current={active ? "page" : undefined}
                 className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                   active

@@ -40,3 +40,26 @@ test("찜 페이지는 지정한 경로에만 페이지 쿼리를 붙인다", ()
   const rendered = links(Pagination({ currentPage: 1, totalPages: 2, basePath: "/mypage/wishlist" }));
   assert.deepEqual(rendered.map((link) => link.href), ["/mypage/wishlist", "/mypage/wishlist?page=2", "/mypage/wishlist?page=2"]);
 });
+
+test("검색·정렬·가격·NEW 조건을 유지하고 page만 교체한다", () => {
+  const query = "q=%ED%82%A4%EC%BA%A1&category=keycap&sort=price_asc&minPrice=1000&maxPrice=30000&new=1&page=2";
+  const rendered = links(Pagination({ currentPage: 2, totalPages: 3, query }));
+  for (const link of rendered) {
+    const url = new URL(link.href, "http://localhost");
+    assert.equal(url.pathname, "/products");
+    assert.equal(url.searchParams.get("q"), "키캡");
+    assert.equal(url.searchParams.get("category"), "keycap");
+    assert.equal(url.searchParams.get("sort"), "price_asc");
+    assert.equal(url.searchParams.get("minPrice"), "1000");
+    assert.equal(url.searchParams.get("maxPrice"), "30000");
+    assert.equal(url.searchParams.get("new"), "1");
+    assert.ok(url.searchParams.getAll("page").length <= 1);
+  }
+  assert.equal(new URL(rendered.find((link) => link["aria-label"] === "이전 페이지").href, "http://localhost").searchParams.has("page"), false);
+  assert.equal(new URL(rendered.find((link) => link["aria-label"] === "다음 페이지").href, "http://localhost").searchParams.get("page"), "3");
+});
+
+test("별도 경로의 쿼리를 상품 필터로 해석하거나 변경하지 않는다", () => {
+  const rendered = links(Pagination({ currentPage: 1, totalPages: 2, basePath: "/mypage/wishlist", query: "view=saved&page=8&page=9" }));
+  assert.deepEqual(rendered.map((link) => link.href), ["/mypage/wishlist?view=saved", "/mypage/wishlist?view=saved&page=2", "/mypage/wishlist?view=saved&page=2"]);
+});
