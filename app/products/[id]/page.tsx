@@ -85,11 +85,11 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
             <dd className="font-pixel">PM-{String(product.id).padStart(3, "0")}</dd>
           </dl>
 
-          <div className="mt-auto flex gap-3">
-            <AddToCartButton />
+          <div className="mt-auto flex flex-col gap-3">
+            <AddToCartButton productId={product.id} />
             <Link
               href="/products"
-              className="grid place-items-center rounded-lg border border-line px-6 py-4 font-bold text-sub transition-colors hover:border-violet/40 hover:text-ink"
+              className="grid place-items-center rounded-lg border border-line px-6 py-3 font-bold text-sub transition-colors hover:border-violet/40 hover:text-ink"
             >
               목록으로
             </Link>

@@ -26,3 +26,16 @@ export interface ApiUser {
   avatarUrl: string | null;
   createdAt: string;
 }
+
+export interface ApiCartItem {
+  product: ApiProduct;
+  quantity: number;
+  subtotal: number;
+  addedAt: string;
+}
+
+export interface ApiCart {
+  items: ApiCartItem[];
+  totalQuantity: number;
+  totalPrice: number;
+}
