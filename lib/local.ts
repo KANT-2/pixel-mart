@@ -26,10 +26,10 @@ export const localApi = {
   ranking: (region: string, period: FandomPeriod, signal?: AbortSignal) =>
     api.get<ApiFandomRank[]>(`/local/fandom/ranking?${query({ region, period, limit: 10 })}`, options(signal)),
   /** 거래·교환 탭 — 종류를 고르지 않으면 HAVE·SELL만 (위시는 위시맵 탭) */
-  trades: (filters: TradeQuery, signal?: AbortSignal) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: filters.region || undefined, kind: filters.kind, q: filters.q, productId: filters.productId, interestId: filters.interestId, page: filters.page, size: 12 })}${filters.kind ? "" : `&${TRADE_BOARD_KINDS.map((kind) => `kind=${kind}`).join("&")}`}`, options(signal)),
+  trades: (filters: TradeQuery, signal?: AbortSignal) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: filters.region || undefined, kind: filters.kind, q: filters.q, nickname: filters.nickname, productId: filters.productId, interestId: filters.interestId, page: filters.page, size: 12 })}${filters.kind ? "" : `&${TRADE_BOARD_KINDS.map((kind) => `kind=${kind}`).join("&")}`}`, options(signal)),
   trade: (id: number, signal?: AbortSignal) => api.get<ApiTradePost>(`/local/trades/${id}`, options(signal)),
   /** 위시맵 WISH 목록 — 지역 안, 또는 닉네임 공개 동의자의 닉네임으로 */
-  wants: (region: string | null, nickname: string | null, signal?: AbortSignal) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: region || undefined, kind: "want", nickname: nickname?.trim().slice(0, 30) || undefined, size: 30 })}`, options(signal)),
+  wants: (region: string | null, nickname: string | null, signal?: AbortSignal, item?: string | null) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: region || undefined, kind: "want", nickname: nickname?.trim().slice(0, 30) || undefined, q: item?.trim().slice(0, 40) || undefined, size: 30 })}`, options(signal)),
   wishWants: (codes: string[], signal?: AbortSignal) => api.get<ApiWishWants[]>(`/local/wish-wants?${query({ codes: codes.join(",") })}`, options(signal)),
   myTrades: (signal?: AbortSignal) => api.get<ApiTradePost[]>("/local/trades/mine", options(signal)),
   createTrade: (input: TradeInput, signal?: AbortSignal) => api.post<ApiTradePost>("/local/trades", input, options(signal)),

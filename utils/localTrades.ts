@@ -51,18 +51,19 @@ export function validateTrade(draft: TradeDraft) {
 }
 
 /** q: 사거나 팔고 싶은 물건 이름 (물건 이름·연결 상품·설명에서 찾음) */
-export interface TradeQuery { region: string | null; hasRegion: boolean; kind?: TradeKind; q?: string; productId?: number; interestId?: number; page: number; }
+export interface TradeQuery { region: string | null; hasRegion: boolean; kind?: TradeKind; q?: string; nickname?: string; productId?: number; interestId?: number; page: number; }
 function positive(value: string | null): number | undefined { return value && /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : undefined; }
 export function parseTradeQuery(params: { get(key: string): string | null }): TradeQuery {
   const region = params.get("region"), kind = params.get("kind");
   return { region: region && region.length <= 12 ? region : null, hasRegion: region !== null,
-    kind: TRADE_KINDS.find((item) => item.value === kind)?.value, q: params.get("q")?.trim().slice(0, 40) || undefined, productId: positive(params.get("productId")), interestId: positive(params.get("interestId")), page: positive(params.get("page")) ?? 1 };
+    kind: TRADE_KINDS.find((item) => item.value === kind)?.value, q: params.get("q")?.trim().slice(0, 40) || undefined, nickname: params.get("nickname")?.trim().slice(0, 30) || undefined, productId: positive(params.get("productId")), interestId: positive(params.get("interestId")), page: positive(params.get("page")) ?? 1 };
 }
 export function tradeQueryParams(query: TradeQuery) {
   const params = new URLSearchParams();
   if (query.hasRegion) params.set("region", query.region ?? "");
   if (query.kind) params.set("kind", query.kind);
   if (query.q) params.set("q", query.q);
+  if (query.nickname) params.set("nickname", query.nickname);
   if (query.productId) params.set("productId", String(query.productId));
   if (query.interestId) params.set("interestId", String(query.interestId));
   if (query.page > 1) params.set("page", String(query.page));

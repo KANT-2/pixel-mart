@@ -3,12 +3,13 @@
 import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
+import LocalSearch from "@/components/local/LocalSearch";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import { useLocalResource } from "@/components/local/useLocalResource";
-import { LocalError, LocalSkeleton, localInput, localToolbar } from "@/components/local/LocalStates";
+import { LocalError, LocalSkeleton, localToolbar } from "@/components/local/LocalStates";
 import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
 import { formatPrice } from "@/utils/formatPrice";
@@ -16,14 +17,18 @@ import { rarityOf } from "@/utils/gameItem";
 import { giftHref } from "@/utils/gift";
 import { containsContact } from "@/utils/localTrades";
 import { viewCodeFor, viewTrail } from "@/utils/localMap";
-import type { ApiRegion, ApiTradePost } from "@/types/api";
+import type { ApiTradePost } from "@/types/api";
 
 const HEART = "/images/hero-heart.svg";
 
-function wishHref(region: string | null, nickname: string | null) {
+/** 검색 — 닉네임(nickname) 또는 아이템(q) 하나만 */
+interface WishFind { nickname?: string; item?: string }
+
+function wishHref(region: string | null, find: WishFind = {}) {
   const params = new URLSearchParams();
   if (region !== null) params.set("region", region);
-  if (nickname) params.set("q", nickname);
+  if (find.nickname) params.set("nickname", find.nickname);
+  if (find.item) params.set("q", find.item);
   const query = params.toString();
   return `/local/wish-map${query ? `?${query}` : ""}`;
 }
@@ -35,13 +40,14 @@ export default function WishMap() {
   const profile = useLocalProfile();
   const catalog = useMemo(() => regions.data ?? [], [regions.data]);
   const byCode = useMemo(() => new Map(catalog.map((region) => [region.code, region])), [catalog]);
-  const nickname = params.get("q")?.trim().slice(0, 30) || null;
+  const nickname = params.get("nickname")?.trim().slice(0, 30) || null;
+  const item = nickname ? null : params.get("q")?.trim().slice(0, 40) || null;
   // URL에 지역이 없으면 내 동네부터 (빈 값은 "전체"를 고른 상태)
   const focus = params.has("region") ? params.get("region") || null : profile.data?.region?.code ?? null;
   const viewCode = viewCodeFor(focus, catalog, MAP_VIEWS);
   const view = MAP_VIEWS[viewCode];
   const selected = focus && focus !== viewCode && view.legend.includes(focus) ? focus : null;
-  const go = useCallback((region: string | null, q: string | null = null) => window.history.pushState(null, "", wishHref(region ?? "", q)), []);
+  const go = useCallback((region: string | null, find: WishFind = {}) => window.history.pushState(null, "", wishHref(region ?? "", find)), []);
 
   const loadCounts = useCallback((signal: AbortSignal) => localApi.wishWants(view.legend, signal), [view.legend]);
   const counts = useLocalResource(loadCounts);
@@ -69,7 +75,8 @@ export default function WishMap() {
               className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
           </span>)}
         </nav>
-      <WishSearch key={nickname ?? ""} regions={catalog} nickname={nickname} onRegion={(code) => go(code)} onNickname={(q) => go(focus, q)} />
+      <LocalSearch key={`${nickname ?? ""}|${item ?? ""}`} regions={catalog} mode={nickname ? "nickname" : item ? "item" : "region"} value={nickname ?? item ?? ""}
+        onRegion={(code) => go(code)} onNickname={(value) => go(focus, { nickname: value })} onItem={(value) => go(focus, { item: value })} />
     </div>
 
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -79,56 +86,21 @@ export default function WishMap() {
             label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
         )}
         <p className="mt-2 text-xs leading-relaxed text-dim">
-          <PixelIcon name="heart" className="mr-1 size-3.5" />하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
+          <PixelIcon name="heart" className="mr-1 size-3.5" />하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;닉네임 공개&rsquo;를 켠 이웃만 보여요.
         </p>
       </div>
       {nickname
-        ? <WantPanel key={`q:${nickname}`} title={`'${nickname}' 검색`} kicker="PLAYER SEARCH" region={null} nickname={nickname} onClear={() => go(focus)} />
-        : <WantPanel key={`r:${place ?? ""}`} title={place ? byCode.get(place)?.fullName ?? place : "서비스 지역 전체"} kicker={selected ? "NEIGHBORHOOD" : "AREA"} region={place} nickname={null} />}
+        ? <WantPanel key={`n:${nickname}`} title={`'${nickname}' 플레이어`} kicker="PLAYER SEARCH" region={null} nickname={nickname} item={null} onClear={() => go(focus)} />
+        : item ? <WantPanel key={`i:${item}`} title={`'${item}' 위시`} kicker="ITEM SEARCH" region={null} nickname={null} item={item} onClear={() => go(focus)} />
+          : <WantPanel key={`r:${place ?? ""}`} title={place ? byCode.get(place)?.fullName ?? place : "서비스 지역 전체"} kicker={selected ? "NEIGHBORHOOD" : "AREA"} region={place} nickname={null} item={null} />}
     </div>
   </div>;
 }
 
-interface WishSearchProps { regions: ApiRegion[]; nickname: string | null; onRegion: (code: string) => void; onNickname: (q: string) => void; }
+interface WantPanelProps { title: string; kicker: string; region: string | null; nickname: string | null; item: string | null; onClear?: () => void; }
 
-/** 동네 이름 또는 닉네임으로 찾기 — 전국으로 늘어나도 긴 목록 없이 */
-function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps) {
-  const [mode, setMode] = useState<"region" | "nickname">(nickname ? "nickname" : "region");
-  const [text, setText] = useState(nickname ?? "");
-  const keyword = text.trim();
-  const matches = mode === "region" && keyword ? regions.filter((region) => region.fullName.includes(keyword)).slice(0, 6) : [];
-  const [notFound, setNotFound] = useState(false);
-  const pick = (code: string) => { onRegion(code); setText(""); setNotFound(false); };
-  return <form role="search" aria-label="위시맵 찾기" className="flex w-full min-w-0 gap-1.5 sm:w-auto" onSubmit={(event) => {
-    event.preventDefault();
-    if (mode === "nickname" && keyword) onNickname(keyword);
-    else if (matches[0]) pick(matches[0].code);
-    else if (keyword) setNotFound(true);
-  }}>
-    <div role="group" aria-label="찾는 방법" className="segmented h-11 text-xs font-bold">
-      <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }}>동네</button>
-      <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }}>닉네임</button>
-    </div>
-    <div className="relative min-w-0 flex-1 sm:w-48 sm:flex-none">
-      <label htmlFor="wish-search" className="sr-only">{mode === "region" ? "동네 이름" : "닉네임"}</label>
-      <input id="wish-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, mode === "region" ? 20 : 30)); setNotFound(false); }}
-        placeholder={mode === "region" ? "동네 검색 (예: 판교)" : "닉네임으로 찾기"} autoComplete="off" enterKeyHint="search"
-        onKeyDown={(event) => { if (event.key === "Escape") setText(""); }} className={localInput} />
-      {matches.length > 0 && <ul aria-label="동네 검색 결과" className="pixel-panel absolute inset-x-0 top-full z-20 mt-1 overflow-hidden">
-        {matches.map((region) => <li key={region.code}>
-          <button type="button" onClick={() => pick(region.code)} className="block w-full px-3 py-2 text-left text-sm hover:bg-panel-2">{region.fullName}</button>
-        </li>)}
-      </ul>}
-      {notFound && <p role="status" className="absolute left-0 top-full z-20 mt-1 rounded bg-night px-2 py-1 text-xs text-pink">없는 동네예요.</p>}
-    </div>
-    <button type="submit" disabled={!keyword} className="btn-lime h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>
-  </form>;
-}
-
-interface WantPanelProps { title: string; kicker: string; region: string | null; nickname: string | null; onClear?: () => void; }
-
-function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps) {
-  const loadWants = useCallback((signal: AbortSignal) => localApi.wants(region, nickname, signal), [region, nickname]);
+function WantPanel({ title, kicker, region, nickname, item, onClear }: WantPanelProps) {
+  const loadWants = useCallback((signal: AbortSignal) => localApi.wants(region, nickname, signal, item), [region, nickname, item]);
   const wants = useLocalResource(loadWants);
   const loadTop = useCallback((signal: AbortSignal) => region ? localApi.wishMap(region, signal) : Promise.resolve([]), [region]);
   const top = useLocalResource(loadTop);
@@ -149,7 +121,7 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
           : rows.length ? <ul className="space-y-2">{rows.map((post) => <li key={post.id}><WantRow post={post} /></li>)}</ul>
             : <div className="p-4 text-center text-sm text-sub">
               <p className="font-pixel text-xs tracking-widest text-dim">EMPTY</p>
-              <p className="mt-2">{nickname ? "닉네임을 공개한 이웃 중에 찾지 못했어요." : "아직 이 동네에 WISH 글이 없어요."}</p>
+              <p className="mt-2">{nickname ? "닉네임을 공개한 이웃 중에 찾지 못했어요." : item ? "그 아이템을 위시한 이웃이 아직 없어요." : "아직 이 동네에 WISH 글이 없어요."}</p>
             </div>}
     </div>
     <footer className="space-y-3 border-t-2 border-frame p-3">

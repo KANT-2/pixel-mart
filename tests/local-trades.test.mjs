@@ -70,7 +70,7 @@ test("필터 URL은 잘못된 종류·id·페이지를 정리하고 변경 시 �
   assert.equal(tradeHref(query), "/local/trades?region=41135&kind=have&productId=3&interestId=11&page=2");
   const next = changeTradeQuery(query, { kind: "want" }); assert.equal(next.page, 1); assert.equal(next.productId, 3); assert.equal(next.region, "41135");
   assert.equal(tradeQueryParams(next).has("page"), false);
-  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, q: undefined, productId: undefined, interestId: undefined, page: 1 });
+  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, q: undefined, nickname: undefined, productId: undefined, interestId: undefined, page: 1 });
   assert.equal(parseTradeQuery(new URLSearchParams()).hasRegion, false);
   assert.equal(tradeHref(parseTradeQuery(new URLSearchParams("q=%20%ED%82%A4%EB%A7%81%20&kind=sell"))), "/local/trades?kind=sell&q=%ED%82%A4%EB%A7%81");
   assert.equal(parseTradeQuery(new URLSearchParams("page=999999999999999999")).page, 1);

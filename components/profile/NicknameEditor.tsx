@@ -52,6 +52,6 @@ export default function NicknameEditor() {
     </form>}
     {error && <p role="alert" className="mt-2 text-sm text-pink">{error}</p>}
     {saved && !editing && <p role="status" className="mt-2 text-xs text-mint">닉네임을 바꿨어요.</p>}
-    {!editing && <p className="mt-3 text-xs leading-relaxed text-dim">닉네임은 다른 플레이어와 겹칠 수 없어요. 위시맵에서는 &lsquo;닉네임 공개&rsquo;를 켰을 때만 보여요.</p>}
+    {!editing && <p className="mt-3 text-xs leading-relaxed text-dim">닉네임은 다른 플레이어와 겹칠 수 없어요. 거래·위시 글에는 &lsquo;닉네임 공개&rsquo;를 켰을 때만 보여요.</p>}
   </section>;
 }
