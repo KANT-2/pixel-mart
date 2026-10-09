@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
+import type { ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiMapAvatars, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
 import type { ApiProduct, ApiTradePost, ApiTradeMatch, ApiWishMapItem, Page, TradeInput } from "@/types/api";
 import type { TradeQuery } from "@/utils/localTrades";
 
@@ -17,6 +17,10 @@ export const localApi = {
   save: (input: LocalProfileInput, signal?: AbortSignal) => api.put<ApiLocalProfile>("/users/me/local", input, options(signal)),
   fandom: (region: string, period: FandomPeriod, interest?: number, signal?: AbortSignal) =>
     api.get<ApiFandom[]>(`/local/fandom?${query({ region, period, interest, limit: 200 })}`, options(signal)),
+  fandomByInterest: (interest: number, period: FandomPeriod, signal?: AbortSignal) =>
+    api.get<ApiFandom[]>(`/local/fandom?${query({ interest, period, limit: 200 })}`, options(signal)),
+  mapAvatars: (region: string, interest?: number, signal?: AbortSignal) =>
+    api.get<ApiMapAvatars[]>(`/local/map-avatars?${query({ region: region || undefined, interest })}`, options(signal)),
   ranking: (region: string, period: FandomPeriod, signal?: AbortSignal) =>
     api.get<ApiFandomRank[]>(`/local/fandom/ranking?${query({ region, period, limit: 10 })}`, options(signal)),
   trades: (filters: TradeQuery, signal?: AbortSignal) => api.get<Page<ApiTradePost>>(`/local/trades?${query({ region: filters.region || undefined, kind: filters.kind, productId: filters.productId, interestId: filters.interestId, page: filters.page, size: 12 })}`, options(signal)),
