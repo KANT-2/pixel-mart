@@ -145,11 +145,10 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
       const block = blockByCode.get(code);
       if (!cell || !block) return null;
       return <button key={code} type="button" className={styles.label} aria-pressed={selected === code} onClick={() => onSelect(code)}
-        aria-label={namesOnly ? `${block.name} 지도로 이동` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 소수의 이웃"}${block.sample ? " · 샘플 데이터" : ""}`}
+        aria-label={namesOnly ? `${block.name} 지도로 이동` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 소수의 이웃"}`}
         style={{ left: percent(cell[0] + 0.5, view.cols), top: percent(cell[1] + 0.5, view.rows) }}>
         <span className={`${styles.labelName} font-pixel`}>{block.name}</span>
         {!namesOnly && (block.count ? <span className={styles.labelCount}>{block.count}</span> : <span className={styles.labelFew}>·</span>)}
-        {block.sample && <span aria-hidden="true" className="text-violet">*</span>}
       </button>;
     })}
   </div>;

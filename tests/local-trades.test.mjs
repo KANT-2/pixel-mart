@@ -21,6 +21,7 @@ const { createLocalResource } = await import(await moduleUrl("../lib/localResour
 const { default: TradeCard } = await import(await moduleUrl("../components/local/TradeCard.tsx", {
   "@/utils/local": localUrl, "@/utils/localTrades": rulesUrl,
   "@/utils/formatDate": await moduleUrl("../utils/formatDate.ts"), "@/utils/formatPrice": await moduleUrl("../utils/formatPrice.ts"), "@/utils/gameItem": await moduleUrl("../utils/gameItem.ts"), "@/utils/gift": await moduleUrl("../utils/gift.ts"),
+  "@/components/PixelIcon": await moduleUrl("../components/PixelIcon.tsx", { "react/jsx-runtime": import.meta.resolve("react/jsx-runtime") }),
   "react/jsx-runtime": import.meta.resolve("react/jsx-runtime"), "next/link": import.meta.resolve("next/link.js"),
 }));
 const draft = { kind: "have", itemName: "  QA 키링  ", condition: "new", price: "", tradeMethod: "direct", content: "첫 줄\n둘째 줄", productId: null, interestId: null };
@@ -86,7 +87,7 @@ test("매칭 배지는 서버 proximity·mutual을 사용하고 게시판은 확
 test("거래 카드는 텍스트로만 렌더링하고 작성자·계정·지역명·연락처를 노출하지 않음", () => {
   const post = { id: 1, kind: "have", status: "open", itemName: "<b>키링</b>", condition: "new", price: 0, tradeMethod: "direct", content: "<script>alert(1)</script>\n둘째 줄", product: null, interest: null, regionCode: "privateCode", regionName: "PRIVATE_LOCATION", nickname: "PRIVATE_AUTHOR", email: "PRIVATE_ACCOUNT", isMine: false, isSample: true, createdAt: "2026-10-09T00:00:00Z" };
   const html = renderToStaticMarkup(createElement(TradeCard, { post, proximity: "same_zone" }));
-  assert.match(html, /&lt;b&gt;키링/); assert.match(html, /&lt;script&gt;/); assert.match(html, /whitespace-pre-line/); assert.match(html, /샘플 데이터/); assert.match(html, /같은 생활권/); assert.match(html, /0원/);
+  assert.match(html, /&lt;b&gt;키링/); assert.match(html, /&lt;script&gt;/); assert.match(html, /whitespace-pre-line/); assert.doesNotMatch(html, /샘플|데모/); assert.match(html, /같은 생활권/); assert.match(html, /0원/);
   assert.doesNotMatch(html, /PRIVATE_|privateCode|<script>|<b>/);
   const redacted = renderToStaticMarkup(createElement(TradeCard, { post: { ...post, content: "010-1234-5678", itemName: "카톡 id pixel" } }));
   assert.doesNotMatch(redacted, /010-1234-5678|카톡 id pixel/);

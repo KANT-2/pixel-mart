@@ -84,8 +84,8 @@ function AvatarForm({ user }: AvatarFormProps) {
     <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
       <div>
         <div role="tablist" aria-label="아바타 만드는 방법" className="mb-4 flex flex-wrap gap-2">
-          <button type="button" role="tab" aria-selected={mode === "ai"} onClick={() => setMode("ai")} className={tab}>🤖 AI로 만들기</button>
-          <button type="button" role="tab" aria-selected={mode === "canvas"} onClick={() => setMode("canvas")} className={tab}>🎨 픽셀 캔버스</button>
+          <button type="button" role="tab" aria-selected={mode === "ai"} onClick={() => setMode("ai")} className={tab}>AI로 만들기</button>
+          <button type="button" role="tab" aria-selected={mode === "canvas"} onClick={() => setMode("canvas")} className={tab}>픽셀 캔버스</button>
         </div>
         {mode === "ai" ? <AiPanel disabled={saving || pending} onSave={(grid) => void save(grid, true)}
           onEdit={(grid) => { setCanvasSeed((seed) => ({ key: seed.key + 1, grid, large: true })); setMode("canvas"); }} />
@@ -178,7 +178,7 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
       </label>
       {unavailable && <p role="status" className="text-sm text-pink">지금은 AI 만들기를 쓸 수 없어요. 픽셀 캔버스로 직접 그려 보세요.</p>}
       <button type="button" onClick={() => void generate()} disabled={disabled || working || !photo || !consent || unavailable}
-        className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{working ? "AI가 그리는 중… (최대 1분)" : "🤖 AI 픽셀 아바타 만들기"}</button>
+        className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{working ? "AI가 그리는 중… (최대 1분)" : "AI 픽셀 아바타 만들기"}</button>
       {error && <p role="alert" className="text-sm text-pink">{error}</p>}
     </div>
     <div className="grid gap-4 sm:grid-cols-2">
@@ -198,7 +198,7 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
         </div>
         {result && <div className="mt-3 flex flex-wrap gap-2">
           <button type="button" disabled={disabled} onClick={() => onSave(result.grid)} className="btn-lime min-h-10 px-4 py-1.5 text-sm font-bold">이대로 저장</button>
-          <button type="button" disabled={disabled} onClick={() => onEdit(result.grid)} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">🎨 캔버스에서 다듬기</button>
+          <button type="button" disabled={disabled} onClick={() => onEdit(result.grid)} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">캔버스에서 다듬기</button>
           <button type="button" disabled={disabled || working} onClick={() => void generate()} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">다시 만들기</button>
         </div>}
       </figure>

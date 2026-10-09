@@ -33,11 +33,9 @@ export function durabilityOf(condition: string | null | undefined): { percent: n
 }
 
 /** 거래 종류 → 게임 거래소 표시 */
-export const TRADE_KIND_GAME: Record<string, { icon: string; tag: string; label: string; tone: string }> = {
-  have: { icon: "🎁", tag: "HAVE", label: "교환 가능", tone: "text-mint border-mint/50" },
-  want: { icon: "💗", tag: "WISH", label: "위시", tone: "text-pink border-pink/50" },
-  sell: { icon: "🪙", tag: "SELL", label: "판매", tone: "text-lime border-lime/50" },
+export const TRADE_KIND_GAME: Record<string, { icon: "chest" | "heart" | "coin"; tag: string; label: string; tone: string }> = {
+  have: { icon: "chest", tag: "HAVE", label: "교환 가능", tone: "text-mint border-mint/50" },
+  want: { icon: "heart", tag: "WISH", label: "위시", tone: "text-pink border-pink/50" },
+  sell: { icon: "coin", tag: "SELL", label: "판매", tone: "text-lime border-lime/50" },
 };
 
-/** 거래 방식 → 아이콘 */
-export const TRADE_METHOD_ICON: Record<string, string> = { direct: "🤝", delivery: "📦", both: "🤝📦" };

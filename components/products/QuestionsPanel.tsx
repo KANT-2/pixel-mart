@@ -12,7 +12,7 @@ interface QuestionsPanelProps { productId: number; }
 export default function QuestionsPanel({ productId }: QuestionsPanelProps) {
   const { user, loading } = useAuth();
   return <div className="space-y-6">
-    <h2 className="text-xl font-bold">상품 Q&A {questions.mode === "demo" && <span className="ml-2 inline-block rounded border border-violet/40 px-2 py-1 align-middle text-xs text-violet">데모 데이터</span>}</h2>
+    <h2 className="text-xl font-bold">상품 Q&A</h2>
     {questions.mode === "demo" && <p className="rounded-xl border border-violet/30 bg-panel p-5 text-sm leading-relaxed text-sub">{questions.notice}</p>}
     {loading ? <FeedbackSkeleton label="질문 공개 범위 확인 중" /> : <AccountQuestions key={`${productId}:${user?.id ?? "guest"}`} productId={productId} viewer={user} />}
   </div>;
@@ -86,10 +86,10 @@ function AccountQuestions({ productId, viewer }: AccountQuestionsProps) {
           {errors.content && <p id={`${id}-content-error`} role="alert" className="mt-2 text-sm text-pink">{errors.content}</p>}
         </div>
         <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={isSecret} onChange={(event) => setIsSecret(event.target.checked)} className="size-4 accent-mint" />비밀글 (나만 보기)</label>
-        <button type="submit" className="min-h-11 btn-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "저장 중…" : questions.mode === "demo" ? "데모 질문 저장" : "질문 등록"}</button>
+        <button type="submit" className="min-h-11 btn-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "저장 중…" : "질문 등록"}</button>
       </fieldset>
       {error && <p role="alert" className="mt-3 text-sm text-pink">{error}</p>}
-      {success && <p role="status" className="mt-3 text-sm text-mint">{questions.mode === "demo" ? "데모 질문을 화면에 저장했어요. 새로고침하면 사라져요." : "질문을 등록했어요."}</p>}
+      {success && <p role="status" className="mt-3 text-sm text-mint">질문을 등록했어요.</p>}
     </form>}
   </>;
 }

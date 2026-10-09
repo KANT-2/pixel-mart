@@ -83,7 +83,6 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
           <form role="search" aria-label="상품 검색" onSubmit={submitSearch} className="flex min-w-0 flex-[1_1_16rem] gap-2">
             <div className="relative min-w-0 flex-1">
               <label htmlFor={`${id}-search`} className="sr-only">상품 검색어</label>
-              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-sm">🔍</span>
               <input
                 id={`${id}-search`}
                 name="q"
@@ -92,7 +91,7 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="아이템 이름으로 찾기"
-                className={`${fieldClass} h-10 w-full py-0 pl-9 pr-10 [&::-webkit-search-cancel-button]:appearance-none`}
+                className={`${fieldClass} h-10 w-full py-0 pl-3 pr-10 [&::-webkit-search-cancel-button]:appearance-none`}
               />
               {search && (
                 <button type="button" aria-label="검색어 지우기" className="absolute inset-y-0 right-0 w-10 text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet" onClick={() => {
@@ -110,7 +109,7 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
               {Object.entries(sortLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
             <button type="button" aria-pressed={Boolean(query.new)} className={toolButton}
-              onClick={() => navigate(changeProductQuery(query, { new: query.new ? undefined : true }))}>✨ NEW만</button>
+              onClick={() => navigate(changeProductQuery(query, { new: query.new ? undefined : true }))}>NEW만</button>
             <div className="relative">
               <button type="button" aria-expanded={expanded} aria-controls={`${id}-filters`} aria-pressed={priceActive} className={toolButton} onClick={() => setExpanded(!expanded)}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- 픽셀 코인 */}

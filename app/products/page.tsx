@@ -80,7 +80,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
           <p className="mt-2 text-sm text-sub">가격 범위를 넓히거나 다른 카테고리의 아이템을 만나보세요.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {categoryResult.data.slice(0, 3).map((item) => (
-              <Link key={item.slug} href={productHref({ sort: "id", page: 1, category: item.slug })} className="rounded-full border border-line px-4 py-2 text-sm text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
+              <Link key={item.slug} href={productHref({ sort: "id", page: 1, category: item.slug })} className="btn-pixel px-4 py-2 text-sm text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
                 {item.name} 둘러보기
               </Link>
             ))}

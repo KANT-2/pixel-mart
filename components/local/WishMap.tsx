@@ -1,5 +1,6 @@
 "use client";
 
+import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -77,12 +78,11 @@ export default function WishMap() {
             label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
         )}
         <p className="mt-2 text-xs leading-relaxed text-dim">
-          💗 하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
-          {blocks.some((block) => block.sample) && <> <span className="text-violet">*</span> 샘플 데이터</>}
+          <PixelIcon name="heart" className="mr-1 size-3.5" />하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
         </p>
       </div>
       {nickname
-        ? <WantPanel key={`q:${nickname}`} title={`👤 '${nickname}' 검색`} kicker="PLAYER SEARCH" region={null} nickname={nickname} onClear={() => go(focus)} />
+        ? <WantPanel key={`q:${nickname}`} title={`'${nickname}' 검색`} kicker="PLAYER SEARCH" region={null} nickname={nickname} onClear={() => go(focus)} />
         : <WantPanel key={`r:${place ?? ""}`} title={place ? byCode.get(place)?.fullName ?? place : "서비스 지역 전체"} kicker={selected ? "NEIGHBORHOOD" : "AREA"} region={place} nickname={null} />}
     </div>
   </div>;
@@ -107,8 +107,8 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
     else if (keyword) setNotFound(true);
   }}>
     <div role="group" aria-label="찾는 방법" className="flex shrink-0 gap-1.5">
-      <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>📍 동네</button>
-      <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }} className={tab}>👤 닉네임</button>
+      <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>동네</button>
+      <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }} className={tab}>닉네임</button>
     </div>
     <div className="relative min-w-0 flex-1 sm:w-52 sm:flex-none">
       <label htmlFor="wish-search" className="sr-only">{mode === "region" ? "동네 이름" : "닉네임"}</label>
@@ -142,7 +142,7 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
         <h2 className="min-w-0 break-keep text-lg font-extrabold">{title}</h2>
         {onClear && <button type="button" onClick={onClear} className="btn-pixel h-8 shrink-0 px-2.5 text-xs font-bold">지우기</button>}
       </div>
-      {wants.data && <p className="mt-1 text-sm text-sub"><span aria-hidden="true">💗 </span>WISH <strong className="text-pink">{wants.data.total}</strong>개</p>}
+      {wants.data && <p className="mt-1 text-sm text-sub"><PixelIcon name="heart" className="mr-1 size-3.5" />WISH <strong className="text-pink">{wants.data.total}</strong>개</p>}
     </header>
     <div className="max-h-[min(60dvh,32rem)] overflow-y-auto p-3">
       {wants.error ? <LocalError message={wants.error} onRetry={() => void wants.refresh()} />
@@ -155,13 +155,13 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
     </div>
     <footer className="space-y-3 border-t-2 border-frame p-3">
       {popular.length > 0 && <div>
-        <p className="mb-1.5 font-pixel text-[10px] tracking-widest text-dim">♥ 이 동네 인기 찜</p>
+        <p className="mb-1.5 font-pixel text-[10px] tracking-widest text-dim"><PixelIcon name="heart" className="mr-1 size-3" />이 동네 인기 찜</p>
         <ol className="space-y-1">{popular.map((row) => <li key={row.product.id} className="flex items-center justify-between gap-2 text-xs">
           <Link href={`/products/${row.product.id}`} className="min-w-0 truncate hover:text-mint"><span className="mr-1.5 font-pixel text-violet">{row.rank}</span>{row.product.name}</Link>
-          <span className="shrink-0 text-dim">{row.count}명{row.isSample ? " · 샘플" : ""}</span>
+          <span className="shrink-0 text-dim">{row.count}명</span>
         </li>)}</ol>
       </div>}
-      <Link href="/local/trades/new?kind=want" className={`${localButton} w-full`}>💗 내 WISH 올리기</Link>
+      <Link href="/local/trades/new?kind=want" className={`${localButton} w-full`}>내 WISH 올리기</Link>
     </footer>
   </aside>;
 }
@@ -181,14 +181,12 @@ function WantRow({ post }: { post: ApiTradePost }) {
     <div className="min-w-0 flex-1">
       <p className="truncate text-xs text-dim">
         <span className={post.author ? "font-bold text-ink" : ""}>{post.isMine ? "나" : post.author?.nickname ?? "이웃 플레이어"}</span> · {post.regionName.split(" ").at(-1)}
-        {post.isSample && <span className="ml-1 text-violet">· 샘플 데이터</span>}
-        {post.isDemo && <span className="ml-1 rounded border border-mint/40 px-1 text-[10px] font-bold text-mint">데모 이웃</span>}
       </p>
-      <p className="truncate font-bold" style={{ color: rarity.color }}><span aria-hidden="true">💗 </span>{name}</p>
+      <p className="truncate font-bold" style={{ color: rarity.color }}><PixelIcon name="heart" className="mr-1 size-3.5" />{name}</p>
       <p className="truncate text-[11px] text-dim">{post.price !== null ? `희망가 ${formatPrice(post.price)}` : post.product ? `연결 상품 ${post.product.name}` : "가격 제안"}</p>
     </div>
     {giftable
-      ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold">🎁 선물</Link>
-      : <span title={post.isMine ? "내 글" : post.isSample ? "샘플 글에는 선물할 수 없어요" : "PIXEL MART 상품을 위시한 글에만 선물할 수 있어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">🎁 선물</span>}
+      ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold"><PixelIcon name="chest" className="mr-1 size-3.5" />선물하기</Link>
+      : <span title={post.isMine ? "내 글" : post.isSample ? "이 글에는 선물할 수 없어요" : "PIXEL MART 상품을 위시한 글에만 선물할 수 있어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">선물하기</span>}
   </article>;
 }

@@ -6,7 +6,6 @@ import { useAuth } from "@/components/AuthProvider";
 import ReviewsPanel from "@/components/products/ReviewsPanel";
 import QuestionsPanel from "@/components/products/QuestionsPanel";
 import { createReviewStore } from "@/lib/reviews";
-import { questions } from "@/lib/questions";
 import { PRODUCT_TABS, tabForKey, tabFromHash, type ProductTab } from "@/utils/productFeedback";
 
 interface ProductDetailTabsProps { productId: number; children: ReactNode; }
@@ -19,10 +18,10 @@ function subscribeHash(listener: () => void) {
 const getHash = () => window.location.hash;
 const serverHash = () => "";
 
-const TAB_META: Record<ProductTab, { icon: string; tag: string; label: string }> = {
-  info: { icon: "📜", tag: "ITEM INFO", label: "상품정보" },
-  reviews: { icon: "⭐", tag: "REVIEW", label: "리뷰" },
-  qna: { icon: "💬", tag: "Q&A", label: "문의" },
+const TAB_META: Record<ProductTab, { tag: string; label: string }> = {
+  info: { tag: "ITEM INFO", label: "상품정보" },
+  reviews: { tag: "REVIEW", label: "리뷰" },
+  qna: { tag: "Q&A", label: "문의" },
 };
 
 export default function ProductDetailTabs(props: ProductDetailTabsProps) {
@@ -62,11 +61,10 @@ function DetailTabs({ productId, children }: ProductDetailTabsProps) {
         const on = active === tab;
         const meta = TAB_META[tab];
         const sub = tab === "reviews" ? (snapshot.data ? `★ ${snapshot.data.averageRating?.toFixed(1) ?? "—"} · ${snapshot.data.total}개` : snapshot.error ? "조회 실패" : "불러오는 중")
-          : tab === "qna" && questions.mode === "demo" ? "데모 데이터" : null;
+          : null;
         return <button key={tab} ref={(element) => { buttons.current[tab] = element; }} type="button" role="tab" id={`product-${productId}-tab-${tab}`} aria-controls={tab} aria-selected={on} tabIndex={on ? 0 : -1}
           onClick={() => select(tab)} onKeyDown={(event) => { const next = tabForKey(tab, event.key); if (next) { event.preventDefault(); select(next); buttons.current[next]?.focus(); } }}
           className={`group flex min-h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-t-md border-2 px-2 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint sm:flex-none sm:px-5 ${on ? "border-violet/70 border-b-panel bg-panel text-lime" : "border-frame bg-night text-sub hover:bg-panel-2 hover:text-ink"}`}>
-          <span aria-hidden="true" className={`text-lg leading-none ${on ? "" : "opacity-60 grayscale-[50%] group-hover:opacity-100 group-hover:grayscale-0"}`}>{meta.icon}</span>
           <span className="min-w-0 text-left">
             <span className="hidden whitespace-nowrap font-pixel text-[11px] tracking-widest sm:block">{on && <span aria-hidden="true" className="motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">▶ </span>}{meta.tag}</span>
             <span className="block truncate text-sm font-bold sm:text-xs">{meta.label}{sub && <span className={`ml-1 hidden font-normal sm:inline ${tab === "qna" ? "text-violet" : "text-dim"}`}>{sub}</span>}</span>

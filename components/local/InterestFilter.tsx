@@ -12,8 +12,8 @@ interface InterestFilterProps {
   onSelect: (id: number | null) => void;
 }
 
-const chip = "shrink-0 rounded-full border-2 px-3 py-1.5 text-xs font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
-const chipState = "border-frame text-sub hover:border-violet aria-pressed:border-lime aria-pressed:bg-lime aria-pressed:text-lime-ink";
+const chip = "btn-pixel h-9 shrink-0 px-3 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
+const chipState = "text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
 
 /** 취향이 늘어나도 한 줄을 넘지 않게: 칩은 몇 개만, 나머지는 검색·종류별 목록 패널에서 고른다 */
 export default function InterestFilter({ interests, quick, selected, onSelect }: InterestFilterProps) {
@@ -51,8 +51,8 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
       {chips.map((item) => <button key={item.id} type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
         title={full(item)} aria-label={full(item)} className={`${chip} ${chipState}`}>{name(item)}</button>)}
       <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls={panelId}
-        className={`${chip} border-frame bg-panel-2 text-ink hover:border-violet`}>
-        <span aria-hidden="true">🔍 </span>취향 찾기{interests.length ? ` · ${interests.length}` : ""}
+        className={`${chip} text-ink`}>
+        취향 찾기{interests.length ? ` · ${interests.length}` : ""}
       </button>
     </div>
     {open && <div id={panelId} role="dialog" aria-label="취향 찾기" className="pixel-panel absolute inset-x-0 top-full z-30 mt-2 p-4 sm:right-auto sm:w-[28rem]">
@@ -65,7 +65,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
       <div role="tablist" aria-label="취향 종류" className="mt-3 flex flex-wrap gap-1.5">
         {[{ value: "all" as const, label: "전체" }, ...INTEREST_TYPES].map((item) => <button key={item.value} type="button" role="tab"
           aria-selected={type === item.value} onClick={() => setType(item.value)}
-          className="rounded-md border-2 border-transparent px-2.5 py-1 text-xs font-bold text-sub aria-selected:border-violet aria-selected:text-ink">{item.label}</button>)}
+          className="btn-pixel h-8 px-2.5 text-xs font-bold text-sub hover:text-ink">{item.label}</button>)}
       </div>
       <ul className="mt-3 grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3">
         {list.map((item) => <li key={item.id}>

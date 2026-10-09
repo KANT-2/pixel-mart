@@ -59,7 +59,7 @@ export default function Home() {
               ▶ 아이템 둘러보기
             </Link>
             <Link href="/local" className="btn-pixel px-6 py-4 font-bold">
-              🗺 월드맵 열기
+              월드맵 열기
             </Link>
           </div>
         </div>

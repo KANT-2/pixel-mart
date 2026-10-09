@@ -160,14 +160,14 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
     </div>
     <div className="space-y-4">
       <div role="toolbar" aria-label="그리기 도구" className="flex flex-wrap gap-2">
-        {([["pen", "✏️ 펜 (B)"], ["eraser", "🧽 지우개 (E)"], ["fill", "🪣 채우기 (G)"], ["picker", "💧 스포이드 (I)"]] as [Tool, string][]).map(([value, label]) =>
+        {([["pen", "펜 (B)"], ["eraser", "지우개 (E)"], ["fill", "채우기 (G)"], ["picker", "스포이드 (I)"]] as [Tool, string][]).map(([value, label]) =>
           <button key={value} type="button" aria-pressed={tool === value} disabled={disabled} onClick={() => setTool(value)} className={toolButton}>{label}</button>)}
-        <button type="button" aria-pressed={mirror} disabled={disabled} onClick={() => setMirror((value) => !value)} className={toolButton}>🪞 좌우 대칭 (M)</button>
+        <button type="button" aria-pressed={mirror} disabled={disabled} onClick={() => setMirror((value) => !value)} className={toolButton}>좌우 대칭 (M)</button>
       </div>
       <div className="flex flex-wrap gap-2">
         <button type="button" disabled={disabled || !past.length} onClick={undo} className={toolButton}>↶ 되돌리기</button>
         <button type="button" disabled={disabled || !future.length} onClick={redo} className={toolButton}>↷ 다시</button>
-        <button type="button" disabled={disabled} onClick={() => commit(createGrid(grid.cols, grid.rows), grid)} className={toolButton}>🗑 모두 지우기</button>
+        <button type="button" disabled={disabled} onClick={() => commit(createGrid(grid.cols, grid.rows), grid)} className={toolButton}>모두 지우기</button>
       </div>
       <div className="grid gap-3 @md:grid-cols-2">
         <label className="text-sm font-bold">캔버스 크기

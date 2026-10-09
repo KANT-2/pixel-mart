@@ -1,11 +1,12 @@
 import Link from "next/link";
+import PixelIcon from "@/components/PixelIcon";
 import type { ReactNode } from "react";
 import type { ApiTradePost, TradeProximity } from "@/types/api";
 import { TRADE_METHODS, TRADE_STATUSES, proximityLabel, containsContact } from "@/utils/localTrades";
 import { interestLabel } from "@/utils/local";
 import { formatDate } from "@/utils/formatDate";
 import { formatPrice } from "@/utils/formatPrice";
-import { durabilityOf, rarityOf, TRADE_KIND_GAME, TRADE_METHOD_ICON } from "@/utils/gameItem";
+import { durabilityOf, rarityOf, TRADE_KIND_GAME } from "@/utils/gameItem";
 
 interface TradeCardProps { post: ApiTradePost; proximity?: TradeProximity | null; actions?: ReactNode; }
 
@@ -20,11 +21,10 @@ export default function TradeCard({ post, proximity = null, actions }: TradeCard
   const method = TRADE_METHODS.find((item) => item.value === post.tradeMethod)?.label;
   return <article aria-label={itemName} className={`flex h-full min-w-0 flex-col pixel-panel p-4 ${post.status !== "open" ? "opacity-60" : ""}`}>
     <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
-      <span className={`rounded border-2 px-1.5 py-0.5 font-pixel ${kind.tone}`}>{kind.icon} {kind.tag}</span>
+      <span className={`rounded border-2 px-1.5 py-0.5 font-pixel ${kind.tone}`}><PixelIcon name={kind.icon} className="mr-1 size-3.5" />{kind.tag}</span>
       <span className="text-sub">{kind.label}</span>
       {post.status !== "open" && <span className="rounded bg-panel-2 px-1.5 py-0.5 text-sub">{TRADE_STATUSES[post.status]}</span>}
       {proximity && <span className="rounded border border-mint/40 px-1.5 py-0.5 text-mint">{proximityLabel(proximity)}</span>}
-      {post.isSample && <span className="ml-auto rounded border border-violet/40 px-1.5 py-0.5 text-violet">샘플 데이터</span>}
     </div>
     <div className="flex gap-3">
       <div className="item-slot grid size-20 shrink-0 place-items-center overflow-hidden" style={{ ["--rarity" as string]: rarity.color }}>
@@ -47,11 +47,11 @@ export default function TradeCard({ post, proximity = null, actions }: TradeCard
         <dt className="mb-1 flex justify-between text-dim"><span>내구도</span><span>{durability?.label ?? "상태 미지정"}</span></dt>
         <dd className="durability"><span style={{ width: `${durability?.percent ?? 0}%` }} /></dd>
       </div>
-      <div className="flex justify-between gap-2"><dt className="text-dim">거래 방식</dt><dd>{TRADE_METHOD_ICON[post.tradeMethod] ?? ""} {method}</dd></div>
+      <div className="flex justify-between gap-2"><dt className="text-dim">거래 방식</dt><dd>{method}</dd></div>
     </dl>
-    {content && <p className="mt-3 whitespace-pre-line break-words rounded-md border-2 border-frame bg-night p-2.5 text-sm leading-relaxed text-sub">💬 {content}</p>}
+    {content && <p className="mt-3 whitespace-pre-line break-words rounded-md border-2 border-frame bg-night p-2.5 text-sm leading-relaxed text-sub">“{content}”</p>}
     {post.product && <Link href={`/products/${post.product.id}`} className="mt-3 text-xs font-semibold text-mint hover:underline focus-visible:outline-2 focus-visible:outline-mint">
-      🛒 {post.product.name} 상점에서 보기 →
+      {post.product.name} 상점에서 보기 →
     </Link>}
     <div className="mt-auto flex items-end justify-between gap-2 pt-3">
       <time dateTime={post.createdAt} className="text-[11px] text-dim">{formatDate(post.createdAt)}</time>

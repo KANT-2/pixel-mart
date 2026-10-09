@@ -33,8 +33,8 @@ function GiftList({ box }: { box: Box }) {
   const tab = "btn-pixel inline-flex min-h-11 items-center px-4 text-sm font-bold aria-[current=page]:border-lime aria-[current=page]:text-lime";
   return <div className="space-y-5">
     <nav aria-label="선물함" className="flex gap-2">
-      <Link href="/mypage/gifts" aria-current={box === "received" ? "page" : undefined} className={tab}>📥 받은 선물</Link>
-      <Link href="/mypage/gifts?box=sent" aria-current={box === "sent" ? "page" : undefined} className={tab}>📤 보낸 선물</Link>
+      <Link href="/mypage/gifts" aria-current={box === "received" ? "page" : undefined} className={tab}>받은 선물</Link>
+      <Link href="/mypage/gifts?box=sent" aria-current={box === "sent" ? "page" : undefined} className={tab}>보낸 선물</Link>
     </nav>
     {gifts.error ? <LocalError message={gifts.error} onRetry={() => void gifts.refresh()} />
       : gifts.loading || !gifts.data ? <LocalSkeleton label="선물 불러오는 중" />
@@ -83,14 +83,14 @@ function GiftRow({ gift, onChanged }: { gift: ApiGift; onChanged: () => void }) 
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className={`rounded border-2 px-1.5 py-0.5 text-[11px] font-bold ${STATUS_TONE[gift.status]}`}>{gift.statusLabel}</span>
-          <span className="text-xs text-dim">{gift.box === "received" ? `🎁 ${gift.counterpart}에게서` : `🎁 ${gift.counterpart}에게`} · {formatDate(gift.createdAt)}</span>
+          <span className="text-xs text-dim">{gift.box === "received" ? `${gift.counterpart}에게서` : `${gift.counterpart}에게`} · {formatDate(gift.createdAt)}</span>
         </div>
         <p className="mt-1 font-bold" style={{ color: rarity.color }}>{gift.product.name} × {gift.quantity}</p>
-        <p className="text-xs text-dim">{rarity.label} · {formatPrice(gift.totalPrice)} (데모 결제)</p>
-        {gift.message && <p className="mt-2 whitespace-pre-line break-words rounded-md border-2 border-frame bg-night p-2 text-sm text-sub">💬 {gift.message}</p>}
+        <p className="text-xs text-dim">{rarity.label} · {formatPrice(gift.totalPrice)}</p>
+        {gift.message && <p className="mt-2 whitespace-pre-line break-words rounded-md border-2 border-frame bg-night p-2 text-sm text-sub">“{gift.message}”</p>}
       </div>
     </div>
-    {gift.orderId && <Link href={`/mypage/orders/${gift.orderId}`} className="mt-3 inline-block text-sm font-semibold text-mint hover:underline">📦 배송 현황 보기 →</Link>}
+    {gift.orderId && <Link href={`/mypage/orders/${gift.orderId}`} className="mt-3 inline-block text-sm font-semibold text-mint hover:underline">배송 현황 보기 →</Link>}
     {canAnswer && mode === "idle" && <div className="mt-3 flex flex-wrap gap-2">
       <button type="button" onClick={() => setMode("accept")} className="btn-lime h-10 px-4 text-sm font-bold">받기</button>
       <button type="button" onClick={() => setMode("decline")} className="btn-pixel h-10 px-4 text-sm font-bold">거절</button>
@@ -108,7 +108,7 @@ function GiftRow({ gift, onChanged }: { gift: ApiGift; onChanged: () => void }) 
       </div>
     </form>}
     {canAnswer && mode === "decline" && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border-2 border-frame bg-night p-3">
-      <p className="text-sm">선물을 거절할까요? 보낸 이웃에게는 데모 환불돼요.</p>
+      <p className="text-sm">선물을 거절할까요? 보낸 이웃에게는 환불돼요.</p>
       <button type="button" disabled={busy} onClick={() => void run(() => giftApi.decline(gift.id))} className="btn-pixel h-9 px-3 text-sm font-bold text-pink">{busy ? "처리 중…" : "거절하기"}</button>
       <button type="button" disabled={busy} onClick={() => setMode("idle")} className="btn-pixel h-9 px-3 text-sm font-bold">취소</button>
     </div>}

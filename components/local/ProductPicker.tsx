@@ -26,7 +26,7 @@ export default function ProductPicker({ selected, onChange, disabled = false }: 
           placeholder="상품 이름으로 검색 (예: 키캡)" className={`${localInput} min-w-0 flex-1`} />
         <button type="button" disabled={disabled || !q.trim()} onClick={search} className="btn-lime min-h-11 shrink-0 px-4 text-sm font-bold disabled:opacity-50">찾기</button>
       </div>
-      <p className="mt-2 text-xs text-dim">물건과 같은 상품이 있다면 연결해 주세요. 찾기를 누르면 결과 전체에서 고를 수 있어요.</p>
+      <p className="mt-2 text-xs text-dim">PIXEL MART에 물건과 같은 상품이 있다면 연결해 주세요. 찾기를 누르면 결과 전체에서 고를 수 있어요.</p>
     </div>
     {open && <ProductSearchModal key={open} initial={open} selectedId={selected?.id ?? null}
       onClose={() => setOpen(null)} onPick={(product) => { onChange(product); setQ(""); setOpen(null); }} />}

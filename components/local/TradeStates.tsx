@@ -3,7 +3,7 @@ import { localButton } from "@/components/local/LocalStates";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 export function TradeNotice() {
-  return <p className="mb-6 rounded-xl border border-violet/30 bg-panel p-4 text-sm leading-relaxed text-sub"><span className="mr-2 font-pixel text-xs text-violet">PROTOTYPE</span>같은 구·생활권의 물건을 발견하는 시연용 게시판이에요. 연락 수단을 받지 않으며 연락처·정확한 장소를 적을 수 없어요. 채팅·결제는 제공하지 않아요.</p>;
+  return <p className="mb-6 rounded-xl border border-violet/30 bg-panel p-4 text-sm leading-relaxed text-sub"><span className="mr-2 font-pixel text-xs text-violet">SAFE TRADE</span>같은 구·생활권의 물건을 발견하는 게시판이에요. 연락처·정확한 장소는 적을 수 없어요.</p>;
 }
 interface TradeLoginProps { next: string; }
 export function TradeLogin({ next }: TradeLoginProps) {

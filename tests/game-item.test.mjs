@@ -20,7 +20,7 @@ test("물건 상태 → 내구도", () => {
   assert.equal(g.durabilityOf(null), null);
 });
 
-test("거래 종류·방식 표시가 모두 정의돼 있다", () => {
+test("거래 종류 표시가 모두 정의돼 있고 위시는 WISH", () => {
   for (const kind of ["have", "want", "sell"]) assert.ok(g.TRADE_KIND_GAME[kind].tag);
-  for (const method of ["direct", "delivery", "both"]) assert.ok(g.TRADE_METHOD_ICON[method]);
+  assert.equal(g.TRADE_KIND_GAME.want.tag, "WISH");
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
 import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -31,26 +32,25 @@ export default function TradesBoard() {
     <section aria-label="게시판 필터" className="space-y-2">
       <div className="pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2">
         {/* 사거나 팔고 싶은 물건 이름으로 찾기 — 물건 이름·연결 상품·설명에서 */}
-        <form role="search" aria-label="물건 찾기" className="flex w-full min-w-0 gap-2" onSubmit={(event) => {
+        <form role="search" aria-label="물건 찾기" className="flex min-w-0 flex-[1_1_16rem] gap-2" onSubmit={(event) => {
           event.preventDefault();
           const q = String(new FormData(event.currentTarget).get("q") ?? "").trim().slice(0, 40);
           change({ q: q || undefined });
         }}>
           <label htmlFor="trade-q" className="sr-only">찾는 물건</label>
           <div className="relative min-w-0 flex-1">
-            <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-sm">🔎</span>
             <input key={query.q ?? ""} id="trade-q" name="q" type="search" defaultValue={query.q ?? ""} maxLength={40} enterKeyHint="search"
-              placeholder="사거나 팔고 싶은 물건 찾기 (예: 키링, 장패드)" className="pixel-input h-10 w-full min-w-0 py-0 pl-9 pr-3 text-sm text-ink" />
+              placeholder="찾는 물건 (예: 키링)" className="pixel-input h-10 w-full min-w-0 px-3 py-0 text-sm text-ink" />
           </div>
           <button type="submit" className="btn-lime h-10 shrink-0 px-4 text-sm font-bold">찾기</button>
-          {query.q && <button type="button" onClick={() => change({ q: undefined })} className="btn-pixel h-10 shrink-0 px-3 text-xs font-bold">✕ 검색 지우기</button>}
+          {query.q && <button type="button" onClick={() => change({ q: undefined })} className="btn-pixel h-10 shrink-0 px-3 text-xs font-bold">검색 지우기</button>}
         </form>
-        <div className="min-w-0 flex-[1_1_22rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
+        <div className="min-w-0 flex-[2_1_26rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
         {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
         <div role="group" aria-label="글 종류 필터" className="flex shrink-0 gap-1.5 border-l-2 border-frame pl-2">
-          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item) =>
+          {[{ value: undefined, label: "ALL", name: "모든 글", icon: undefined }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: TRADE_KIND_GAME[item.value].tag, name: item.label, icon: TRADE_KIND_GAME[item.value].icon }))].map((item) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
-              className="btn-pixel h-10 px-3 font-pixel text-xs text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">{item.label}</button>)}
+              className="btn-pixel h-10 px-3 font-pixel text-xs text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">{item.icon && <PixelIcon name={item.icon} className="mr-1.5 size-3.5" />}{item.label}</button>)}
         </div>
       </div>
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
@@ -75,6 +75,6 @@ function TradesResults({ query, regions, ownRegion }: TradesResultsProps) {
     <ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} /></li>)}</ul>
     <Pagination currentPage={data.page} totalPages={data.totalPages} basePath="/local/trades" query={tradeQueryParams(query).toString()} />
   </> : <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 가진 물건을 올려 보세요. 갖고 싶은 아이템은 위시맵에서 찾을 수 있어요.</p>
-    <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=have" className={localButton}>HAVE 글쓰기</Link><Link href="/local/wish-map" className={localButton}>💗 위시맵 보기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
+    <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=have" className={localButton}>HAVE 글쓰기</Link><Link href="/local/wish-map" className={localButton}>위시맵 보기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
   </div>;
 }

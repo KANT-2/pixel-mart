@@ -118,7 +118,7 @@ export default function FaqBrowser({ items, fallback }: FaqBrowserProps) {
 
       <nav aria-label="FAQ 분류" className="-mx-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin]">
         <div className="flex w-max gap-2">
-          {tabs.map((tab) => <button key={tab.category ?? "all"} type="button" aria-pressed={category === tab.category} onClick={() => selectCategory(tab.category)} className={`flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet ${category === tab.category ? "border-violet bg-violet/15 text-ink" : "border-line bg-panel text-sub hover:text-ink"}`}>
+          {tabs.map((tab) => <button key={tab.category ?? "all"} type="button" aria-pressed={category === tab.category} onClick={() => selectCategory(tab.category)} className="btn-pixel flex min-h-10 items-center gap-2 px-4 text-sm font-semibold whitespace-nowrap text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
             {tab.label}<span className="text-dim">{tab.count}</span>
           </button>)}
         </div>

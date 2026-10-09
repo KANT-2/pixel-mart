@@ -8,7 +8,7 @@ export default function WishMapPage() {
   return <section className="mx-auto max-w-6xl px-4 pb-10 pt-3 md:px-8 md:pt-4">
     <header className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <p className="stage-kicker font-pixel text-sm text-mint">LOCAL WISH MAP</p>
-      <h1 className="text-xl font-extrabold">동네 이웃이 구하는 아이템 <span aria-hidden="true">💗</span></h1>
+      <h1 className="text-xl font-extrabold">동네 이웃이 갖고 싶은 아이템</h1>
     </header>
     <Suspense fallback={<LocalSkeleton />}><WishMap /></Suspense>
   </section>;

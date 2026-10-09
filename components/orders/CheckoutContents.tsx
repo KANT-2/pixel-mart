@@ -134,7 +134,7 @@ function CheckoutForm() {
     <div role="status" className="rounded-2xl border border-mint/30 bg-panel p-6">
       <p className="mb-3 font-pixel text-mint" aria-hidden="true">ORDER COMPLETE</p>
       <h2 className="text-xl font-extrabold">주문이 완료됐어요</h2>
-      <p className="mt-2 text-sm text-sub">주문번호 #{createdOrder.id} · 실제 결제는 진행되지 않았어요.</p>
+      <p className="mt-2 text-sm text-sub">주문번호 #{createdOrder.id}</p>
       <p className="mt-3 text-sm text-sub">{busy ? "장바구니를 갱신한 뒤 주문 상세로 이동해요." : "아래는 서버에서 확정한 주문 내용이에요."}</p>
     </div>
     <CheckoutSummary items={createdOrder.items} totalPrice={createdOrder.totalPrice} confirmed />
@@ -168,7 +168,6 @@ function CheckoutForm() {
     </div>
     <form onSubmit={submit} noValidate className="min-w-0 pixel-panel p-5 sm:p-6">
       <h2 className="mb-2 text-xl font-extrabold">배송지 입력</h2>
-      <p className="mb-6 text-sm leading-relaxed text-sub">데모 주문이에요. 실제 결제나 배송은 이루어지지 않아요.</p>
       <fieldset disabled={disabled} className="space-y-5">
         <div>
           <label htmlFor="recipientName" className="mb-2 block text-sm font-semibold">받는 사람</label>
@@ -193,7 +192,7 @@ function CheckoutForm() {
       </div>}
       <p className="mt-5 text-xs leading-relaxed text-dim">주문 버튼을 누르면 서버 장바구니의 모든 상품으로 주문이 생성돼요.</p>
       <button type="submit" disabled={disabled || cartPending}
-        className="mt-4 min-h-12 w-full btn-lime px-4 py-3 text-sm font-bold text-lime-ink disabled:opacity-50">{busy ? "주문 처리 중…" : "주문하기 (데모: 실제 결제 없음)"}</button>
+        className="mt-4 min-h-12 w-full btn-lime px-4 py-3 text-sm font-bold text-lime-ink disabled:opacity-50">{busy ? "주문 처리 중…" : "주문하기"}</button>
       <p role="status" className="mt-3 min-h-5 text-center text-xs text-sub">{cartPending ? "장바구니 변경 사항을 확인하고 있어요." : ""}</p>
     </form>
   </div>;

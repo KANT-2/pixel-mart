@@ -56,7 +56,7 @@ export default function Pagination({ currentPage, totalPages, category, basePath
             href={pageHref(page)}
             aria-current={page === currentPage ? "page" : undefined}
             className={`${baseClass} transition-colors ${
-              page === currentPage ? "bg-lime text-lime-ink" : "text-sub hover:bg-white/5 hover:text-ink"
+              page === currentPage ? "btn-pixel" : "btn-pixel text-sub hover:text-ink"
             }`}
           >
             {page}

@@ -52,7 +52,7 @@ export default function InterestPicker({ selected, onChange, disabled = false, s
         : results.data?.length ? <ul aria-label="취향 검색 결과" className="flex flex-wrap gap-2">
           {results.data.map((item) => {
             const checked = selected.some((value) => value.id === item.id);
-            return <li key={item.id}><button type="button" disabled={disabled} aria-pressed={checked} onClick={() => toggle(item)} className={`${localButton} ${checked ? "border-mint/50 text-mint" : ""}`}>
+            return <li key={item.id}><button type="button" disabled={disabled} aria-pressed={checked} onClick={() => toggle(item)} className={localButton}>
               <span aria-hidden="true" className="mr-2">{checked ? "✓" : "+"}</span>{item.name}
               <span className="ml-2 text-xs text-dim">{INTEREST_TYPES.find((value) => value.value === item.type)?.label}</span>
             </button></li>;

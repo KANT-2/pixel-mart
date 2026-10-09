@@ -15,7 +15,7 @@ interface TradeWindowProps {
 
 const SLOTS = 6;
 
-/** 게임 교환 창 — 왼쪽은 나, 오른쪽은 이웃(익명), 아래는 고른 아이템 정보. 실제 교환·채팅·결제는 없는 시연용 */
+/** 게임 교환 창 — 왼쪽은 나, 오른쪽은 이웃(익명), 아래는 고른 아이템 정보. 채팅·연락처 없이 아이템과 조건만 */
 export default function TradeWindow({ match, me }: TradeWindowProps) {
   const [picked, setPicked] = useState<"want" | "offer">("offer");
   const item = picked === "want" ? match.want : match.offer;

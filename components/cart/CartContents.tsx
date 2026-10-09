@@ -47,7 +47,6 @@ export default function CartContents() {
             <div className="flex justify-between gap-3 text-sm"><dt className="text-sub">총 수량</dt><dd className="font-semibold">{cart.totalQuantity}개</dd></div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-4"><dt className="font-semibold">총 상품 금액</dt><dd className="text-2xl font-extrabold text-lime">{formatPrice(cart.totalPrice)}</dd></div>
           </dl>
-          <p className="mt-3 text-xs text-dim">데모 주문으로 실제 결제와 배송은 이루어지지 않아요.</p>
           <Link href="/checkout" className="mt-6 flex min-h-11 w-full items-center justify-center btn-lime px-4 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">주문하기</Link>
           <p role="status" className="mt-4 min-h-5 text-center text-xs text-sub">{pendingIds.length > 0 ? "변경 사항을 저장하고 있어요." : loading ? "장바구니를 확인하고 있어요." : "장바구니는 로그인 계정에 저장돼요."}</p>
         </aside>

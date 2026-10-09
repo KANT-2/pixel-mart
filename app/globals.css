@@ -139,6 +139,25 @@ html {
   }
 }
 
+/* 고른 토글(탭·필터·모드)은 주 버튼처럼 연두로 솟아 보이게 — 찾기 버튼과 같은 입체감.
+   레이어 밖에 두어 각 컴포넌트의 글자색 유틸리티보다 우선한다 */
+.btn-pixel[aria-pressed="true"],
+.btn-pixel[aria-selected="true"],
+.btn-pixel[aria-current="page"],
+.btn-pixel[aria-current="location"] {
+  border-color: #0b0f1e;
+  background-color: var(--color-lime);
+  color: var(--color-lime-ink);
+  box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 4px 0 #4f7d1c;
+}
+.btn-pixel[aria-pressed="true"]:hover:not(:disabled),
+.btn-pixel[aria-selected="true"]:hover:not(:disabled),
+.btn-pixel[aria-current="page"]:hover:not(:disabled) {
+  border-color: #0b0f1e;
+  color: var(--color-lime-ink);
+  box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 5px 0 #4f7d1c;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-lime,
   .btn-pixel {

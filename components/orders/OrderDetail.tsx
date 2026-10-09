@@ -119,7 +119,7 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
     {order && <>
       {placed && <div role="status" className="rounded-xl border border-mint/30 bg-mint/5 p-5">
         <p className="font-extrabold text-mint">주문이 완료됐어요!</p>
-        <p className="mt-2 text-sm leading-relaxed text-sub">아래는 서버에 접수된 실제 주문 내역이에요. 데모 주문으로 실제 결제는 발생하지 않아요.</p>
+        <p className="mt-2 text-sm leading-relaxed text-sub">접수된 주문 내역과 배송 진행 상황이에요.</p>
       </div>}
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -154,8 +154,8 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
           {cancellationAccepted ? <div role="status" className="rounded-xl border border-mint/30 bg-panel p-5 text-sm leading-relaxed text-mint">취소 신청이 접수됐어요. 최신 주문 상태를 확인해 주세요.</div> :
             canCancelOrder(order.status) && <CancelRequestForm busy={blocked} onSubmit={(reason) => mutate("cancel", reason)} />}
           {process.env.NODE_ENV === "development" && canAdvanceOrder(order.status) && !cancellationAccepted && <section className="rounded-xl border border-violet/30 bg-panel p-5">
-            <p className="text-sm font-bold text-violet">개발용 · 배송 시연</p>
-            <p className="mt-2 text-xs leading-relaxed text-sub">로컬 데모 주문의 배송을 다음 단계로 진행해요.</p>
+            <p className="text-sm font-bold text-violet">개발용 · 배송 진행</p>
+            <p className="mt-2 text-xs leading-relaxed text-sub">주문의 배송을 다음 단계로 진행해요.</p>
             <button type="button" disabled={blocked} onClick={() => { void mutate("advance"); }} className={`mt-4 btn-pixel px-4 py-3 text-sm font-bold disabled:opacity-50 ${focusClass}`}>{pending ? "처리 중…" : "다음 배송 단계로"}</button>
           </section>}
         </div>
@@ -166,7 +166,6 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
             <div><dt className="text-sub">주소</dt><dd className="mt-1 whitespace-pre-line break-words leading-relaxed">{order.address}</dd></div>
             <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-5"><dt className="font-bold">주문 금액</dt><dd className="text-2xl font-extrabold text-mint">{formatPrice(order.totalPrice)}</dd></div>
           </dl>
-          <p className="mt-3 text-xs leading-relaxed text-dim">실제 결제가 없는 데모 주문이에요.</p>
         </aside>
       </div>
     </>}

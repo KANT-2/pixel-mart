@@ -36,6 +36,9 @@ export default function FandomMapScreen() {
 
   const loadBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewCode, view.legend, query.interest, signal), [viewCode, view.legend, query.interest]);
   const blocks = useLocalResource(loadBlocks);
+  // 칩은 취향을 골라도 바뀌지 않게 '전체' 기준 인기 취향으로 (같은 요청은 캐시돼 다시 받지 않음)
+  const loadAllBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewCode, view.legend, null, signal), [viewCode, view.legend]);
+  const allBlocks = useLocalResource(loadAllBlocks);
   const loadInterests = useCallback((signal: AbortSignal) => localApi.interests("", undefined, signal), []);
   const interests = useLocalResource(loadInterests);
   const locator = useRegionLocator(catalog);
@@ -54,8 +57,12 @@ export default function FandomMapScreen() {
   const trail = viewTrail(viewCode, catalog);
   // 칩은 내 취향, 없으면 지금 지도에서 인기 있는 취향 몇 개만 — 나머지는 '취향 찾기'에서
   const saved = profile.data?.interests ?? [];
-  const popularNames = [...new Set((blocks.data ?? []).map((block) => block.topInterest).filter(Boolean))];
-  const quickInterests = saved.length ? saved : (interests.data ?? []).filter((item) => popularNames.includes(item.name)).slice(0, 5);
+  const popularNames = [...new Set((allBlocks.data ?? []).map((block) => block.topInterest).filter(Boolean))];
+  const popular = (interests.data ?? []).filter((item) => popularNames.includes(item.name)).slice(0, 5);
+  const base = saved.length ? saved : popular;
+  // 취향 찾기로 고른 취향도 칩으로 보여 준다 (옆 칩이 사라지지 않고 하나 더 붙음)
+  const picked = interests.data?.find((item) => item.id === query.interest);
+  const quickInterests = picked && !base.some((item) => item.id === picked.id) ? [...base, picked] : base;
   const interestName = interests.data?.find((item) => item.id === query.interest)?.name;
 
   return <section className="mx-auto max-w-6xl px-4 pb-10 pt-3 md:px-8 md:pt-4">
@@ -88,7 +95,6 @@ export default function FandomMapScreen() {
         )}
         <p className="mt-2 text-xs leading-relaxed text-dim">
           지도의 캐릭터는 &lsquo;지도에 내 아바타 표시&rsquo;에 동의한 이웃의 아바타예요. 동의한 이웃이 5명 미만인 동네는 집계 인원만큼 기본 슬라임으로 채우며, 위치는 동네 안에서 무작위로 놓인 장식이에요.
-          {mapBlocks.some((block) => block.sample) && <> <span className="text-violet">*</span> 샘플 데이터</>}
         </p>
       </div>
       <PlacePanel code={selected ?? (viewCode || null)} region={byCode.get(selected ?? viewCode) ?? null}
@@ -149,13 +155,12 @@ function PlacePanel({ code, region, block, interest, interestName, hasChildren }
     <h2 className="mt-1 break-keep text-lg font-extrabold">{region.fullName}</h2>
     {block && <p className="mt-3 text-sm">
       {block.count ? <><strong className="text-lime">{block.count}명</strong>의 {block.hint === "지도 표시 이웃" ? "이웃이 지도에 아바타를 보여 주고" : `${interestName ? `${interestName} 팬` : block.hint ?? "이웃"}이`} 있어요</> : "아직 소수의 이웃이 있어요"}
-      {block.sample && <span className="ml-1 text-xs text-violet">· 샘플</span>}
     </p>}
     {top.length > 0 && <div className="mt-4">
       <p className="mb-2 text-xs text-dim">이 동네 인기 취향</p>
       <ol className="space-y-1.5">{top.map((row) => <li key={row.interestId} className="flex items-center justify-between gap-2 text-sm">
         <span className="min-w-0 truncate"><span className="mr-2 font-pixel text-violet">{row.rank}</span>{row.interest}</span>
-        <span className="shrink-0 text-xs text-sub">{row.count}명{row.isSample ? " · 샘플" : ""}</span>
+        <span className="shrink-0 text-xs text-sub">{row.count}명</span>
       </li>)}</ol>
     </div>}
     <div className="mt-5 grid gap-2">
