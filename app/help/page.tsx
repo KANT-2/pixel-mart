@@ -40,11 +40,10 @@ export default function HelpPage() {
           <h2 className="font-bold">상품 Q&A는 상품 상세에서</h2>
           <p className="mt-2 text-sm text-sub">궁금한 아이템을 찾아보세요 <span aria-hidden="true">→</span></p>
         </Link>
-        {/* TODO(#42): 마이페이지의 주문 내역으로 연결 */}
-        <Link href="/mypage" className="rounded-2xl border border-line bg-panel p-5 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">
+        <Link href="/mypage/orders" className="rounded-2xl border border-line bg-panel p-5 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">
           <p className="mb-3 font-pixel text-xs text-mint">MY ITEMS</p>
           <h2 className="font-bold">주문·배송 확인은 마이페이지에서</h2>
-          <p className="mt-2 text-sm text-sub">내 정보 확인하기 <span aria-hidden="true">→</span></p>
+          <p className="mt-2 text-sm text-sub">주문 내역 확인하기 <span aria-hidden="true">→</span></p>
         </Link>
       </section>
     </div>
