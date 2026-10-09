@@ -19,7 +19,7 @@ function SearchIcon() {
 
 function SearchForm({ query, onSubmit, inputRef, className = "" }: SearchFormProps) {
   return <form role="search" aria-label="헤더 상품 검색" onSubmit={onSubmit}
-    className={`h-10 min-w-0 items-center pixel-input focus-within:ring-2 focus-within:ring-violet ${className}`}>
+    className={`h-10 min-w-0 items-center pixel-input focus-within:border-mint/60 ${className}`}>
     <input ref={inputRef} name="q" type="search" aria-label="상품 검색어" placeholder="상품 검색" maxLength={50}
       defaultValue={query} className="h-full min-w-0 flex-1 rounded-lg bg-transparent px-3 text-sm text-ink outline-none placeholder:text-dim" />
     <button type="submit" aria-label="상품 검색 실행"

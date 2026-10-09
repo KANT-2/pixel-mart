@@ -19,6 +19,10 @@ export default function MyPage() {
       <span aria-hidden="true" className="grid size-16 shrink-0 place-items-center rounded-lg bg-panel-2 font-pixel text-mint">BOX</span>
       <span><span className="block font-bold">주문 내역 보기 →</span><span className="mt-1 block text-sm text-sub">주문한 아이템과 배송 진행 상황을 확인하세요.</span></span>
     </Link>
+    <Link href="/mypage/gifts" className="mb-6 flex items-center gap-4 pixel-panel p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">
+      <span aria-hidden="true" className="grid size-16 shrink-0 place-items-center rounded-lg bg-panel-2 text-3xl">🎁</span>
+      <span><span className="block font-bold">선물함 →</span><span className="mt-1 block text-sm text-sub">이웃에게 받은 선물을 받거나, 보낸 선물 상태를 확인하세요.</span></span>
+    </Link>
     <Link href="/mypage/wishlist" className="mb-6 flex items-center gap-4 pixel-panel p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">
       <span className="grid size-16 shrink-0 place-items-center rounded-lg bg-panel-2 text-pink" aria-hidden="true">
         <svg width="32" height="32" viewBox="0 0 16 16" fill="currentColor" shapeRendering="crispEdges"><path d="M2 2h4v2h4V2h4v2h2v6h-2v2h-2v2h-2v2H6v-2H4v-2H2v-2H0V4h2z" /></svg>

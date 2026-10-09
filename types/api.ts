@@ -221,3 +221,18 @@ export interface ApiTradeMatch {
 }
 
 export interface ApiWishMapItem { rank: number; product: ApiProduct; count: number; isSample?: boolean; }
+
+/** 동네 선물 — 상대는 항상 "이웃 플레이어" (닉네임·주소 없음) */
+export interface ApiGift {
+  id: number;
+  box: "sent" | "received";
+  status: "pending" | "accepted" | "declined";
+  statusLabel: string;
+  product: ApiProduct;
+  quantity: number;
+  totalPrice: number;
+  message: string;
+  counterpart: string;
+  orderId: number | null;
+  createdAt: string;
+}

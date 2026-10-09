@@ -130,8 +130,12 @@ html {
     background-color: var(--color-night);
     box-shadow: inset 2px 2px 0 rgb(0 0 0 / 0.35);
   }
-  .pixel-input:focus {
-    border-color: var(--color-mint);
+  /* 포커스 네온 — 한 겹만, 은은하게 */
+  .pixel-input:focus,
+  .pixel-input:focus-visible {
+    border-color: color-mix(in srgb, var(--color-mint) 55%, var(--color-frame));
+    outline: none;
+    box-shadow: inset 2px 2px 0 rgb(0 0 0 / 0.35), 0 0 6px color-mix(in srgb, var(--color-mint) 25%, transparent);
   }
 }
 

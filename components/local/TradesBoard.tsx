@@ -28,7 +28,7 @@ export default function TradesBoard() {
     {/* 거래소 도구 막대 — 지역 · 종류를 한 줄에 */}
     <section aria-label="게시판 필터" className="space-y-2">
       <div className="pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2">
-        <div className="min-w-0 flex-[1_1_14rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} onChange={(region) => change({ region })} /></div>
+        <div className="min-w-0 flex-[1_1_22rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
         <div role="group" aria-label="글 종류 필터" className="flex flex-wrap gap-1.5">
           {[{ value: undefined, label: "전체" }, ...TRADE_KINDS.map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}` }))].map((item) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} onClick={() => change({ kind: item.value as TradeKind | undefined })}

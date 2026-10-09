@@ -19,7 +19,7 @@ const sortLabels: Record<ProductQuery["sort"], string> = {
   price_asc: "낮은 가격순",
   price_desc: "높은 가격순",
 };
-const fieldClass = "min-w-0 pixel-input px-3 py-2.5 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-violet";
+const fieldClass = "min-w-0 pixel-input px-3 py-2.5 text-sm text-ink";
 
 export default function ProductFilters({ query, categories }: ProductFiltersProps) {
   const router = useRouter();

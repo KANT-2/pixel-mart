@@ -20,7 +20,7 @@ const { localApi } = await import(await moduleUrl("../lib/local.ts", { "@/lib/ap
 const { createLocalResource } = await import(await moduleUrl("../lib/localResource.ts", { "@/lib/api": apiUrl }));
 const { default: TradeCard } = await import(await moduleUrl("../components/local/TradeCard.tsx", {
   "@/utils/local": localUrl, "@/utils/localTrades": rulesUrl,
-  "@/utils/formatDate": await moduleUrl("../utils/formatDate.ts"), "@/utils/formatPrice": await moduleUrl("../utils/formatPrice.ts"), "@/utils/gameItem": await moduleUrl("../utils/gameItem.ts"),
+  "@/utils/formatDate": await moduleUrl("../utils/formatDate.ts"), "@/utils/formatPrice": await moduleUrl("../utils/formatPrice.ts"), "@/utils/gameItem": await moduleUrl("../utils/gameItem.ts"), "@/utils/gift": await moduleUrl("../utils/gift.ts"),
   "react/jsx-runtime": import.meta.resolve("react/jsx-runtime"), "next/link": import.meta.resolve("next/link.js"),
 }));
 const draft = { kind: "have", itemName: "  QA 키링  ", condition: "new", price: "", tradeMethod: "direct", content: "첫 줄\n둘째 줄", productId: null, interestId: null };
