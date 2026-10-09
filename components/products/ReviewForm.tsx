@@ -7,7 +7,7 @@ import { ApiError } from "@/lib/api";
 import { reviewsApi } from "@/lib/reviews";
 import { validateReview } from "@/utils/productFeedback";
 
-interface ReviewFormProps { productId: number; onCreated: () => Promise<void>; }
+interface ReviewFormProps { productId: number; onCreated: () => Promise<void>; deleting?: boolean; }
 
 export default function ReviewForm(props: ReviewFormProps) {
   const { user, loading } = useAuth();
@@ -16,7 +16,7 @@ export default function ReviewForm(props: ReviewFormProps) {
   return <AccountReviewForm key={user.id} {...props} />;
 }
 
-function AccountReviewForm({ productId, onCreated }: ReviewFormProps) {
+function AccountReviewForm({ productId, onCreated, deleting = false }: ReviewFormProps) {
   const { pending: authPending, refresh } = useAuth();
   const id = useId();
   const [rating, setRating] = useState(0);
@@ -36,7 +36,7 @@ function AccountReviewForm({ productId, onCreated }: ReviewFormProps) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (lock.current || authPending || submitted) return;
+    if (lock.current || authPending || submitted || deleting) return;
     const validation = validateReview(rating, content);
     setErrors(validation.errors);
     setError(null);
@@ -63,7 +63,7 @@ function AccountReviewForm({ productId, onCreated }: ReviewFormProps) {
 
   if (expired) return <FeedbackLogin section="reviews" />;
   if (submitted) return <p role="status" className="rounded-xl border border-mint/30 bg-panel p-5 text-sm text-mint">리뷰를 등록했어요.</p>;
-  const disabled = busy || authPending;
+  const disabled = busy || authPending || deleting;
   return <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-panel p-5 sm:p-6">
     <h3 className="text-lg font-bold">리뷰 쓰기</h3>
     <p className="mt-2 text-xs leading-relaxed text-sub">배송 완료한 상품에 한 번만 작성할 수 있어요. 작성 가능 여부는 등록할 때 확인해요.</p>

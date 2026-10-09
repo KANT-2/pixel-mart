@@ -11,11 +11,12 @@ async function moduleUrl(path, dependencies = {}) {
   for (const [specifier, replacement] of Object.entries(dependencies)) output = output.replaceAll(`"${specifier}"`, JSON.stringify(replacement));
   return `data:text/javascript;base64,${Buffer.from(output).toString("base64")}`;
 }
-const { tabFromHash, tabForKey, validateReview } = await import(await moduleUrl("../utils/productFeedback.ts"));
+const feedbackModule = await moduleUrl("../utils/productFeedback.ts");
+const { tabFromHash, tabForKey, validateReview, canDeleteReview, reviewPageAfterReload } = await import(feedbackModule);
 const { createQuestionsAdapter, validateQuestion } = await import(await moduleUrl("../lib/questions.ts"));
 const apiModule = await moduleUrl("../lib/api.ts");
 const { ApiError } = await import(apiModule);
-const { reviewsApi, createReviewStore } = await import(await moduleUrl("../lib/reviews.ts", { "@/lib/api": apiModule }));
+const { reviewsApi, createReviewStore } = await import(await moduleUrl("../lib/reviews.ts", { "@/lib/api": apiModule, "@/utils/productFeedback": feedbackModule }));
 const formatModule = await moduleUrl("../utils/formatDate.ts");
 const renderDependencies = { "react/jsx-runtime": import.meta.resolve("react/jsx-runtime"), "@/utils/formatDate": formatModule };
 const { default: ReviewEntries } = await import(await moduleUrl("../components/products/ReviewEntries.tsx", renderDependencies));
@@ -42,6 +43,22 @@ test("탭 해시 해석과 좌우 순환·Home·End, 관계없는 키 무시", (
   assert.equal(tabForKey("reviews", "Tab"), null);
 });
 
+test("리뷰 삭제 표시 판단은 로그인 + isMine만 사용하고 닉네임은 무관", () => {
+  assert.equal(canDeleteReview({ isMine: true, nickname: "바뀐 닉네임" }, true), true);
+  assert.equal(canDeleteReview({ isMine: false, nickname: "내 닉네임과 같음" }, true), false);
+  assert.equal(canDeleteReview({ isMine: true }, false), false);
+  for (const isMine of [undefined, null, "true", 1, false]) assert.equal(canDeleteReview({ isMine }, true), false);
+});
+
+test("삭제 후 페이지에 항목이 있으면 유지, 비면 이전 페이지로 이동하며 1보다 작아지지 않음", () => {
+  assert.equal(reviewPageAfterReload({ page: 2, totalPages: 3, items: [{ id: 1 }] }), 2);
+  assert.equal(reviewPageAfterReload({ page: 2, totalPages: 1, items: [] }), 1);
+  assert.equal(reviewPageAfterReload({ page: 3, totalPages: 3, items: [] }), 2);
+  assert.equal(reviewPageAfterReload({ page: 5, totalPages: 2, items: [] }), 2);
+  assert.equal(reviewPageAfterReload({ page: 1, totalPages: 1, items: [] }), 1);
+  assert.equal(reviewPageAfterReload({ page: 1, totalPages: 0, items: [] }), 1);
+});
+
 test("리뷰 API는 쿠키 포함 클라이언트 GET·POST, 캐시 비활성, 400·403 서버 메시지 보존", async (t) => {
   const originalFetch = globalThis.fetch;
   t.after(() => { globalThis.fetch = originalFetch; });
@@ -49,15 +66,28 @@ test("리뷰 API는 쿠키 포함 클라이언트 GET·POST, 캐시 비활성, 4
   globalThis.fetch = async (url, init) => { calls.push({ url, ...init }); return new Response(JSON.stringify({ id: 7 })); };
   await reviewsApi.list(3, 2);
   await reviewsApi.create(3, { rating: 5, content: "본문" });
+  await reviewsApi.remove(3, 7);
   assert.equal(calls[0].url, "/api/products/3/reviews?page=2&size=10");
   assert.equal(calls[0].method, "GET");
   assert.equal(calls[1].url, "/api/products/3/reviews");
   assert.equal(calls[1].method, "POST");
   assert.deepEqual(JSON.parse(calls[1].body), { rating: 5, content: "본문" });
+  assert.equal(calls[2].url, "/api/products/3/reviews/7");
+  assert.equal(calls[2].method, "DELETE");
+  assert.equal(calls[2].body, undefined);
   for (const call of calls) { assert.equal(call.cache, "no-store"); assert.equal(call.credentials, "same-origin"); }
   for (const [status, detail] of [[403, "배송이 완료된 상품만 리뷰를 작성할 수 있습니다."], [400, "이미 리뷰를 작성한 상품입니다."]]) {
     globalThis.fetch = async () => new Response(JSON.stringify({ detail }), { status });
     await assert.rejects(reviewsApi.create(3, { rating: 5, content: "본문" }), { status, message: detail });
+  }
+});
+
+test("리뷰 DELETE의 404·401·기타 서버 오류를 상태와 메시지 그대로 전달", async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  for (const [status, detail, expected] of [[404, "리뷰를 찾을 수 없습니다.", "리뷰를 찾을 수 없습니다."], [401, "Unauthorized", "로그인이 필요합니다"], [500, "삭제 요청 처리 실패", "삭제 요청 처리 실패"]]) {
+    globalThis.fetch = async () => new Response(JSON.stringify({ detail }), { status });
+    await assert.rejects(reviewsApi.remove(3, 7), { status, message: expected });
   }
 });
 
@@ -102,6 +132,28 @@ test("리뷰 GET 실패는 기존 데이터를 보존하고 GET 재시도로 복
   assert.equal(store.getSnapshot().error, null);
   assert.equal(store.getSnapshot().data.total, 0);
   assert.equal(store.getSnapshot().data.averageRating, null);
+});
+
+test("마지막 페이지 리뷰 삭제 후 현재 페이지를 조회하고 이전 페이지·평균·개수를 갱신", async (t) => {
+  const { store, calls } = makeStore(t);
+  store.start(); calls[0].resolve(reviewPage(1, 11)); await tick();
+  const reload = store.load(2);
+  calls[1].resolve({ ...reviewPage(2, 10, 4), items: [] }); await tick();
+  assert.equal(calls[2].page, 1);
+  calls[2].resolve(reviewPage(1, 10, 4)); await reload;
+  assert.deepEqual(calls.map((call) => call.page), [1, 2, 1]);
+  assert.equal(store.getSnapshot().data.page, 1);
+  assert.equal(store.getSnapshot().data.total, 10);
+  assert.equal(store.getSnapshot().data.averageRating, 4);
+});
+
+test("계정별 새 스토어는 이전 계정의 늦은 isMine 응답을 공유하지 않음", async (t) => {
+  const previous = makeStore(t), current = makeStore(t);
+  previous.store.start(); previous.store.stop(); current.store.start();
+  current.calls[0].resolve({ ...reviewPage(1), items: [{ id: 7, isMine: false }] }); await tick();
+  previous.calls[0].resolve({ ...reviewPage(1), items: [{ id: 7, isMine: true }] }); await tick();
+  assert.equal(previous.store.getSnapshot().data, null);
+  assert.equal(current.store.getSnapshot().data.items[0].isMine, false);
 });
 
 test("질문 데모 입력 검증은 제목·본문 trim과 길이 제한, 텍스트 줄바꿈 보존", () => {

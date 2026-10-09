@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import ReviewsPanel from "@/components/products/ReviewsPanel";
 import QuestionsPanel from "@/components/products/QuestionsPanel";
 import { createReviewStore } from "@/lib/reviews";
@@ -20,19 +21,21 @@ const serverHash = () => "";
 
 export default function ProductDetailTabs(props: ProductDetailTabsProps) {
   const pathname = usePathname();
+  const { user, loading } = useAuth();
   // 숨겨진 상품 화면의 작성 상태·요청이 다음 방문이나 다른 상품으로 남지 않게 합니다.
   if (pathname !== `/products/${props.productId}`) return null;
-  return <DetailTabs key={props.productId} {...props} />;
+  return <DetailTabs key={`${props.productId}:${loading ? "checking" : user?.id ?? "guest"}`} {...props} />;
 }
 
 function DetailTabs({ productId, children }: ProductDetailTabsProps) {
+  const { loading: authLoading } = useAuth();
   const hash = useSyncExternalStore(subscribeHash, getHash, serverHash);
   const active = tabFromHash(hash);
   const root = useRef<HTMLElement>(null);
   const buttons = useRef<Partial<Record<ProductTab, HTMLButtonElement | null>>>({});
   const reviews = useMemo(() => createReviewStore(productId), [productId]);
   const snapshot = useSyncExternalStore(reviews.subscribe, reviews.getSnapshot, reviews.getSnapshot);
-  useEffect(() => { reviews.start(); return () => reviews.stop(); }, [reviews]);
+  useEffect(() => { if (!authLoading) reviews.start(); return () => reviews.stop(); }, [reviews, authLoading]);
   useEffect(() => {
     if (!["#info", "#reviews", "#qna"].includes(hash)) return;
     const frame = requestAnimationFrame(() => root.current?.scrollIntoView({ block: "start", behavior: "instant" }));

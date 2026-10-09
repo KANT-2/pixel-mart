@@ -1,9 +1,10 @@
 import type { ApiReview } from "@/types/api";
+import type { ReactNode } from "react";
 import { formatDate } from "@/utils/formatDate";
 
-interface ReviewEntriesProps { items: ApiReview[]; }
+interface ReviewEntriesProps { items: ApiReview[]; actions?: (review: ApiReview) => ReactNode; }
 
-export default function ReviewEntries({ items }: ReviewEntriesProps) {
+export default function ReviewEntries({ items, actions }: ReviewEntriesProps) {
   return <ul aria-label="상품 리뷰 목록" className="divide-y divide-line rounded-xl border border-line bg-panel px-5 sm:px-6">
     {items.map((review) => <li key={review.id} className="min-w-0 py-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -12,6 +13,7 @@ export default function ReviewEntries({ items }: ReviewEntriesProps) {
       </div>
       <p className="mt-3 break-words text-sm font-bold">{review.nickname}</p>
       <p className="mt-3 whitespace-pre-line break-words text-sm leading-relaxed text-sub">{review.content}</p>
+      {actions?.(review)}
     </li>)}
   </ul>;
 }

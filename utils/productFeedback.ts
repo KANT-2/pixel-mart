@@ -1,6 +1,14 @@
 export const PRODUCT_TABS = ["info", "reviews", "qna"] as const;
 export type ProductTab = typeof PRODUCT_TABS[number];
 
+export function canDeleteReview(review: { isMine: boolean }, signedIn: boolean): boolean {
+  return signedIn && review.isMine === true;
+}
+
+export function reviewPageAfterReload({ page, totalPages, items }: { page: number; totalPages: number; items: readonly unknown[] }): number {
+  return Math.max(1, Math.min(items.length === 0 ? page - 1 : page, totalPages));
+}
+
 export function tabFromHash(hash: string): ProductTab {
   return hash === "#reviews" ? "reviews" : hash === "#qna" ? "qna" : "info";
 }
