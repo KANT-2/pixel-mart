@@ -98,14 +98,15 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
   const matches = mode === "region" && keyword ? regions.filter((region) => region.fullName.includes(keyword)).slice(0, 6) : [];
   const [notFound, setNotFound] = useState(false);
   const pick = (code: string) => { onRegion(code); setText(""); setNotFound(false); };
-  const tab = "h-11 px-3 text-xs font-bold aria-pressed:bg-lime aria-pressed:text-lime-ink";
+  // 다른 토글(내 동네·전체 지역)과 같은 픽셀 버튼 — 고르면 연두 테두리·글자
+  const tab = "btn-pixel h-11 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
   return <form role="search" aria-label="위시맵 찾기" className="flex w-full gap-1.5 sm:w-auto" onSubmit={(event) => {
     event.preventDefault();
     if (mode === "nickname" && keyword) onNickname(keyword);
     else if (matches[0]) pick(matches[0].code);
     else if (keyword) setNotFound(true);
   }}>
-    <div className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-panel">
+    <div role="group" aria-label="찾는 방법" className="flex shrink-0 gap-1.5">
       <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>📍 동네</button>
       <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }} className={tab}>👤 닉네임</button>
     </div>

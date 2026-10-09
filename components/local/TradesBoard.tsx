@@ -47,10 +47,10 @@ export default function TradesBoard() {
         </form>
         <div className="min-w-0 flex-[1_1_22rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
         {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
-        <div role="group" aria-label="글 종류 필터" className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-night">
-          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item, index) =>
+        <div role="group" aria-label="글 종류 필터" className="flex shrink-0 gap-1.5 border-l-2 border-frame pl-2">
+          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
-              className={`h-9 px-3 font-pixel text-xs text-sub hover:bg-panel-2 hover:text-ink aria-pressed:bg-lime aria-pressed:text-lime-ink ${index ? "border-l-2 border-frame" : ""}`}>{item.label}</button>)}
+              className="btn-pixel h-10 px-3 font-pixel text-xs text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">{item.label}</button>)}
         </div>
       </div>
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
