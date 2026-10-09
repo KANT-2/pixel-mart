@@ -44,3 +44,10 @@ export interface ApiWishlistItem {
   product: ApiProduct;
   createdAt: string;
 }
+
+export interface ApiFaq {
+  id: number;
+  category: string;
+  question: string;
+  answer: string;
+}
