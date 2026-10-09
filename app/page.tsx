@@ -27,7 +27,7 @@ async function RecommendedProducts() {
 function SectionTitle({ quest, title, href }: { quest: string; title: string; href?: string }) {
   return <div className="mb-5 flex items-end justify-between gap-3">
     <div>
-      <p className="mb-1 font-pixel text-xs tracking-widest text-violet">▶ {quest}</p>
+      <p className="mb-1 font-pixel text-xs tracking-widest text-violet motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">▶ {quest}</p>
       <h2 className="text-2xl font-extrabold">{title}</h2>
     </div>
     {href && <Link href={href} className="shrink-0 text-sm font-semibold text-sub transition-colors hover:text-ink">전체 보기 →</Link>}
@@ -56,14 +56,12 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Link href="/products" className="btn-lime px-7 py-4 font-extrabold text-lime-ink">
-              ▶ 상품 둘러보기
+              ▶ 아이템 둘러보기
             </Link>
             <Link href="/local" className="btn-pixel px-6 py-4 font-bold">
               🗺 월드맵 열기
             </Link>
           </div>
-          {/* 게임 타이틀 화면처럼 깜빡이는 안내 (움직임 줄이기 설정이면 고정) */}
-          <p className="mt-6 font-pixel text-xs tracking-[0.3em] text-lime motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">PRESS START</p>
         </div>
 
         <HeroStage />
