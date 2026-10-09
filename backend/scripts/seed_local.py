@@ -7,7 +7,7 @@ from sqlalchemy import delete, select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import FandomSample, Interest, Region, TradePost, User
+from app.models import FandomSample, Interest, Region, TradePost, User, WishSample
 
 SEED_DIR = Path(__file__).resolve().parent.parent / "seed"
 # 샘플 거래글 작성자 — 집계 참여(fandom_opt_in)를 켜지 않아 덕력지도·Wish Map 숫자에는 들어가지 않는다
@@ -23,6 +23,7 @@ async def seed_local(db: AsyncSession) -> str:
     interests = load("interests.json")
     samples = load("fandom_samples.json")
     trade_samples = load("trade_samples.json")
+    wish_samples = load("wish_samples.json")
 
     # 부모가 먼저 들어가도록 시 → 구 → 생활권 순서 (JSON도 그 순서로 작성)
     for r in sorted(regions, key=lambda x: ["sido", "sigungu", "zone"].index(x["level"])):
@@ -41,6 +42,12 @@ async def seed_local(db: AsyncSession) -> str:
     await db.execute(
         insert(FandomSample),
         [{"region_code": x["regionCode"], "interest_id": x["interestId"], "count": x["count"]} for x in samples],
+    )
+
+    await db.execute(delete(WishSample))
+    await db.execute(
+        insert(WishSample),
+        [{"region_code": x["regionCode"], "product_id": x["productId"], "count": x["count"]} for x in wish_samples],
     )
 
     # 샘플 거래·교환 글 (응답에 isSample) — 샘플 작성자의 글을 매번 새로 넣는다
@@ -68,5 +75,5 @@ async def seed_local(db: AsyncSession) -> str:
         )
     return (
         f"지역 {len(regions)}개, 취향 {len(interests)}개, 덕력지도 샘플 {len(samples)}칸, "
-        f"샘플 거래글 {len(trade_samples)}개"
+        f"샘플 거래글 {len(trade_samples)}개, Wish Map 샘플 {len(wish_samples)}칸"
     )

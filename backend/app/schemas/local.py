@@ -112,3 +112,4 @@ class WishMapOut(CamelModel):
     rank: int
     product: ProductOut
     count: int
+    is_sample: bool = Field(description="true면 Cold Start용 샘플 데이터 — 화면에 '샘플' 표시")

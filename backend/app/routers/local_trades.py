@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import func, select
 
 from app.deps import CurrentUser, DbSession, OptionalUser
-from app.models import Interest, Product, TradePost, User, Wishlist
+from app.models import Interest, Product, TradePost, User, Wishlist, WishSample
 from app.schemas.common import Page
 from app.schemas.local import (
     InterestOut,
@@ -217,13 +217,17 @@ async def wish_map(
         )
         .group_by(User.region_code, Wishlist.product_id)
     )
-    totals = rollup(tree, {(r, pid): n for r, pid, n in rows})
+    real = rollup(tree, {(r, pid): n for r, pid, n in rows})
+    # 덕력지도와 같은 방식: 실제 찜이 있는 칸은 실제 값, 없는 칸만 샘플로 채운다
+    samples = rollup(tree, {(s.region_code, s.product_id): s.count for s in await db.scalars(select(WishSample))})
+    cells = {key: (n, True) for key, n in samples.items() if n > 0}
+    cells.update({key: (n, False) for key, n in real.items() if n > 0})
     ranked = sorted(
-        ((n, pid) for (code, pid), n in totals.items() if code == region and n >= MIN_GROUP_SIZE),
+        ((n, pid, sample) for (code, pid), (n, sample) in cells.items() if code == region and n >= MIN_GROUP_SIZE),
         key=lambda x: (-x[0], x[1]),
     )[:limit]
-    products = {p.id: p for p in await db.scalars(select(Product).where(Product.id.in_([pid for _, pid in ranked])))}
+    products = {p.id: p for p in await db.scalars(select(Product).where(Product.id.in_([pid for _, pid, _ in ranked])))}
     return [
-        WishMapOut(rank=rank, product=ProductOut.from_model(products[pid]), count=n)
-        for rank, (n, pid) in enumerate(ranked, 1)
+        WishMapOut(rank=rank, product=ProductOut.from_model(products[pid]), count=n, is_sample=sample)
+        for rank, (n, pid, sample) in enumerate(ranked, 1)
     ]

@@ -68,4 +68,4 @@
 | GET | /api/local/trades/mine 🔒 | 내 글 (완료·숨김 포함) | ✅ |
 | PATCH | /api/local/trades/{id} 🔒 | 내 글 상태 `done`/`hidden` (남의 글 404) | ✅ |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
-| GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만) | ✅ |
+| GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만). 실제 찜이 없는 칸은 샘플로 채우고 `isSample: true` | ✅ |
