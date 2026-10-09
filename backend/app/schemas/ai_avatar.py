@@ -22,6 +22,6 @@ class AiAvatarStatusOut(CamelModel):
     """동의 문구에 보여 줄 제공자와 보내기 전 사진 크기"""
 
     enabled: bool
-    provider: Literal["cloudflare", "gemini"] | None
+    provider: Literal["cloudflare"] | None
     provider_name: str | None = Field(examples=["Cloudflare Workers AI"])
     max_photo_side: int = Field(description="브라우저가 사진 긴 변을 이 크기 이하로 줄여 보낸다")

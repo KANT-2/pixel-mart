@@ -1,14 +1,13 @@
-"""AI 픽셀 아바타 — Gemini·Cloudflare 호출은 가짜 전송(MockTransport)으로 대신해 외부로 나가지 않는다"""
+"""AI 픽셀 아바타 — Cloudflare 호출은 가짜 전송(MockTransport)으로 대신해 외부로 나가지 않는다"""
 
 import base64
-import json
 
 import httpx
 import pytest
 
 from app.core.config import settings
 from app.services import ai_avatar
-from app.services.ai_avatar import AiAvatarError, RateLimiter, decode_photo, find_image
+from app.services.ai_avatar import AiAvatarError, RateLimiter, decode_photo
 
 PHOTO = "data:image/jpeg;base64," + base64.b64encode(b"\xff\xd8\xff fake jpeg").decode()
 PIXEL = base64.b64encode(b"\x89PNG\r\n\x1a\n fake png").decode()
@@ -31,21 +30,6 @@ def test_decode_photo_rejects_large_photo():
         decode_photo(big)
 
 
-def test_find_image_in_steps_and_shortcut():
-    steps = {
-        "steps": [
-            {"type": "thought"},
-            {
-                "type": "model_output",
-                "content": [{"type": "text", "text": "hi"}, {"type": "image", "mime_type": "image/png", "data": "AAA"}],
-            },
-        ]
-    }
-    assert find_image(steps) == ("image/png", "AAA")
-    assert find_image({"output_image": {"type": "image", "data": "BBB"}}) == ("image/png", "BBB")
-    assert find_image({"steps": [{"type": "model_output", "content": [{"type": "text", "text": "blocked"}]}]}) is None
-
-
 def test_rate_limiter_window():
     limiter = RateLimiter(per_hour=2, window=3600)
     limiter.check(1, now=0)
@@ -59,14 +43,10 @@ def test_rate_limiter_window():
 
 # ---- API ----
 @pytest.fixture
-def gemini(monkeypatch):
-    """가짜 Gemini 응답을 정하는 함수를 돌려준다. 실제 요청 내용은 calls에 기록"""
+def upstream(monkeypatch):
+    """가짜 Cloudflare 응답을 정하는 함수를 돌려준다. 실제 요청 내용은 calls에 기록"""
     calls: list[httpx.Request] = []
-    state = {
-        "handler": lambda request: httpx.Response(
-            200, json={"output_image": {"type": "image", "mime_type": "image/png", "data": PIXEL}}
-        )
-    }
+    state = {"handler": lambda request: httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})}
 
     def transport_handler(request: httpx.Request) -> httpx.Response:
         calls.append(request)
@@ -76,9 +56,8 @@ def gemini(monkeypatch):
     monkeypatch.setattr(
         ai_avatar.httpx, "AsyncClient", lambda **kw: real_client(transport=httpx.MockTransport(transport_handler))
     )
-    monkeypatch.setattr(settings, "gemini_api_key", "test-key")
-    monkeypatch.setattr(settings, "cloudflare_account_id", "")  # .env에 Cloudflare 값이 있어도 Gemini로
-    monkeypatch.setattr(settings, "cloudflare_api_token", "")
+    monkeypatch.setattr(settings, "cloudflare_account_id", "acct-123")
+    monkeypatch.setattr(settings, "cloudflare_api_token", "cf-token")
     monkeypatch.setattr(ai_avatar, "limiter", RateLimiter(per_hour=100))
 
     def respond(handler):
@@ -96,84 +75,39 @@ async def test_requires_login(client):
     assert (await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})).status_code == 401
 
 
-async def test_requires_consent(client, gemini):
+async def test_requires_consent(client, upstream):
     await login(client)
     for body in ({"photo": PHOTO}, {"photo": PHOTO, "consent": False}):
         assert (await client.post("/api/avatars/ai", json=body)).status_code == 422
-    assert gemini.calls == []  # 동의 없으면 외부로 보내지 않음
+    assert upstream.calls == []  # 동의 없으면 외부로 보내지 않음
 
 
-async def test_disabled_without_key(client, gemini, monkeypatch):
+async def test_disabled_without_key(client, upstream, monkeypatch):
     await login(client)
-    monkeypatch.setattr(settings, "gemini_api_key", "")
+    monkeypatch.setattr(settings, "cloudflare_api_token", "")
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == 503
-    assert gemini.calls == []
+    assert upstream.calls == []
 
 
-async def test_success_returns_image_and_sends_photo_once(client, gemini):
-    await login(client)
-    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
-    assert res.status_code == 200
-    assert res.json() == {"image": f"data:image/png;base64,{PIXEL}"}
-
-    [request] = gemini.calls
-    assert request.headers["x-goog-api-key"] == "test-key"
-    sent = json.loads(request.content)
-    assert sent["model"] == settings.gemini_image_model
-    assert sent["input"][1] == {"type": "image", "mime_type": "image/jpeg", "data": PHOTO.split(",", 1)[1]}
-    assert "pose" in sent["input"][0]["text"] and "magenta" in sent["input"][0]["text"]
-
-
-@pytest.mark.parametrize(
-    ("upstream", "status"),
-    [
-        (
-            httpx.Response(
-                200, json={"steps": [{"type": "model_output", "content": [{"type": "text", "text": "no"}]}]}
-            ),
-            422,
-        ),
-        (httpx.Response(500, json={"error": "boom"}), 502),
-        (httpx.Response(429, json={"error": "quota"}), 429),
-    ],
-)
-async def test_upstream_errors(client, gemini, upstream, status):
-    await login(client)
-    gemini(lambda request: upstream)
-    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
-    assert res.status_code == status
-    assert "test-key" not in res.text and "boom" not in res.text  # 키·원본 오류는 노출하지 않음
-
-
-async def test_network_error_is_502(client, gemini):
+async def test_network_error_is_502(client, upstream):
     await login(client)
 
     def fail(request):
         raise httpx.ConnectError("down")
 
-    gemini(fail)
+    upstream(fail)
     assert (await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})).status_code == 502
 
 
-async def test_rate_limit(client, gemini, monkeypatch):
+async def test_rate_limit(client, upstream, monkeypatch):
     await login(client)
     monkeypatch.setattr(ai_avatar, "limiter", RateLimiter(per_hour=1))
     assert (await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})).status_code == 200
     assert (await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})).status_code == 429
 
 
-# ---- Cloudflare Workers AI (FLUX.2 klein) ----
-@pytest.fixture
-def cloudflare(gemini, monkeypatch):
-    """gemini 픽스처의 가짜 전송을 그대로 쓰고 Cloudflare 설정만 켠다 (Cloudflare가 Gemini보다 우선)"""
-    monkeypatch.setattr(settings, "cloudflare_account_id", "acct-123")
-    monkeypatch.setattr(settings, "cloudflare_api_token", "cf-token")
-    gemini(lambda request: httpx.Response(200, json={"result": {"image": PIXEL}, "success": True}))
-    return gemini
-
-
-async def test_status_shows_provider_for_consent_text(client, cloudflare, monkeypatch):
+async def test_status_shows_provider_for_consent_text(client, upstream, monkeypatch):
     res = (await client.get("/api/avatars/ai")).json()
     assert res == {
         "enabled": True,
@@ -182,19 +116,17 @@ async def test_status_shows_provider_for_consent_text(client, cloudflare, monkey
         "maxPhotoSide": 504,
     }
     monkeypatch.setattr(settings, "cloudflare_api_token", "")
-    assert (await client.get("/api/avatars/ai")).json()["provider"] == "gemini"
-    monkeypatch.setattr(settings, "gemini_api_key", "")
     res = (await client.get("/api/avatars/ai")).json()
-    assert res["enabled"] is False and res["provider"] is None and "test-key" not in str(res)
+    assert res["enabled"] is False and res["provider"] is None and "cf-token" not in str(res)
 
 
-async def test_cloudflare_sends_photo_as_reference_image(client, cloudflare):
+async def test_cloudflare_sends_photo_as_reference_image(client, upstream):
     await login(client)
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == 200
     assert res.json() == {"image": f"data:image/png;base64,{PIXEL}"}
 
-    [request] = cloudflare.calls
+    [request] = upstream.calls
     assert str(request.url).endswith("/accounts/acct-123/ai/run/@cf/black-forest-labs/flux-2-klein-4b")
     assert request.headers["authorization"] == "Bearer cf-token"
     assert request.headers["content-type"].startswith("multipart/form-data")
@@ -205,7 +137,7 @@ async def test_cloudflare_sends_photo_as_reference_image(client, cloudflare):
 
 
 @pytest.mark.parametrize(
-    ("upstream", "status", "message"),
+    ("reply", "status", "message"),
     [
         (httpx.Response(429, json={"errors": [{"message": "daily free allocation"}]}), 429, "무료 사용량"),
         (httpx.Response(400, json={"errors": [{"message": "image too large"}]}), 422, "다른 사진"),
@@ -214,31 +146,32 @@ async def test_cloudflare_sends_photo_as_reference_image(client, cloudflare):
         (httpx.Response(200, text="not json"), 502, "만들지 못했어요"),
     ],
 )
-async def test_cloudflare_errors(client, cloudflare, upstream, status, message):
+async def test_cloudflare_errors(client, upstream, reply, status, message):
     await login(client)
-    cloudflare(lambda request: upstream)
+    upstream(lambda request: reply)
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == status and message in res.json()["detail"]
     assert "cf-token" not in res.text and "allocation" not in res.text and "boom" not in res.text
 
 
-async def test_cloudflare_retries_false_positive_safety_flag(client, cloudflare):
+async def test_cloudflare_retries_false_positive_safety_flag(client, upstream):
     """출력 안전 필터(3030)는 시드에 따라 오탐 — 다른 시드로 다시 시도한다"""
     await login(client)
     flagged = httpx.Response(400, json={"errors": [{"code": 3030, "message": "flagged"}], "success": False})
     answers = iter([flagged, httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})])
-    cloudflare(lambda request: next(answers))
+    upstream(lambda request: next(answers))
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == 200
-    seeds = [r.content.split(b'name="seed"\r\n\r\n')[1].split(b"\r\n")[0] for r in cloudflare.calls]
+    seeds = [r.content.split(b'name="seed"\r\n\r\n')[1].split(b"\r\n")[0] for r in upstream.calls]
     assert len(seeds) == 2 and seeds[0] != seeds[1]
 
 
-async def test_cloudflare_gives_up_after_three_flags(client, cloudflare):
+async def test_cloudflare_gives_up_after_five_flags(client, upstream):
     await login(client)
-    cloudflare(lambda request: httpx.Response(400, json={"errors": [{"code": 3030}], "success": False}))
+    upstream(lambda request: httpx.Response(400, json={"errors": [{"code": 3030}], "success": False}))
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
-    assert res.status_code == 422 and len(cloudflare.calls) == 3
+    assert res.status_code == 422 and len(upstream.calls) == 5
+    assert "바로 픽셀로" in res.json()["detail"]  # 브라우저 픽셀 변환으로 이어지게
 
 
 def test_image_mime():

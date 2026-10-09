@@ -18,8 +18,8 @@
 | GET | /api/users/nickname-check?nickname= | 닉네임 사용 가능 여부 `{nickname, available, suggestions}` — 겹치면 지금 쓸 수 있는 추천 3개(예: `슬라임킹0421`, `슬라임킹_1`), 내 닉네임은 available | ✅ |
 | PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB, 아니면 422) | ✅ |
 | DELETE | /api/users/me/avatar 🔒 | 아바타 삭제 (기본 슬라임으로) | ✅ |
-| GET | /api/avatars/ai | AI 아바타 사용 가능 여부 `{enabled, provider: cloudflare\|gemini\|null, providerName, maxPhotoSide}` — 동의 문구·사진 축소 크기용 (키 값은 내보내지 않음) | ✅ |
-| POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Cloudflare FLUX.2 klein 또는 Gemini 생성 원본, 저장 안 함). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과(Cloudflare 일일 무료 할당 소진 포함) 429 | ✅ |
+| GET | /api/avatars/ai | AI 아바타 사용 가능 여부 `{enabled, provider: cloudflare\|null, providerName, maxPhotoSide}` — 동의 문구·사진 축소 크기용 (키 값은 내보내지 않음) | ✅ |
+| POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Cloudflare FLUX.2 klein 생성 원본, 저장 안 함, 안전 필터 오탐은 최대 5번 재시도). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과(Cloudflare 일일 무료 할당 소진 포함) 429 | ✅ |
 | GET | /api/categories | 카테고리 6개 | ✅ |
 | GET | /api/products?category=&q=&minPrice=&maxPrice=&isNew=&sort=&page=&size= | 목록 (category는 쉼표로 여러 개, sort: `id/new/price_asc/price_desc/popular`(찜 많은 순), 응답에 `isWished`) | ✅ |
 | GET | /api/products/{id} | 상세 (없으면 404, 응답에 `isWished`) | ✅ |
