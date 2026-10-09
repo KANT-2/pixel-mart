@@ -12,7 +12,7 @@ function LocalNavLinks({ pathname, region }: LocalNavLinksProps) {
     {links.map((item) => <Link key={item.href} href={`${item.href}${region !== undefined ? `?region=${encodeURIComponent(region ?? "")}` : ""}`}
       aria-current={pathname === item.href || (item.href === "/local/trades" && pathname?.startsWith("/local/trades/")) ? "page" : undefined}
       onFocus={(event) => event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" })}
-      className="btn-pixel inline-flex shrink-0 items-center px-4 py-2.5 text-sm font-semibold text-sub hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-mint">{item.icon && <PixelIcon name={item.icon} className="mr-1.5 size-4" />}{item.label}</Link>)}
+      className="inline-flex shrink-0 items-center rounded-lg border border-line px-4 py-3 text-sm font-semibold text-sub hover:text-ink aria-[current=page]:border-mint/50 aria-[current=page]:bg-panel aria-[current=page]:text-mint focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-mint">{item.icon && <PixelIcon name={item.icon} className="mr-1.5 size-4" />}{item.label}</Link>)}
   </nav>;
 }
 export function LocalNavFallback() { return <LocalNavLinks />; }

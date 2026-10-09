@@ -65,7 +65,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
       <div role="tablist" aria-label="취향 종류" className="mt-3 flex flex-wrap gap-1.5">
         {[{ value: "all" as const, label: "전체" }, ...INTEREST_TYPES].map((item) => <button key={item.value} type="button" role="tab"
           aria-selected={type === item.value} onClick={() => setType(item.value)}
-          className="btn-pixel h-8 px-2.5 text-xs font-bold text-sub hover:text-ink">{item.label}</button>)}
+          className="btn-pixel toggle-outline h-8 px-2.5 text-xs font-bold text-sub hover:text-ink">{item.label}</button>)}
       </div>
       <ul className="mt-3 grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3">
         {list.map((item) => <li key={item.id}>

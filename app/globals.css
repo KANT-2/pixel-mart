@@ -163,7 +163,9 @@ html {
 .btn-pixel.toggle-outline[aria-pressed="true"],
 .btn-pixel.toggle-outline[aria-pressed="true"]:hover:not(:disabled),
 .btn-pixel.toggle-outline[aria-current="page"],
-.btn-pixel.toggle-outline[aria-current="page"]:hover:not(:disabled) {
+.btn-pixel.toggle-outline[aria-current="page"]:hover:not(:disabled),
+.btn-pixel.toggle-outline[aria-selected="true"],
+.btn-pixel.toggle-outline[aria-selected="true"]:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--color-mint) 55%, var(--color-frame));
   background-color: var(--color-panel-2);
   color: var(--color-ink);

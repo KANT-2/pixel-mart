@@ -59,18 +59,18 @@ export default function WishMap() {
 
   if (regions.error) return <LocalError message={regions.error} onRetry={() => void regions.refresh()} />;
   return <div className="space-y-3">
-    {/* 탭 공통 도구 막대 — 동네·닉네임 찾기 */}
+    {/* 탭 공통 도구 막대 — 왼쪽 지도 위치, 오른쪽 동네·닉네임 찾기 */}
     <div className={localToolbar}>
+      <nav aria-label="지도 위치" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 px-1 font-pixel text-sm">
+          <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
+          {trail.map((code) => <span key={code} className="flex items-center gap-1">
+            <span aria-hidden="true" className="text-dim">›</span>
+            <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
+              className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
+          </span>)}
+        </nav>
       <WishSearch key={nickname ?? ""} regions={catalog} nickname={nickname} onRegion={(code) => go(code)} onNickname={(q) => go(focus, q)} />
     </div>
-    <nav aria-label="지도 위치" className="flex min-w-0 flex-wrap items-center gap-1 font-pixel text-sm">
-        <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
-        {trail.map((code) => <span key={code} className="flex items-center gap-1">
-          <span aria-hidden="true" className="text-dim">›</span>
-          <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
-            className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
-        </span>)}
-      </nav>
 
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
       <div className="mx-auto w-full" style={{ maxWidth: `calc((100dvh - 15rem) * ${view.cols / view.rows})` }}>
@@ -101,7 +101,7 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
   const pick = (code: string) => { onRegion(code); setText(""); setNotFound(false); };
   // 다른 토글(내 동네·전체 지역)과 같은 픽셀 버튼 — 고르면 연두 테두리·글자
   const tab = "btn-pixel toggle-outline h-11 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
-  return <form role="search" aria-label="위시맵 찾기" className="flex w-full min-w-0 max-w-xl gap-1.5" onSubmit={(event) => {
+  return <form role="search" aria-label="위시맵 찾기" className="flex w-full min-w-0 gap-1.5 sm:w-auto" onSubmit={(event) => {
     event.preventDefault();
     if (mode === "nickname" && keyword) onNickname(keyword);
     else if (matches[0]) pick(matches[0].code);
@@ -111,7 +111,7 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
       <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>동네</button>
       <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }} className={tab}>닉네임</button>
     </div>
-    <div className="relative min-w-0 flex-1">
+    <div className="relative min-w-0 flex-1 sm:w-48 sm:flex-none">
       <label htmlFor="wish-search" className="sr-only">{mode === "region" ? "동네 이름" : "닉네임"}</label>
       <input id="wish-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, mode === "region" ? 20 : 30)); setNotFound(false); }}
         placeholder={mode === "region" ? "동네 검색 (예: 판교)" : "닉네임으로 찾기"} autoComplete="off" enterKeyHint="search"
