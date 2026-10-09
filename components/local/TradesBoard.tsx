@@ -16,7 +16,9 @@ import { TRADE_KIND_GAME } from "@/utils/gameItem";
 
 export default function TradesBoard() {
   const params = useSearchParams(), router = useRouter();
-  const query = parseTradeQuery(params);
+  const parsed = parseTradeQuery(params);
+  // 위시(want)는 위시맵 탭에서 — 거래·교환 탭은 HAVE·SELL만
+  const query = parsed.kind === "want" ? { ...parsed, kind: undefined } : parsed;
   const selection = useLocalSelection(query);
   const { catalog, profile, selected, loading, invalid } = selection;
   if (catalog.error) return <LocalError message={catalog.error} onRetry={() => void catalog.refresh()} />;
@@ -46,7 +48,7 @@ export default function TradesBoard() {
         <div className="min-w-0 flex-[1_1_22rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
         {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
         <div role="group" aria-label="글 종류 필터" className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-night">
-          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item, index) =>
+          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item, index) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
               className={`h-9 px-3 font-pixel text-xs text-sub hover:bg-panel-2 hover:text-ink aria-pressed:bg-lime aria-pressed:text-lime-ink ${index ? "border-l-2 border-frame" : ""}`}>{item.label}</button>)}
         </div>
@@ -72,7 +74,7 @@ function TradesResults({ query, regions, ownRegion }: TradesResultsProps) {
   return data.items.length ? <><p className="text-sm text-sub">진행 중인 글 {data.total}개 · 최신순</p>
     <ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} /></li>)}</ul>
     <Pagination currentPage={data.page} totalPages={data.totalPages} basePath="/local/trades" query={tradeQueryParams(query).toString()} />
-  </> : <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 구하는 물건을 남겨 보세요.</p>
-    <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=want" className={localButton}>WANT 글쓰기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
+  </> : <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 가진 물건을 올려 보세요. 갖고 싶은 아이템은 위시맵에서 찾을 수 있어요.</p>
+    <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=have" className={localButton}>HAVE 글쓰기</Link><Link href="/local/wish-map" className={localButton}>💗 위시맵 보기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
   </div>;
 }

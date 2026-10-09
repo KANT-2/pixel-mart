@@ -37,7 +37,7 @@ export default function TradeWindow({ match, me }: TradeWindowProps) {
       <TradeCard post={item} />
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button type="button" disabled className="btn-pixel h-10 px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50">교환 신청 · 준비 중</button>
-        <p className="text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WANT 글에서 보낼 수 있어요.</p>
+        <p className="text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WISH 글에서 보낼 수 있어요.</p>
       </div>
     </div>
   </section>;

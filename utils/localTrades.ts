@@ -2,7 +2,7 @@ import type { ApiRegion, TradeCondition, TradeInput, TradeKind, TradeMethod, Tra
 import { regionPath } from "@/utils/local";
 
 export const TRADE_KINDS: { value: TradeKind; label: string }[] = [
-  { value: "have", label: "가진 물건 HAVE" }, { value: "want", label: "구해요 WANT" }, { value: "sell", label: "판매 SELL" },
+  { value: "have", label: "가진 물건 HAVE" }, { value: "want", label: "위시 WISH" }, { value: "sell", label: "판매 SELL" },
 ];
 export const TRADE_CONDITIONS: { value: TradeCondition; label: string }[] = [
   { value: "new", label: "새 상품" }, { value: "like_new", label: "거의 새 상품" }, { value: "used", label: "사용감 있음" },

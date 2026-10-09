@@ -25,7 +25,7 @@ const { default: TradeCard } = await import(await moduleUrl("../components/local
 }));
 const draft = { kind: "have", itemName: "  QA 키링  ", condition: "new", price: "", tradeMethod: "direct", content: "첫 줄\n둘째 줄", productId: null, interestId: null };
 
-test("HAVE·SELL 상태 필수, WANT 선택 가능, trim·길이·방식 검증", () => {
+test("HAVE·SELL 상태 필수, WISH 선택 가능, trim·길이·방식 검증", () => {
   for (const kind of ["have", "sell"]) assert.ok(validateTrade({ ...draft, kind, condition: "" }).errors.condition);
   assert.equal(validateTrade({ ...draft, kind: "want", condition: "" }).valid, true);
   const result = validateTrade(draft);

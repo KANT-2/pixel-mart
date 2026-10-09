@@ -27,7 +27,7 @@ function wishHref(region: string | null, nickname: string | null) {
   return `/local/wish-map${query ? `?${query}` : ""}`;
 }
 
-/** 위시맵 — 픽셀 지도 위에 동네별 WANT(구해요) 하트, 고른 동네의 WANT 글에서 바로 선물 */
+/** 위시맵 — 픽셀 지도 위에 동네별 WISH(갖고 싶은 아이템) 하트, 고른 동네의 WISH 글에서 바로 선물 */
 export default function WishMap() {
   const params = useSearchParams();
   const regions = useRegions();
@@ -47,7 +47,7 @@ export default function WishMap() {
   const blocks: MapBlock[] = view.legend.map((code) => {
     const row = counts.data?.find((item) => item.regionCode === code);
     const count = row?.count ?? 0;
-    return { code, name: byCode.get(code)?.name ?? code, count: count || null, pins: Array(Math.min(count, 4)).fill(HEART), sample: row?.sample ?? false, hint: "WANT", unit: "개" };
+    return { code, name: byCode.get(code)?.name ?? code, count: count || null, pins: Array(Math.min(count, 4)).fill(HEART), sample: row?.sample ?? false, hint: "WISH", unit: "개" };
   });
   const choose = (code: string) => {
     if (MAP_VIEWS[code]) go(code); // 시·구는 지도 안으로
@@ -77,7 +77,7 @@ export default function WishMap() {
             label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
         )}
         <p className="mt-2 text-xs leading-relaxed text-dim">
-          💗 하트는 그 동네에서 진행 중인 WANT(구해요) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
+          💗 하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
           {blocks.some((block) => block.sample) && <> <span className="text-violet">*</span> 샘플 데이터</>}
         </p>
       </div>
@@ -134,22 +134,22 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
   const top = useLocalResource(loadTop);
   const rows = wants.data?.items ?? [];
   const popular = (top.data ?? []).filter((row) => row.count >= 5).slice(0, 3);
-  return <aside aria-label={`${title} WANT 글`} className="pixel-panel overflow-hidden">
+  return <aside aria-label={`${title} WISH 글`} className="pixel-panel overflow-hidden">
     <header className="border-b-2 border-frame bg-panel-2 px-4 py-3">
       <p className="font-pixel text-[10px] tracking-widest text-lime">▶ {kicker}</p>
       <div className="mt-1 flex items-center justify-between gap-2">
         <h2 className="min-w-0 break-keep text-lg font-extrabold">{title}</h2>
         {onClear && <button type="button" onClick={onClear} className="btn-pixel h-8 shrink-0 px-2.5 text-xs font-bold">지우기</button>}
       </div>
-      {wants.data && <p className="mt-1 text-sm text-sub"><span aria-hidden="true">💗 </span>WANT <strong className="text-pink">{wants.data.total}</strong>개</p>}
+      {wants.data && <p className="mt-1 text-sm text-sub"><span aria-hidden="true">💗 </span>WISH <strong className="text-pink">{wants.data.total}</strong>개</p>}
     </header>
     <div className="max-h-[min(60dvh,32rem)] overflow-y-auto p-3">
       {wants.error ? <LocalError message={wants.error} onRetry={() => void wants.refresh()} />
-        : wants.loading ? <LocalSkeleton label="WANT 글 불러오는 중" />
+        : wants.loading ? <LocalSkeleton label="WISH 글 불러오는 중" />
           : rows.length ? <ul className="space-y-2">{rows.map((post) => <li key={post.id}><WantRow post={post} /></li>)}</ul>
             : <div className="p-4 text-center text-sm text-sub">
               <p className="font-pixel text-xs tracking-widest text-dim">EMPTY</p>
-              <p className="mt-2">{nickname ? "닉네임을 공개한 이웃 중에 찾지 못했어요." : "아직 이 동네에 WANT 글이 없어요."}</p>
+              <p className="mt-2">{nickname ? "닉네임을 공개한 이웃 중에 찾지 못했어요." : "아직 이 동네에 WISH 글이 없어요."}</p>
             </div>}
     </div>
     <footer className="space-y-3 border-t-2 border-frame p-3">
@@ -160,7 +160,7 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
           <span className="shrink-0 text-dim">{row.count}명{row.isSample ? " · 샘플" : ""}</span>
         </li>)}</ol>
       </div>}
-      <Link href="/local/trades/new?kind=want" className={`${localButton} w-full`}>💗 내 WANT 올리기</Link>
+      <Link href="/local/trades/new?kind=want" className={`${localButton} w-full`}>💗 내 WISH 올리기</Link>
     </footer>
   </aside>;
 }
