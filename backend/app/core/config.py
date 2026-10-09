@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
     google_client_id: str = ""
     google_client_secret: str = ""
+    # AI 픽셀 아바타 (Gemini) — 키가 없으면 AI 만들기만 꺼지고 나머지 기능은 그대로
+    gemini_api_key: str = ""
+    gemini_image_model: str = "gemini-nano-banana-2.1"
+    ai_avatar_per_hour: int = 10
 
     @property
     def is_local(self) -> bool:
