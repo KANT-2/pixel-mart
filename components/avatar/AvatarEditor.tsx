@@ -17,8 +17,8 @@ function AvatarForm({ user }: AvatarFormProps) {
   const { updateUser, refresh, pending } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [original, setOriginal] = useState<string | null>(null);
-  const [result, setResult] = useState<{ dataUrl: string; bytes: number } | null>(null);
-  const [resolution, setResolution] = useState<16 | 24 | 32>(32);
+  const [result, setResult] = useState<{ dataUrl: string; bytes: number; width: number; height: number } | null>(null);
+  const [resolution, setResolution] = useState<16 | 24 | 32 | 48>(32);
   const [colors, setColors] = useState<8 | 16>(16);
   const [converting, setConverting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -32,7 +32,7 @@ function AvatarForm({ user }: AvatarFormProps) {
   useEffect(() => () => { if (original) URL.revokeObjectURL(original); }, [original]);
   useEffect(() => () => { conversion.current++; operation.current++; }, []);
 
-  async function convert(selected: File, nextResolution: 16 | 24 | 32, nextColors: 8 | 16) {
+  async function convert(selected: File, nextResolution: 16 | 24 | 32 | 48, nextColors: 8 | 16) {
     const request = ++conversion.current;
     setConverting(true);
     setResult(null);
@@ -98,7 +98,7 @@ function AvatarForm({ user }: AvatarFormProps) {
       <input ref={input} id="avatar-photo" type="file" accept="image/*" disabled={saving || pending}
         onChange={(event) => choose(event.target.files?.[0])}
         className="block w-full min-w-0 text-sm text-sub file:mr-3 file:rounded-lg file:border-0 file:bg-panel-2 file:px-4 file:py-3 file:font-semibold file:text-ink" />
-      <p className="mt-3 text-xs text-dim">최대 10MB · 가운데를 정사각형으로 잘라요. 배경도 함께 픽셀로 변환됩니다.</p>
+      <p className="mt-3 text-xs text-dim">최대 10MB · 사진을 자르지 않고 비율 그대로 축소해요. 배경도 함께 픽셀로 변환됩니다.</p>
     </div>
     <div className="grid gap-5 sm:grid-cols-2">
       <div className="rounded-xl border border-line bg-panel p-5">
@@ -114,25 +114,25 @@ function AvatarForm({ user }: AvatarFormProps) {
         <h2 className="mb-4 font-bold">무대 위 미리보기</h2>
         <MotionBoundary className="grid aspect-square place-items-center rounded-lg bg-night">
           {converting ? <div role="status" aria-label="픽셀 아바타 변환 중" className="size-40 animate-pulse bg-panel-2" /> : (
-            <div className={`${heroStyles.bob} w-3/5`}>
-              {preview ? <PixelAvatar src={preview} alt="변환한 픽셀 아바타" className="w-full" /> : (
+            <div className={`${heroStyles.bob} grid h-3/5 w-3/5 place-items-center`}>
+              {preview ? <PixelAvatar src={preview} alt="변환한 픽셀 아바타" className="h-full w-full" /> : (
                 // eslint-disable-next-line @next/next/no-img-element -- 무대와 같은 기존 픽셀 스프라이트
                 <img src="/images/hero-slime.svg" alt="기본 슬라임" className="w-full" />
               )}
             </div>
           )}
         </MotionBoundary>
-        <p className="mt-3 text-xs text-sub">{result ? `PNG ${(result.bytes / 1024).toFixed(1)}KB / 50KB` : "저장 후 메인에서도 같은 모습으로 통통 뛰어요."}</p>
+        <p className="mt-3 text-xs text-sub">{result ? `${result.width} × ${result.height}px · PNG ${(result.bytes / 1024).toFixed(1)}KB / 50KB` : "저장 후 메인에서도 같은 모습으로 통통 뛰어요."}</p>
       </div>
     </div>
     <fieldset disabled={saving || pending} className="grid gap-4 rounded-xl border border-line bg-panel p-5 sm:grid-cols-2">
       <legend className="px-2 font-bold">변환 옵션</legend>
-      <label className="text-sm">해상도
-        <select aria-label="해상도" value={resolution} onChange={(event) => {
-          const value = Number(event.target.value) as 16 | 24 | 32;
+      <label className="text-sm">도트 개수 (긴 쪽)
+        <select aria-label="도트 개수" value={resolution} onChange={(event) => {
+          const value = Number(event.target.value) as 16 | 24 | 32 | 48;
           setResolution(value); if (file) void convert(file, value, colors);
         }} className="mt-2 block w-full rounded-lg border border-line bg-night p-3">
-          {[16, 24, 32].map((value) => <option key={value} value={value}>{value} × {value}</option>)}
+          {[16, 24, 32, 48].map((value) => <option key={value} value={value}>{value}칸</option>)}
         </select>
       </label>
       <label className="text-sm">색 수
