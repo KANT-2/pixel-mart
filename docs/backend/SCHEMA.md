@@ -77,4 +77,5 @@ erDiagram
 | trade_posts | id, user_id FK, region_code FK, kind(`have/want/sell`), product_id FK nullable, interest_id FK nullable, item_name, condition(`new/like_new/used`), price nullable, trade_method(`direct/delivery/both`), content, status(`open/done/hidden`), is_sample, created_at | 연락처·장소 기재 금지, 매칭은 item·interest + 지역 |
 | fandom_samples | region_code, interest_id, count · PK(region_code, interest_id) | Cold Start용 Mock 집계 (응답에 `isSample`) |
 | wish_samples | region_code, product_id, count · PK(region_code, product_id) | Wish Map Cold Start용 Mock 찜 집계 — 실제 찜이 없는 칸만 채움 (응답에 `isSample`) |
+| gifts | sender_id·recipient_id FK users, trade_post_id FK(SET NULL), product_id, quantity 1~9, unit_price, message(100), status pending/accepted/declined, order_id FK(받는 사람 주문), created_at, responded_at | 동네 선물 (데모 결제, 서로 익명) |
 | (집계) | `region_code × interest_id` **사용자 수**(중복 제거) — 5명 미만은 숫자 비공개, 상위 지역은 하위 합산 | 쿼리로 계산 |

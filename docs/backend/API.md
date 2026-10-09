@@ -71,3 +71,7 @@
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
 | GET | /api/local/map-avatars?region=&interest= | 덕력지도 아바타 핀 — 보고 있는 지역의 하위 지역(생활권이면 자기 자신)별 `mapAvatarOptIn` 동의자 수와 무작위 최대 6개 아바타(PNG data URL, null=기본 슬라임). 하위 합산 5명 미만은 `count: null, belowThreshold: true, avatars: []`, id·닉네임 없음, 테스트 계정 제외 | ✅ |
 | GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만). 실제 찜이 없는 칸은 샘플로 채우고 `isSample: true` | ✅ |
+| POST | /api/gifts 🔒 | 거래글 이웃에게 선물(데모 결제) `{tradePostId, productId, quantity 1~9, message ≤100}` → 201. 내 글·샘플 400, 없음·숨김 404, 연락처 메시지 422. 상대는 항상 "이웃 플레이어" | ✅ |
+| GET | /api/gifts?box=received\|sent 🔒 | 받은/보낸 선물함 (최신순, 닉네임·주소 없음, `orderId`는 받은 사람만) | ✅ |
+| POST | /api/gifts/{id}/accept 🔒 | 받은 선물 받기 `{recipientName, address}` → 받는 사람의 주문 생성(배송 흐름), 남의 선물 404, 이미 처리 400 | ✅ |
+| POST | /api/gifts/{id}/decline 🔒 | 받은 선물 거절 → 보낸 사람에게 "거절 · 환불(데모)" | ✅ |
