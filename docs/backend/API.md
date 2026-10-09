@@ -12,7 +12,8 @@
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
 | GET | /api/auth/google/login | 구글 로그인 시작 (키 없으면 503) | ✅ |
 | GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 (실패 시 `/?loginError=google`) | ✅ |
-| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자) | ✅ |
+| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자, 대소문자 구분 없이 남이 쓰는 닉네임이면 409) | ✅ |
+| GET | /api/users/nickname-check?nickname= | 닉네임 사용 가능 여부 `{nickname, available}` (내 닉네임은 available) | ✅ |
 | PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB, 아니면 422) | ✅ |
 | DELETE | /api/users/me/avatar 🔒 | 아바타 삭제 (기본 슬라임으로) | ✅ |
 | POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Gemini 생성 원본, 저장 안 함). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과 429 | ✅ |

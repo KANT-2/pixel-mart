@@ -28,6 +28,11 @@ class UserUpdateIn(CamelModel):
     )
 
 
+class NicknameCheckOut(CamelModel):
+    nickname: str
+    available: bool
+
+
 class AvatarIn(CamelModel):
     """브라우저에서 픽셀 변환한 PNG (data URL, 디코딩 50KB 이하). 얼굴 원본 사진은 받지 않는다"""
 

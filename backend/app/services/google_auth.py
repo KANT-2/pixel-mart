@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models import User
+from app.services.nickname import unique_nickname
 
 oauth = OAuth()
 oauth.register(
@@ -36,8 +37,8 @@ async def get_or_create_google_user(db: AsyncSession, userinfo: dict) -> tuple[U
             user.google_sub = sub
     created = user is None
     if created:
-        nickname = (userinfo.get("name") or email.split("@")[0]).strip()[:30] or email.split("@")[0][:30]
-        user = User(email=email, google_sub=sub, nickname=nickname)
+        nickname = (userinfo.get("name") or "").strip() or email.split("@")[0]
+        user = User(email=email, google_sub=sub, nickname=await unique_nickname(db, nickname))
         db.add(user)
 
     await db.commit()

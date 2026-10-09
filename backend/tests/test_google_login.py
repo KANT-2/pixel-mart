@@ -42,7 +42,7 @@ def google_userinfo(**overrides) -> dict:
         "sub": sub,
         "email": f"g-{sub[:8]}@pixelmart.test",
         "email_verified": True,
-        "name": "구글 플레이어",
+        "name": f"구글 플레이어 {sub[:6]}",  # 닉네임은 하나뿐이라 실행마다 다르게
     } | overrides
 
 
@@ -77,7 +77,7 @@ async def test_callback_creates_user_and_sets_cookie(client, google_configured, 
 
     me = (await client.get("/api/auth/me")).json()
     assert me["email"] == info["email"]
-    assert me["nickname"] == "구글 플레이어"
+    assert me["nickname"] == info["name"]
 
 
 async def test_callback_existing_user_logs_in_without_duplicate(client, google_configured, monkeypatch):
@@ -91,7 +91,7 @@ async def test_callback_existing_user_logs_in_without_duplicate(client, google_c
     await client.get("/api/auth/google/callback")
     me = (await client.get("/api/auth/me")).json()
     assert me["id"] == first_id
-    assert me["nickname"] == "구글 플레이어"
+    assert me["nickname"] == info["name"]
     async with engine.connect() as conn:
         count = await conn.scalar(text("SELECT count(*) FROM users WHERE google_sub = :s"), {"s": info["sub"]})
     assert count == 1

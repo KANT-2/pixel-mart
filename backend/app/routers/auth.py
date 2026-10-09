@@ -10,6 +10,7 @@ from app.models import User
 from app.schemas.common import Message
 from app.schemas.user import DevLoginIn, UserOut
 from app.services.google_auth import get_or_create_google_user, google_callback_url, oauth
+from app.services.nickname import unique_nickname
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -50,7 +51,7 @@ async def dev_login(body: DevLoginIn, response: Response, db: DbSession):
 
     user = await db.scalar(select(User).where(User.email == body.email))
     if user is None:
-        user = User(email=body.email, nickname=body.nickname or body.email.split("@")[0][:30])
+        user = User(email=body.email, nickname=await unique_nickname(db, body.nickname or body.email.split("@")[0]))
         db.add(user)
         await db.commit()
         await db.refresh(user)
