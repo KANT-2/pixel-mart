@@ -59,8 +59,8 @@ export default function CompactRegionSelect({ regions, value, onChange, ownRegio
     </div>
     <button type="button" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={search} className="btn-lime h-10 shrink-0 px-3 text-xs font-bold">찾기</button>
     {ownRegion && <button type="button" disabled={disabled} aria-pressed={value === ownRegion} onClick={() => pick(ownRegion)}
-      className="h-10 shrink-0 btn-pixel px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">내 동네</button>}
+      className="btn-pixel toggle-outline h-10 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink">내 동네</button>}
     <button type="button" disabled={disabled} aria-pressed={value === null} onClick={() => pick(null)}
-      className="h-10 shrink-0 btn-pixel px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">전체 지역</button>
+      className="btn-pixel toggle-outline h-10 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink">전체 지역</button>
   </div>;
 }

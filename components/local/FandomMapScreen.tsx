@@ -112,7 +112,7 @@ function RegionSearch({ regions, onPick }: RegionSearchProps) {
   const [notFound, setNotFound] = useState(false);
   const pick = (code: string) => { onPick(code); setText(""); setNotFound(false); };
   const search = () => { if (matches[0]) pick(matches[0].code); else if (keyword) setNotFound(true); };
-  return <form role="search" aria-label="동네 검색" onSubmit={(event) => { event.preventDefault(); search(); }} className="relative flex min-w-0 flex-[1_1_18rem] gap-1.5">
+  return <form role="search" aria-label="동네 검색" onSubmit={(event) => { event.preventDefault(); search(); }} className="relative flex w-full min-w-0 max-w-md flex-1 gap-1.5">
     <label htmlFor="region-search" className="sr-only">동네 검색</label>
     <input id="region-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, 20)); setNotFound(false); }} placeholder="동네 검색 (예: 판교)"
       autoComplete="off" role="combobox" aria-expanded={matches.length > 0} aria-controls="region-search-list" enterKeyHint="search"

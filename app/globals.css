@@ -158,6 +158,18 @@ html {
   box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 5px 0 #4f7d1c;
 }
 
+/* 필터·모드 토글(취향 칩, 내 동네/전체 지역, 동네/닉네임, 상품 카테고리)은 채우지 않고
+   검색창 포커스와 같은 은은한 민트 테두리로만 고른 상태를 보여 준다 */
+.btn-pixel.toggle-outline[aria-pressed="true"],
+.btn-pixel.toggle-outline[aria-pressed="true"]:hover:not(:disabled),
+.btn-pixel.toggle-outline[aria-current="page"],
+.btn-pixel.toggle-outline[aria-current="page"]:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-mint) 55%, var(--color-frame));
+  background-color: var(--color-panel-2);
+  color: var(--color-ink);
+  box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 3px 0 var(--color-shadow), 0 0 6px color-mix(in srgb, var(--color-mint) 25%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn-lime,
   .btn-pixel {

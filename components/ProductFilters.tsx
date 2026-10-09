@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState, useTransition, type FormEvent } from "react";
-import type { ApiCategory } from "@/types/api";
 import { formatPrice } from "@/utils/formatPrice";
 import { changeProductQuery, productHref, PRODUCT_MAX_PRICE, type ProductQuery } from "@/utils/productQuery";
 
 interface ProductFiltersProps {
   query: ProductQuery;
-  categories: ApiCategory[];
 }
 
 const sortLabels: Record<ProductQuery["sort"], string> = {
@@ -21,7 +18,7 @@ const sortLabels: Record<ProductQuery["sort"], string> = {
 };
 const fieldClass = "min-w-0 pixel-input px-3 py-2.5 text-sm text-ink";
 
-export default function ProductFilters({ query, categories }: ProductFiltersProps) {
+export default function ProductFilters({ query }: ProductFiltersProps) {
   const router = useRouter();
   const id = useId();
   const [pending, startTransition] = useTransition();
@@ -64,13 +61,6 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
     navigate(next);
   }
 
-  const chips: { label: string; patch: Partial<ProductQuery> }[] = [];
-  if (query.q) chips.push({ label: `검색: ${query.q}`, patch: { q: undefined } });
-  if (query.category) chips.push({ label: categories.find((category) => category.slug === query.category)?.name ?? query.category, patch: { category: undefined } });
-  if (query.sort !== "id") chips.push({ label: sortLabels[query.sort], patch: { sort: "id" } });
-  if (query.minPrice !== undefined) chips.push({ label: `${formatPrice(query.minPrice)} 이상`, patch: { minPrice: undefined } });
-  if (query.maxPrice !== undefined) chips.push({ label: `${formatPrice(query.maxPrice)} 이하`, patch: { maxPrice: undefined } });
-  if (query.new) chips.push({ label: "NEW만 보기", patch: { new: undefined } });
 
   const priceActive = query.minPrice !== undefined || query.maxPrice !== undefined;
   const toolButton = "inline-flex h-10 shrink-0 items-center gap-1.5 btn-pixel px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime aria-expanded:border-violet focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet";
@@ -139,16 +129,6 @@ export default function ProductFilters({ query, categories }: ProductFiltersProp
         </div>
       </fieldset>
 
-      {chips.length > 0 && (
-        <div aria-label="적용된 필터" className="mt-3 flex min-w-0 flex-wrap items-center gap-2">
-          {chips.map((chip) => (
-            <Link key={Object.keys(chip.patch)[0]} href={productHref(changeProductQuery(query, chip.patch))} scroll={false} aria-label={`${chip.label} 필터 해제`} className="inline-flex min-h-8 max-w-full items-center gap-2 btn-pixel px-2.5 py-1 text-xs text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
-              <span className="max-w-56 truncate" title={chip.label}>{chip.label}</span><span aria-hidden="true" className="text-base">×</span>
-            </Link>
-          ))}
-          <Link href="/products" scroll={false} className="grid min-h-10 place-items-center rounded-lg px-2 text-xs font-semibold text-sub underline underline-offset-4 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">전체 초기화</Link>
-        </div>
-      )}
     </section>
   );
 }

@@ -12,7 +12,7 @@ interface InterestFilterProps {
   onSelect: (id: number | null) => void;
 }
 
-const chip = "btn-pixel h-9 shrink-0 px-3 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
+const chip = "btn-pixel toggle-outline h-9 shrink-0 px-3 text-xs font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
 const chipState = "text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
 
 /** 취향이 늘어나도 한 줄을 넘지 않게: 칩은 몇 개만, 나머지는 검색·종류별 목록 패널에서 고른다 */

@@ -67,7 +67,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
         </p>
       </header>
 
-      <ProductFilters key={canonical.toString()} query={currentQuery} categories={categoryResult.data} />
+      <ProductFilters key={canonical.toString()} query={currentQuery} />
       <CategoryTabs current={query.category} categories={categoryResult.data} query={currentQuery} />
       {(result.fallback || categoryResult.fallback) && <ProductFallbackNotice />}
       {result.fallback && query.sort === "popular" && (

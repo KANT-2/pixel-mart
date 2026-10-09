@@ -100,8 +100,8 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
   const [notFound, setNotFound] = useState(false);
   const pick = (code: string) => { onRegion(code); setText(""); setNotFound(false); };
   // 다른 토글(내 동네·전체 지역)과 같은 픽셀 버튼 — 고르면 연두 테두리·글자
-  const tab = "btn-pixel h-11 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
-  return <form role="search" aria-label="위시맵 찾기" className="flex w-full min-w-0 gap-1.5" onSubmit={(event) => {
+  const tab = "btn-pixel toggle-outline h-11 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime";
+  return <form role="search" aria-label="위시맵 찾기" className="flex w-full min-w-0 max-w-xl gap-1.5" onSubmit={(event) => {
     event.preventDefault();
     if (mode === "nickname" && keyword) onNickname(keyword);
     else if (matches[0]) pick(matches[0].code);
