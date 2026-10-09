@@ -53,6 +53,17 @@ class FandomSample(Base):
     count: Mapped[int] = mapped_column(Integer)
 
 
+class WishSample(Base):
+    """Cold Start용 Mock 찜 집계 — Wish Map에서 실제 찜 데이터가 없는 칸만 채우고 isSample로 표시"""
+
+    __tablename__ = "wish_samples"
+    __table_args__ = (CheckConstraint("count >= 0", name="count"),)
+
+    region_code: Mapped[str] = mapped_column(ForeignKey("regions.code", ondelete="CASCADE"), primary_key=True)
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id", ondelete="CASCADE"), primary_key=True)
+    count: Mapped[int] = mapped_column(Integer)
+
+
 class TradePost(Base):
     """거래(sell)·교환(have/want) 글 — 연락처·정확한 장소는 남기지 않고 당사자끼리 정한다 (Prototype)"""
 

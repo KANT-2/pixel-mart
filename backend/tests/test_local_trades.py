@@ -221,6 +221,36 @@ async def test_wish_map_ranks_opted_in_neighbors(users, monkeypatch):
     assert [(r["product"]["id"], r["count"]) for r in district] == [(130, 5), (131, 5)]
 
 
+async def test_wish_map_samples_fill_gaps_and_real_data_wins(users, monkeypatch):
+    monkeypatch.setattr(local_stats, "EXCLUDED_EMAIL_SUFFIX", "@never.invalid")
+    zone_a = [await users(f"wishmap-a{n}@pixelmart.test", region=ZONE_A) for n in range(1, 6)]
+    async with engine.begin() as conn:  # 테스트 지역을 지우면 CASCADE로 함께 정리된다
+        await conn.execute(
+            text(
+                "INSERT INTO wish_samples (region_code, product_id, count) "
+                "VALUES (:r, 130, 9), (:r, 132, 7), (:r, 133, 4)"
+            ),
+            {"r": ZONE_A},
+        )
+    for c in zone_a:
+        await c.put("/api/wishlist/130")  # 실제 5명 → 샘플 9명 대신 실제 값
+
+    rows = (await zone_a[0].get("/api/local/wish-map", params={"region": ZONE_A})).json()
+    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in rows] == [(132, 7, True), (130, 5, False)]
+    district = (await zone_a[0].get("/api/local/wish-map", params={"region": "TRD1"})).json()  # 하위 지역 합산
+    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in district] == [(132, 7, True), (130, 5, False)]
+
+
+async def test_seeded_wish_samples_are_marked(client):
+    # 시드 샘플: 판교에는 실제 집계 참여자의 찜이 없다
+    rows = (await client.get("/api/local/wish-map", params={"region": "41135-01"})).json()
+    if not rows:
+        pytest.skip("Wish Map 샘플 시드 전입니다 (python -m scripts.seed)")
+    assert all(r["isSample"] and r["count"] >= 5 for r in rows)
+    assert [r["rank"] for r in rows] == list(range(1, len(rows) + 1))
+    assert [r["count"] for r in rows] == sorted((r["count"] for r in rows), reverse=True)
+
+
 async def test_wish_map_excludes_test_accounts_and_validates(users):
     c = await users("wishmap-a1@pixelmart.test", region=ZONE_A)
     assert (await c.get("/api/local/wish-map", params={"region": ZONE_A})).json() == []

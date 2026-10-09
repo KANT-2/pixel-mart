@@ -1,0 +1,692 @@
+[
+  {
+    "regionCode": "11200-01",
+    "productId": 171,
+    "count": 12
+  },
+  {
+    "regionCode": "11200-01",
+    "productId": 52,
+    "count": 8
+  },
+  {
+    "regionCode": "11200-01",
+    "productId": 119,
+    "count": 5
+  },
+  {
+    "regionCode": "11200-01",
+    "productId": 36,
+    "count": 4
+  },
+  {
+    "regionCode": "11200-01",
+    "productId": 86,
+    "count": 3
+  },
+  {
+    "regionCode": "11200-01",
+    "productId": 22,
+    "count": 2
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 171,
+    "count": 12
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 67,
+    "count": 11
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 88,
+    "count": 9
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 78,
+    "count": 4
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 138,
+    "count": 2
+  },
+  {
+    "regionCode": "11440-01",
+    "productId": 100,
+    "count": 2
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 52,
+    "count": 10
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 116,
+    "count": 9
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 111,
+    "count": 8
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 49,
+    "count": 5
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 147,
+    "count": 3
+  },
+  {
+    "regionCode": "11440-02",
+    "productId": 135,
+    "count": 2
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 49,
+    "count": 13
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 125,
+    "count": 10
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 106,
+    "count": 7
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 24,
+    "count": 6
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 55,
+    "count": 4
+  },
+  {
+    "regionCode": "11650-01",
+    "productId": 123,
+    "count": 3
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 25,
+    "count": 11
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 107,
+    "count": 7
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 32,
+    "count": 6
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 26,
+    "count": 5
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 105,
+    "count": 2
+  },
+  {
+    "regionCode": "11650-02",
+    "productId": 158,
+    "count": 1
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 132,
+    "count": 9
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 89,
+    "count": 9
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 167,
+    "count": 7
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 138,
+    "count": 6
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 146,
+    "count": 2
+  },
+  {
+    "regionCode": "11680-01",
+    "productId": 95,
+    "count": 2
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 139,
+    "count": 15
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 5,
+    "count": 6
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 2,
+    "count": 5
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 97,
+    "count": 4
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 86,
+    "count": 1
+  },
+  {
+    "regionCode": "11680-02",
+    "productId": 136,
+    "count": 1
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 163,
+    "count": 7
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 36,
+    "count": 7
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 148,
+    "count": 6
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 102,
+    "count": 5
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 61,
+    "count": 3
+  },
+  {
+    "regionCode": "11680-03",
+    "productId": 96,
+    "count": 2
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 60,
+    "count": 15
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 92,
+    "count": 8
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 53,
+    "count": 7
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 59,
+    "count": 5
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 82,
+    "count": 1
+  },
+  {
+    "regionCode": "11710-01",
+    "productId": 100,
+    "count": 1
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 12,
+    "count": 15
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 93,
+    "count": 7
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 148,
+    "count": 5
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 125,
+    "count": 5
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 45,
+    "count": 2
+  },
+  {
+    "regionCode": "11710-02",
+    "productId": 84,
+    "count": 2
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 157,
+    "count": 9
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 114,
+    "count": 6
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 149,
+    "count": 6
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 49,
+    "count": 4
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 130,
+    "count": 2
+  },
+  {
+    "regionCode": "28185-01",
+    "productId": 135,
+    "count": 1
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 172,
+    "count": 12
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 33,
+    "count": 12
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 178,
+    "count": 5
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 62,
+    "count": 4
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 123,
+    "count": 2
+  },
+  {
+    "regionCode": "28237-01",
+    "productId": 98,
+    "count": 1
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 117,
+    "count": 15
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 61,
+    "count": 12
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 139,
+    "count": 8
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 9,
+    "count": 6
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 27,
+    "count": 2
+  },
+  {
+    "regionCode": "41115-01",
+    "productId": 123,
+    "count": 1
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 165,
+    "count": 7
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 74,
+    "count": 7
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 50,
+    "count": 6
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 87,
+    "count": 5
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 132,
+    "count": 4
+  },
+  {
+    "regionCode": "41117-01",
+    "productId": 153,
+    "count": 3
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 117,
+    "count": 14
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 69,
+    "count": 6
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 88,
+    "count": 4
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 173,
+    "count": 3
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 130,
+    "count": 3
+  },
+  {
+    "regionCode": "41117-02",
+    "productId": 45,
+    "count": 2
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 155,
+    "count": 9
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 161,
+    "count": 7
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 176,
+    "count": 5
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 160,
+    "count": 5
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 87,
+    "count": 3
+  },
+  {
+    "regionCode": "41131-01",
+    "productId": 101,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 145,
+    "count": 9
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 131,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 108,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 144,
+    "count": 3
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 102,
+    "count": 1
+  },
+  {
+    "regionCode": "41135-01",
+    "productId": 77,
+    "count": 1
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 2,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 21,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 115,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 174,
+    "count": 4
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 141,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-02",
+    "productId": 22,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 118,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 75,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 143,
+    "count": 6
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 100,
+    "count": 3
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 27,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-03",
+    "productId": 87,
+    "count": 2
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 146,
+    "count": 14
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 106,
+    "count": 8
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 63,
+    "count": 5
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 33,
+    "count": 3
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 120,
+    "count": 3
+  },
+  {
+    "regionCode": "41135-04",
+    "productId": 27,
+    "count": 1
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 8,
+    "count": 12
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 34,
+    "count": 7
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 89,
+    "count": 7
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 176,
+    "count": 6
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 73,
+    "count": 2
+  },
+  {
+    "regionCode": "41463-01",
+    "productId": 74,
+    "count": 1
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 16,
+    "count": 8
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 104,
+    "count": 7
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 40,
+    "count": 6
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 90,
+    "count": 5
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 108,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-01",
+    "productId": 78,
+    "count": 1
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 125,
+    "count": 9
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 154,
+    "count": 6
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 169,
+    "count": 6
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 55,
+    "count": 5
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 160,
+    "count": 3
+  },
+  {
+    "regionCode": "41465-02",
+    "productId": 3,
+    "count": 3
+  }
+]

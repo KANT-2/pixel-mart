@@ -2,7 +2,7 @@
 from app.models.cancel_request import CancelRequest
 from app.models.cart import CartItem
 from app.models.faq import Faq
-from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest
+from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest, WishSample
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
 from app.models.review import Review
@@ -26,4 +26,5 @@ __all__ = [
     "User",
     "UserInterest",
     "Wishlist",
+    "WishSample",
 ]
