@@ -110,7 +110,13 @@ async def test_clear_local_profile(client, db_ready):
     await client.post("/api/auth/dev-login", json={"email": "local3@pixelmart.test"})
     await client.put("/api/users/me/local", json={"regionCode": "11680", "interestIds": [11], "fandomOptIn": True})
     cleared = (await client.put("/api/users/me/local", json={"regionCode": None, "interestIds": []})).json()
-    assert cleared == {"region": None, "interests": [], "fandomOptIn": False, "profilePublic": False}
+    assert cleared == {
+        "region": None,
+        "interests": [],
+        "fandomOptIn": False,
+        "profilePublic": False,
+        "mapAvatarOptIn": False,
+    }
 
 
 @pytest.mark.parametrize(

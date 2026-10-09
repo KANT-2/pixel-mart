@@ -19,3 +19,5 @@ class User(Base):
     region_code: Mapped[str | None] = mapped_column(ForeignKey("regions.code"), index=True)
     fandom_opt_in: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     profile_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    # 덕력지도 핀에 내 아바타 표시 (opt-in, 5명 이상 지역에서만 무작위로 노출 — 닉네임·위치는 내보내지 않는다)
+    map_avatar_opt_in: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
