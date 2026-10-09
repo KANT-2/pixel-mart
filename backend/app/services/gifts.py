@@ -1,6 +1,6 @@
 """동네 선물 — 거래글을 올린 이웃에게 데모 결제로 선물하고, 받는 사람이 주소를 넣어 받으면 그 사람의 주문이 된다.
 
-보낸 사람·받는 사람은 서로를 "이웃 플레이어"로만 본다 (닉네임·계정·주소 비공개).
+선물함에서 보낸 사람·받는 사람은 서로를 "이웃 플레이어"로만 본다 (계정·주소 비공개).
 """
 
 from datetime import UTC, datetime
@@ -26,6 +26,8 @@ async def send_gift(
     post = await db.get(TradePost, trade_post_id)
     if post is None or post.status != "open":
         raise GiftError(404, "선물할 수 있는 거래글을 찾을 수 없습니다.")
+    if post.kind != "want":
+        raise GiftError(400, "구하는 글(WANT)에만 선물할 수 있습니다.")
     if post.user_id == sender.id:
         raise GiftError(400, "내 글에는 선물할 수 없습니다.")
     if post.is_sample:

@@ -94,6 +94,7 @@ async def test_send_and_both_boxes_stay_anonymous(users):
     ("setup", "body_patch", "status"),
     [
         ("own", {}, 400),
+        ("have", {}, 400),
         ("sample", {}, 400),
         ("hidden", {}, 404),
         ("open", {"productId": 999999}, 404),
@@ -106,6 +107,11 @@ async def test_send_rules(users, setup, body_patch, status):
     recipient = await users("gift-recipient@pixelmart.test")
     sender = await users("gift-sender@pixelmart.test")
     post_id = await want_post(sender if setup == "own" else recipient)
+    if setup == "have":
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("UPDATE trade_posts SET kind = 'have', condition = 'new' WHERE id = :i"), {"i": post_id}
+            )
     if setup == "sample":
         async with engine.begin() as conn:
             await conn.execute(text("UPDATE trade_posts SET is_sample = true WHERE id = :i"), {"i": post_id})

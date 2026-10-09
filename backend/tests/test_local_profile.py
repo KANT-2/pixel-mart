@@ -116,6 +116,7 @@ async def test_clear_local_profile(client, db_ready):
         "fandomOptIn": False,
         "profilePublic": False,
         "mapAvatarOptIn": False,
+        "nicknamePublic": False,
     }
 
 

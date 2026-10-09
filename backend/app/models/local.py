@@ -93,3 +93,5 @@ class TradePost(Base):
 
     product: Mapped[Product | None] = relationship(lazy="joined")
     interest: Mapped[Interest | None] = relationship(lazy="joined")
+    # 위시맵 닉네임 공개(opt-in) 판단용 — 응답에는 동의한 경우의 닉네임·아바타만 나간다
+    author: Mapped["User"] = relationship(lazy="joined")  # noqa: F821

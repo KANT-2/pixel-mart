@@ -30,6 +30,7 @@ class LocalProfileIn(CamelModel):
     fandom_opt_in: bool = Field(default=False, description="덕력지도 등 지역 익명 집계에 참여")
     profile_public: bool = Field(default=False, description="선택한 취향을 다른 사용자에게 공개")
     map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시 (5명 이상 지역에서만)")
+    nickname_public: bool = Field(default=False, description="위시맵 WANT 글에 닉네임·아바타 표시, 닉네임 검색 허용")
 
 
 class LocalProfileOut(CamelModel):
@@ -40,6 +41,7 @@ class LocalProfileOut(CamelModel):
     fandom_opt_in: bool
     profile_public: bool
     map_avatar_opt_in: bool
+    nickname_public: bool
 
 
 class MapAvatarsOut(CamelModel):
@@ -91,6 +93,13 @@ class TradeStatusIn(CamelModel):
     status: Literal["done", "hidden"]
 
 
+class TradeAuthorOut(CamelModel):
+    """위시맵 닉네임 공개에 동의한 작성자의 WANT 글에만 붙는다 (id·이메일·지역 상세 없음)"""
+
+    nickname: str
+    avatar_url: str | None
+
+
 class TradePostOut(CamelModel):
     """정책 10장의 노출 항목만 — 작성자 정보·연락처·정확한 장소는 없다"""
 
@@ -109,6 +118,16 @@ class TradePostOut(CamelModel):
     is_mine: bool
     is_sample: bool
     created_at: datetime
+    author: TradeAuthorOut | None = Field(default=None, description="WANT 글 + 작성자가 닉네임 공개에 동의했을 때만")
+
+
+class WishWantsOut(CamelModel):
+    """위시맵 지역 블록 하나의 진행 중 WANT 글 수와 핀 이미지 (하위 지역 포함)"""
+
+    region_code: str
+    count: int
+    images: list[str | None] = Field(description="핀으로 쓸 상품 이미지, 연결 상품이 없으면 null (최대 4개)")
+    sample: bool = Field(description="샘플 글만 있는 지역")
 
 
 class TradeMatchOut(CamelModel):
