@@ -61,17 +61,19 @@
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
-| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
+| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`)·위시맵 닉네임 공개(`nicknamePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
 | GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
 | GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
 | GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (5명 이상만, `rank`·`isSample`) | ✅ |
-| GET · POST | /api/local/trades?region=&kind=&productId=&interestId= 🔒(POST) | 거래(`sell`)·교환(`have/want`) 글 (Prototype). 목록은 진행 중 글, 상위 지역은 하위 포함, 작성자 정보 없음, 샘플은 `isSample`. POST는 내 지역으로 작성 — 지역 미설정 400, have·sell 상태 미선택·연락처/정확한 장소 422, 같은 물건 진행 중 글 400 | ✅ |
+| GET · POST | /api/local/trades?region=&kind=&productId=&interestId=&nickname= 🔒(POST) | 거래(`sell`)·교환(`have/want`) 글 (Prototype). 목록은 진행 중 글, 상위 지역은 하위 포함, 작성자 정보는 닉네임 공개 동의자의 WANT 글에만 `author {nickname, avatarUrl}`(그 외 null), `nickname`은 동의자 WANT 글만 부분 검색, 샘플은 `isSample`. POST는 내 지역으로 작성 — 지역 미설정 400, have·sell 상태 미선택·연락처/정확한 장소 422, 같은 물건 진행 중 글 400 | ✅ |
 | GET | /api/local/trades/mine 🔒 | 내 글 (완료·숨김 포함) | ✅ |
+| GET | /api/local/trades/{id} | 거래글 하나 (진행 중이거나 내 글, 그 외 404) | ✅ |
+| GET | /api/local/wish-wants?codes=a,b | 위시맵 지역 블록별 진행 중 WANT 수·핀 이미지(최대 4, 하위 지역 포함), 없는 지역 404, 최대 40개 | ✅ |
 | PATCH | /api/local/trades/{id} 🔒 | 내 글 상태 `done`/`hidden` (남의 글 404) | ✅ |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
 | GET | /api/local/map-avatars?region=&interest= | 덕력지도 아바타 핀 — 보고 있는 지역의 하위 지역(생활권이면 자기 자신)별 `mapAvatarOptIn` 동의자 수와 무작위 최대 6개 아바타(PNG data URL, null=기본 슬라임). 하위 합산 5명 미만은 `count: null, belowThreshold: true, avatars: []`, id·닉네임 없음, 테스트 계정 제외 | ✅ |
 | GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만). 실제 찜이 없는 칸은 샘플로 채우고 `isSample: true` | ✅ |
-| POST | /api/gifts 🔒 | 거래글 이웃에게 선물(데모 결제) `{tradePostId, productId, quantity 1~9, message ≤100}` → 201. 내 글·샘플 400, 없음·숨김 404, 연락처 메시지 422. 상대는 항상 "이웃 플레이어" | ✅ |
+| POST | /api/gifts 🔒 | WANT 글 이웃에게 선물(데모 결제) `{tradePostId, productId, quantity 1~9, message ≤100}` → 201. HAVE·SELL·내 글·샘플 400, 없음·숨김 404, 연락처 메시지 422. 상대는 항상 "이웃 플레이어" | ✅ |
 | GET | /api/gifts?box=received\|sent 🔒 | 받은/보낸 선물함 (최신순, 닉네임·주소 없음, `orderId`는 받은 사람만) | ✅ |
 | POST | /api/gifts/{id}/accept 🔒 | 받은 선물 받기 `{recipientName, address}` → 받는 사람의 주문 생성(배송 흐름), 남의 선물 404, 이미 처리 400 | ✅ |
 | POST | /api/gifts/{id}/decline 🔒 | 받은 선물 거절 → 보낸 사람에게 "거절 · 환불(데모)" | ✅ |

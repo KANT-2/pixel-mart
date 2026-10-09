@@ -63,6 +63,7 @@ async def _profile_out(db: DbSession, user: User) -> LocalProfileOut:
         fandom_opt_in=user.fandom_opt_in,
         profile_public=user.profile_public,
         map_avatar_opt_in=user.map_avatar_opt_in,
+        nickname_public=user.nickname_public,
     )
 
 
@@ -87,6 +88,7 @@ async def put_my_local(body: LocalProfileIn, user: CurrentUser, db: DbSession):
     user.fandom_opt_in = body.fandom_opt_in
     user.profile_public = body.profile_public
     user.map_avatar_opt_in = body.map_avatar_opt_in
+    user.nickname_public = body.nickname_public
     # 계속 고른 취향은 그대로 두어 고른 시각(집계 기간 기준)을 유지
     current = set(await db.scalars(select(UserInterest.interest_id).where(UserInterest.user_id == user.id)))
     if removed := current - wanted:
