@@ -9,7 +9,7 @@ import { useLocalResource } from "@/components/local/useLocalResource";
 import CompactRegionSelect from "@/components/local/CompactRegionSelect";
 import TradeCard from "@/components/local/TradeCard";
 import Pagination from "@/components/Pagination";
-import { LocalError, LocalSkeleton, localButton } from "@/components/local/LocalStates";
+import { LocalError, LocalSkeleton, localButton, localToolbar } from "@/components/local/LocalStates";
 import { localApi } from "@/lib/local";
 import { changeTradeQuery, parseTradeQuery, tradeHref, tradeProximity, tradeQueryParams, TRADE_KINDS, type TradeQuery } from "@/utils/localTrades";
 import type { ApiRegion, TradeKind } from "@/types/api";
@@ -30,7 +30,7 @@ export default function TradesBoard() {
     {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택할 수 있어요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
     {/* 거래소 도구 막대 — 지역 · 종류를 한 줄에 */}
     <section aria-label="게시판 필터" className="space-y-2">
-      <div className="pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2">
+      <div className={localToolbar}>
         {/* 사거나 팔고 싶은 물건 이름으로 찾기 — 물건 이름·연결 상품·설명에서 */}
         <form role="search" aria-label="물건 찾기" className="flex min-w-0 flex-[1_1_16rem] gap-2" onSubmit={(event) => {
           event.preventDefault();

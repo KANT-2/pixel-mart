@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import WishMap from "@/components/local/WishMap";
+import LocalPageHeader from "@/components/local/LocalPageHeader";
 import { LocalSkeleton } from "@/components/local/LocalStates";
 
 export const metadata: Metadata = { title: "위시맵 | PIXEL MART" };
 export default function WishMapPage() {
-  return <section className="mx-auto max-w-6xl px-4 pb-10 pt-3 md:px-8 md:pt-4">
-    <header className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      <p className="stage-kicker font-pixel text-sm text-mint">LOCAL WISH MAP</p>
-      <h1 className="text-xl font-extrabold">동네 이웃이 갖고 싶은 아이템</h1>
-    </header>
+  return <section className="mx-auto max-w-6xl px-4 pb-10 pt-4 md:px-8">
+    <LocalPageHeader kicker="WISH MAP" title="위시맵" description="동네 이웃이 갖고 싶은 아이템을 지도에서 찾고, 선물해 보세요."
+      actions={<Link href="/local/trades/new?kind=want" className="btn-lime inline-flex min-h-11 items-center px-5 text-sm font-bold">내 WISH 올리기</Link>} />
     <Suspense fallback={<LocalSkeleton />}><WishMap /></Suspense>
   </section>;
 }

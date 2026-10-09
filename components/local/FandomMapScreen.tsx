@@ -8,7 +8,7 @@ import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { useRegionLocator } from "@/components/local/useRegionLocator";
-import { LocalError, localButton, localInput } from "@/components/local/LocalStates";
+import { LocalError, localButton, localInput, localToolbar } from "@/components/local/LocalStates";
 import { loadMapBlocks } from "@/lib/fandomMapData";
 import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
@@ -65,9 +65,16 @@ export default function FandomMapScreen() {
   const quickInterests = picked && !base.some((item) => item.id === picked.id) ? [...base, picked] : base;
   const interestName = interests.data?.find((item) => item.id === query.interest)?.name;
 
-  return <section className="mx-auto max-w-6xl px-4 pb-10 pt-3 md:px-8 md:pt-4">
-    <div className="mb-3 flex flex-wrap items-center gap-2">
-      <nav aria-label="지도 위치" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 font-pixel text-sm">
+  return <div className="space-y-3">
+    {/* 탭 공통 도구 막대 — 동네 검색 · 내 위치 */}
+    <div className={localToolbar}>
+      <RegionSearch regions={catalog} onPick={go} />
+      <button type="button" onClick={() => locator.locate((code) => go(code))} disabled={locator.busy || locator.denied || !catalog.length}
+        aria-label="내 위치로 보기 — 누를 때만 위치 권한을 요청하고 좌표는 저장하지 않아요" className={`${localButton} shrink-0 gap-1.5`}>
+        <span aria-hidden="true">◎</span><span className="hidden sm:inline">{locator.busy ? "찾는 중…" : "내 위치로 보기"}</span></button>
+    </div>
+    {locator.message && <p role="status" className="text-xs text-sub">{locator.message}</p>}
+    <nav aria-label="지도 위치" className="flex min-w-0 flex-wrap items-center gap-1 font-pixel text-sm">
         <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
         {trail.map((code) => <span key={code} className="flex items-center gap-1">
           <span aria-hidden="true" className="text-dim">›</span>
@@ -75,14 +82,6 @@ export default function FandomMapScreen() {
             className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
         </span>)}
       </nav>
-      <div className="flex w-full gap-2 sm:w-auto">
-        <RegionSearch regions={catalog} onPick={go} />
-        <button type="button" onClick={() => locator.locate((code) => go(code))} disabled={locator.busy || locator.denied || !catalog.length}
-          aria-label="내 위치로 보기 — 누를 때만 위치 권한을 요청하고 좌표는 저장하지 않아요" className={`${localButton} shrink-0 gap-1.5`}>
-          <span aria-hidden="true">◎</span><span className="hidden sm:inline">{locator.busy ? "찾는 중…" : "내 위치로 보기"}</span></button>
-      </div>
-    </div>
-    {locator.message && <p role="status" className="mb-3 text-xs text-sub">{locator.message}</p>}
 
     <InterestFilter interests={interests.data ?? []} quick={quickInterests} selected={query.interest}
       onSelect={(id) => go(focus ?? "", id)} />
@@ -101,7 +100,7 @@ export default function FandomMapScreen() {
         block={mapBlocks.find((block) => block.code === selected) ?? null} interestName={interestName} interest={query.interest}
         hasChildren={!selected && Boolean(viewCode)} />
     </div>
-  </section>;
+  </div>;
 }
 
 interface RegionSearchProps { regions: ApiRegion[]; onPick: (code: string) => void; }
@@ -113,7 +112,7 @@ function RegionSearch({ regions, onPick }: RegionSearchProps) {
   const [notFound, setNotFound] = useState(false);
   const pick = (code: string) => { onPick(code); setText(""); setNotFound(false); };
   const search = () => { if (matches[0]) pick(matches[0].code); else if (keyword) setNotFound(true); };
-  return <form role="search" aria-label="동네 검색" onSubmit={(event) => { event.preventDefault(); search(); }} className="relative flex min-w-0 flex-1 gap-1.5 sm:w-72 sm:flex-none">
+  return <form role="search" aria-label="동네 검색" onSubmit={(event) => { event.preventDefault(); search(); }} className="relative flex min-w-0 flex-[1_1_18rem] gap-1.5">
     <label htmlFor="region-search" className="sr-only">동네 검색</label>
     <input id="region-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, 20)); setNotFound(false); }} placeholder="동네 검색 (예: 판교)"
       autoComplete="off" role="combobox" aria-expanded={matches.length > 0} aria-controls="region-search-list" enterKeyHint="search"

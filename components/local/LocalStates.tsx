@@ -2,6 +2,8 @@ import Link from "next/link";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 export const localButton = "inline-flex min-h-11 items-center justify-center btn-pixel px-4 py-2 text-sm font-semibold text-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
+/** 탭마다 검색·필터를 담는 같은 도구 막대 */
+export const localToolbar = "pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2";
 export const localInput = "min-h-11 w-full min-w-0 pixel-input px-3 py-2 text-sm text-ink focus-visible:outline-2 focus-visible:outline-mint disabled:opacity-50";
 
 interface LocalSkeletonProps { label?: string; }
