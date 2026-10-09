@@ -60,7 +60,7 @@
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
-| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
+| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
 | GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
 | GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
 | GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (5명 이상만, `rank`·`isSample`) | ✅ |
@@ -68,4 +68,5 @@
 | GET | /api/local/trades/mine 🔒 | 내 글 (완료·숨김 포함) | ✅ |
 | PATCH | /api/local/trades/{id} 🔒 | 내 글 상태 `done`/`hidden` (남의 글 404) | ✅ |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
+| GET | /api/local/map-avatars?region=&interest= | 덕력지도 아바타 핀 — 보고 있는 지역의 하위 지역(생활권이면 자기 자신)별 `mapAvatarOptIn` 동의자 수와 무작위 최대 6개 아바타(PNG data URL, null=기본 슬라임). 하위 합산 5명 미만은 `count: null, belowThreshold: true, avatars: []`, id·닉네임 없음, 테스트 계정 제외 | ✅ |
 | GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 5명 이상만). 실제 찜이 없는 칸은 샘플로 채우고 `isSample: true` | ✅ |

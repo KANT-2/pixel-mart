@@ -29,6 +29,7 @@ class LocalProfileIn(CamelModel):
     interest_ids: Annotated[list[int], Field(max_length=20)] = Field(default_factory=list, examples=[[12, 51, 71]])
     fandom_opt_in: bool = Field(default=False, description="덕력지도 등 지역 익명 집계에 참여")
     profile_public: bool = Field(default=False, description="선택한 취향을 다른 사용자에게 공개")
+    map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시 (5명 이상 지역에서만)")
 
 
 class LocalProfileOut(CamelModel):
@@ -38,6 +39,17 @@ class LocalProfileOut(CamelModel):
     interests: list[InterestOut]
     fandom_opt_in: bool
     profile_public: bool
+    map_avatar_opt_in: bool
+
+
+class MapAvatarsOut(CamelModel):
+    """덕력지도 지역 블록 하나의 아바타 핀 — 사용자 id·닉네임·위치는 절대 포함하지 않는다"""
+
+    region_code: str
+    region_name: str
+    count: int | None = Field(description="아바타 표시에 동의한 인원, 5명 미만이면 null")
+    below_threshold: bool
+    avatars: list[str | None] = Field(description="무작위 최대 6개 — PNG data URL, null이면 기본 슬라임")
 
 
 class FandomOut(CamelModel):

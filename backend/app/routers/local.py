@@ -1,5 +1,6 @@
 """PIXEL LOCAL ① 지역·취향 설정 (GPS 없이 시 › 구 › 동·생활권 직접 선택, 집계 참여·공개는 opt-in)"""
 
+import random
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -14,6 +15,7 @@ from app.schemas.local import (
     InterestType,
     LocalProfileIn,
     LocalProfileOut,
+    MapAvatarsOut,
     RegionOut,
 )
 from app.services import local_stats
@@ -60,6 +62,7 @@ async def _profile_out(db: DbSession, user: User) -> LocalProfileOut:
         interests=[InterestOut.model_validate(i) for i in interests],
         fandom_opt_in=user.fandom_opt_in,
         profile_public=user.profile_public,
+        map_avatar_opt_in=user.map_avatar_opt_in,
     )
 
 
@@ -83,6 +86,7 @@ async def put_my_local(body: LocalProfileIn, user: CurrentUser, db: DbSession):
     user.region_code = body.region_code
     user.fandom_opt_in = body.fandom_opt_in
     user.profile_public = body.profile_public
+    user.map_avatar_opt_in = body.map_avatar_opt_in
     # 계속 고른 취향은 그대로 두어 고른 시각(집계 기간 기준)을 유지
     current = set(await db.scalars(select(UserInterest.interest_id).where(UserInterest.user_id == user.id)))
     if removed := current - wanted:
@@ -195,3 +199,50 @@ async def fandom_ranking(
         )
         for rank, (n, iid, is_sample) in enumerate(ranked, 1)
     ]
+
+
+MAX_MAP_AVATARS = 6
+
+
+@router.get(
+    "/local/map-avatars",
+    response_model=list[MapAvatarsOut],
+    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (5명 미만 비공개)",
+)
+async def map_avatars(
+    db: DbSession,
+    region: Annotated[str | None, Query(max_length=12, description="보고 있는 지역 — 없으면 시 단계")] = None,
+    interest: Annotated[int | None, Query(description="이 취향을 고른 사람만")] = None,
+):
+    tree = await load_tree(db)
+    await _check_filters(db, tree, region, interest)
+    blocks = [r.code for r in tree.by_code.values() if r.parent_code == region] or ([region] if region else [])
+
+    stmt = select(User.region_code, User.avatar_url).where(
+        User.map_avatar_opt_in.is_(True),
+        User.region_code.is_not(None),
+        User.email.not_like(f"%{local_stats.EXCLUDED_EMAIL_SUFFIX}"),
+    )
+    if interest is not None:
+        stmt = stmt.join(UserInterest, UserInterest.user_id == User.id).where(UserInterest.interest_id == interest)
+    by_block: dict[str, list[str | None]] = {code: [] for code in blocks}
+    for region_code, avatar_url in await db.execute(stmt):
+        for code in tree.ancestors(region_code):  # 하위 지역 사람도 상위 블록에 포함
+            if code in by_block:
+                by_block[code].append(avatar_url)
+
+    out = []
+    for code in sorted(blocks):
+        avatars = by_block[code]
+        enough = len(avatars) >= MIN_GROUP_SIZE
+        out.append(
+            MapAvatarsOut(
+                region_code=code,
+                region_name=tree.full_name(code),
+                count=len(avatars) if enough else None,
+                below_threshold=not enough,
+                # 매번 무작위로 뽑아 순서·구성으로 개인을 추정하기 어렵게 한다
+                avatars=random.sample(avatars, min(len(avatars), MAX_MAP_AVATARS)) if enough else [],
+            )
+        )
+    return out

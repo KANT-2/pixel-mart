@@ -72,7 +72,7 @@ erDiagram
 | --- | --- | --- |
 | regions | code PK, level(`sido/sigungu/zone`), parent_code FK, name | Mock 시드 — 시 › 구 › 동·생활권 Zone (예: 성남시 › 분당구 › 판교) |
 | interests | id, type(`work/character/style/product_type`), name, parent_id | 작품 > 캐릭터 계층, 텍스트 태그만 |
-| (users 추가 컬럼) | region_code FK, fandom_opt_in bool, profile_public bool | 지역 집계 참여 · 취향 공개 여부 |
+| (users 추가 컬럼) | region_code FK, fandom_opt_in bool, profile_public bool, map_avatar_opt_in bool | 지역 집계 참여 · 취향 공개 · 덕력지도 아바타 표시 여부 (모두 기본 false) |
 | user_interests | user_id FK, interest_id FK · PK | |
 | trade_posts | id, user_id FK, region_code FK, kind(`have/want/sell`), product_id FK nullable, interest_id FK nullable, item_name, condition(`new/like_new/used`), price nullable, trade_method(`direct/delivery/both`), content, status(`open/done/hidden`), is_sample, created_at | 연락처·장소 기재 금지, 매칭은 item·interest + 지역 |
 | fandom_samples | region_code, interest_id, count · PK(region_code, interest_id) | Cold Start용 Mock 집계 (응답에 `isSample`) |
