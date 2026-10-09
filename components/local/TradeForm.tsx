@@ -63,7 +63,7 @@ function AccountTradeForm({ initialKind }: AccountTradeFormProps) {
   if (regionMissing) return <TradeRegionPrompt />;
   return <form onSubmit={submit} noValidate className="space-y-6">
     <p className="text-sm text-sub">내 동네 설정에 저장한 지역으로 등록돼요. 다른 사람에게 작성자 정보나 정확한 위치는 표시하지 않아요.</p>
-    <fieldset disabled={disabled} className="space-y-5 rounded-xl border border-line bg-panel p-5 sm:p-6">
+    <fieldset disabled={disabled} className="space-y-5 pixel-panel p-5 sm:p-6">
       <legend className="px-2 text-lg font-bold">물건 정보</legend>
       <label className="block text-sm font-semibold">글 종류<select aria-label="글 종류" value={draft.kind} onChange={(event) => { field("kind", event.target.value as TradeKind); setErrors({}); }} className={`${localInput} mt-2`}>{TRADE_KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
       <label className="block text-sm font-semibold">물건명<input aria-label="물건명" value={draft.itemName} maxLength={60} onChange={(event) => field("itemName", event.target.value)} aria-invalid={Boolean(errors.itemName)} aria-describedby={errors.itemName ? "trade-name-error" : undefined} className={`${localInput} mt-2`} /></label>
@@ -76,9 +76,9 @@ function AccountTradeForm({ initialKind }: AccountTradeFormProps) {
       <div id="trade-content-help" className="flex flex-wrap justify-between gap-2 text-xs text-dim"><span>물건 설명만 작성해 주세요. 연락처·정확한 장소는 적을 수 없어요.</span><span>{[...draft.content].length} / 1,000자</span></div>
       <p id="trade-content-error" role={errors.content ? "alert" : undefined} className="text-sm text-pink">{errors.content}</p>
     </fieldset>
-    <fieldset disabled={disabled} className="rounded-xl border border-line bg-panel p-5 sm:p-6"><legend className="px-2 text-lg font-bold">상품 연결</legend><ProductPicker selected={product} onChange={setProduct} disabled={disabled} /></fieldset>
-    <fieldset disabled={disabled} className="rounded-xl border border-line bg-panel p-5 sm:p-6"><legend className="px-2 text-lg font-bold">취향 연결</legend><InterestPicker selected={interests} onChange={setInterests} single disabled={disabled} /></fieldset>
+    <fieldset disabled={disabled} className="pixel-panel p-5 sm:p-6"><legend className="px-2 text-lg font-bold">상품 연결</legend><ProductPicker selected={product} onChange={setProduct} disabled={disabled} /></fieldset>
+    <fieldset disabled={disabled} className="pixel-panel p-5 sm:p-6"><legend className="px-2 text-lg font-bold">취향 연결</legend><InterestPicker selected={interests} onChange={setInterests} single disabled={disabled} /></fieldset>
     {error && <p role="alert" className="rounded-lg border border-pink/30 bg-panel p-4 text-sm text-pink">{error}</p>}
-    <button type="submit" disabled={disabled} className="min-h-11 rounded-lg bg-lime px-8 py-3 font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint">{busy ? "등록 중…" : "글 등록"}</button>
+    <button type="submit" disabled={disabled} className="min-h-11 btn-lime px-8 py-3 font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint">{busy ? "등록 중…" : "글 등록"}</button>
   </form>;
 }

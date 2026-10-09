@@ -8,7 +8,7 @@ export default function ProductNotFound() {
       <p className="mb-8 text-sub">주소가 잘못되었거나 판매가 끝난 상품이에요.</p>
       <Link
         href="/products"
-        className="inline-block rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink transition hover:-translate-y-0.5"
+        className="inline-block btn-lime px-6 py-3 font-bold text-lime-ink"
       >
         상품 목록으로
       </Link>

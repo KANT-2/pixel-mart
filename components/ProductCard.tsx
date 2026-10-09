@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, muted = false }: ProductCardProps) {
   return (
-    <article aria-label={`${product.name} 상품`} className="group flex min-w-0 flex-col rounded-2xl border border-line bg-panel p-2 transition sm:p-3 duration-200 hover:-translate-y-1 hover:border-violet/40 hover:bg-panel-2">
+    <article aria-label={`${product.name} 상품`} className="group flex min-w-0 flex-col pixel-panel p-2 transition sm:p-3 duration-200 hover:-translate-y-1 hover:border-violet/40 hover:bg-panel-2">
       <Link
         href={`/products/${product.id}`}
         className={`flex flex-1 flex-col rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet ${muted ? "opacity-45" : ""}`}

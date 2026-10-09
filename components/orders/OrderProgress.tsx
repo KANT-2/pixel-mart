@@ -9,7 +9,7 @@ interface OrderProgressProps {
 export default function OrderProgress({ order }: OrderProgressProps) {
   const steps = getDeliverySteps(order);
 
-  return <section aria-labelledby="order-progress-title" className="rounded-2xl border border-line bg-panel p-5 sm:p-6">
+  return <section aria-labelledby="order-progress-title" className="pixel-panel p-5 sm:p-6">
     <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
       <h2 id="order-progress-title" className="text-lg font-extrabold">배송 현황</h2>
       <span className="font-pixel text-xs text-dim" aria-hidden="true">DELIVERY QUEST</span>

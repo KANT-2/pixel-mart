@@ -73,7 +73,7 @@ export default function ReviewsPanel({ productId, snapshot, load }: ProductRevie
     {deleteError && <p role="alert" className="rounded-xl border border-pink/30 bg-panel p-4 text-sm text-pink">{deleteError}</p>}
     {notice && <p role="status" className="rounded-xl border border-mint/30 bg-panel p-4 text-sm text-mint">{notice}</p>}
     {loading ? <FeedbackSkeleton label="리뷰 불러오는 중" /> : data && <>
-      {data.items.length ? <ReviewEntries items={data.items} actions={(review) => canDeleteReview(review, signedIn) ? <ReviewDeleteButton disabled={blocked || Boolean(error)} pending={pendingId === review.id} onConfirm={() => remove(review)} /> : null} /> : <div className="rounded-xl border border-line bg-panel p-8 text-center">
+      {data.items.length ? <ReviewEntries items={data.items} actions={(review) => canDeleteReview(review, signedIn) ? <ReviewDeleteButton disabled={blocked || Boolean(error)} pending={pendingId === review.id} onConfirm={() => remove(review)} /> : null} /> : <div className="pixel-panel p-8 text-center">
         <p className="font-bold">아직 리뷰가 없어요</p><p className="mt-2 text-sm text-sub">배송 완료한 상품의 첫 리뷰를 남겨 주세요.</p>
       </div>}
       {data.totalPages > 1 && <nav aria-label="리뷰 페이지 이동" className="flex flex-wrap items-center justify-center gap-4 text-sm">

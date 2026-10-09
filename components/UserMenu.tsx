@@ -43,7 +43,7 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
       ) : user ? (
         <button ref={trigger} type="button" aria-expanded={open} aria-controls={panelId}
           aria-label={`${user.nickname} 사용자 메뉴`} onClick={() => setOpen(!open)}
-          className="flex h-10 w-full items-center gap-1.5 rounded-lg border border-line bg-panel px-2 text-sm">
+          className="flex h-10 w-full items-center gap-1.5 btn-pixel px-2 text-sm">
           {user.avatarUrl && user.avatarUrl !== failedAvatar ? (
             <PixelAvatar src={user.avatarUrl} onError={() => setFailedAvatar(user.avatarUrl)} className="size-6 shrink-0" />
           ) : (
@@ -53,16 +53,16 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
           <span className={`min-w-0 flex-1 truncate ${compact ? "hidden sm:block" : ""}`}>{user.nickname}</span><span aria-hidden="true" className={compact ? "hidden sm:inline" : ""}>▾</span>
         </button>
       ) : (
-        <Link href="/login" className="flex h-10 w-full items-center justify-center rounded-lg border border-line bg-panel text-sm font-semibold">로그인</Link>
+        <Link href="/login" className="flex h-10 w-full items-center justify-center btn-pixel text-sm font-semibold">로그인</Link>
       )}
       {open && user && (
-        <div id={panelId} className="absolute right-0 top-12 z-50 w-60 rounded-xl border border-line bg-panel p-2 shadow-lg">
+        <div id={panelId} className="absolute right-0 top-12 z-50 w-60 pixel-panel p-2 shadow-lg">
           <Link href="/mypage" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-sm hover:bg-panel-2">마이페이지</Link>
           <button type="button" disabled={pending} onClick={handleLogout} className="w-full rounded-lg px-3 py-3 text-left text-sm hover:bg-panel-2 disabled:opacity-50">{pending ? "로그아웃 중…" : "로그아웃"}</button>
           {logoutError && <p role="alert" className="px-3 py-2 text-sm text-pink">{logoutError}</p>}
         </div>
       )}
-      {error && !loading && <div className="absolute right-0 top-12 w-60 rounded-xl border border-line bg-panel p-3 text-sm text-sub">
+      {error && !loading && <div className="absolute right-0 top-12 w-60 pixel-panel p-3 text-sm text-sub">
         <p role="status">{error}</p><button type="button" onClick={() => void refresh()} className="mt-2 underline">다시 확인</button>
       </div>}
     </div>

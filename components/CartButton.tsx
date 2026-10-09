@@ -11,7 +11,7 @@ export default function CartButton() {
 
   return <Link href="/cart"
     aria-label={loading ? "장바구니" : `장바구니, ${quantity}개 담김`}
-    className="relative grid size-10 shrink-0 place-items-center rounded-lg border border-line bg-panel transition-colors hover:border-violet/40">
+    className="relative grid size-10 shrink-0 place-items-center btn-pixel transition-colors hover:border-violet/40">
     <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2" />
       <circle cx="9.5" cy="20" r="1.2" /><circle cx="17" cy="20" r="1.2" />

@@ -13,9 +13,9 @@ export function ProductSkeleton({ count = 4 }: ProductSkeletonProps) {
 }
 
 export function ProductFallbackNotice() {
-  return <p role="status" className="mb-6 rounded-xl border border-line bg-panel p-4 text-sm text-sub">상품 정보를 불러오지 못해 기본 상품을 보여드리고 있어요. 잠시 후 다시 방문해 주세요.</p>;
+  return <p role="status" className="mb-6 pixel-panel p-4 text-sm text-sub">상품 정보를 불러오지 못해 기본 상품을 보여드리고 있어요. 잠시 후 다시 방문해 주세요.</p>;
 }
 
 export function EmptyProducts() {
-  return <p className="rounded-xl border border-line bg-panel p-8 text-center text-sub">아직 등록된 상품이 없어요.</p>;
+  return <p className="pixel-panel p-8 text-center text-sub">아직 등록된 상품이 없어요.</p>;
 }

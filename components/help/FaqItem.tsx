@@ -27,7 +27,7 @@ export default function FaqItem({ faq, query, open, onOpenChange }: FaqItemProps
       id={`faq-${faq.id}`}
       open={open}
       onToggle={(event) => onOpenChange(faq.id, event.currentTarget.open)}
-      className="group/faq scroll-mt-36 rounded-2xl border border-line bg-panel open:border-violet/40"
+      className="group/faq scroll-mt-36 pixel-panel open:border-violet/40"
     >
       <summary className="flex cursor-pointer list-none items-center gap-3 rounded-2xl p-5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet [&::-webkit-details-marker]:hidden">
         <span aria-hidden="true" className="shrink-0 font-pixel text-sm text-mint">Q</span>

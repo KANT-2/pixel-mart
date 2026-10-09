@@ -43,18 +43,18 @@ function AccountOrders({ page }: OrderListProps) {
         <button type="button" disabled={loading || authPending} onClick={() => { void refresh().catch(() => undefined); }} className="mt-3 min-h-11 rounded-lg border border-line px-4 text-sm font-semibold disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-violet">다시 시도</button>
       </div>}
       {data && (data.total === 0 ? (
-        <div className="rounded-2xl border border-line bg-panel px-5 py-16 text-center">
+        <div className="pixel-panel px-5 py-16 text-center">
           <p className="mb-3 font-pixel text-violet">EMPTY LOG</p>
           <h2 className="text-xl font-bold">아직 주문이 없어요</h2>
           <p className="mt-3 text-sm text-sub">마음에 드는 아이템을 찾아 첫 주문을 만들어 보세요.</p>
-          <Link href="/products" className="mt-6 inline-flex rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink">상품 보러가기</Link>
+          <Link href="/products" className="mt-6 inline-flex btn-lime px-6 py-3 font-bold text-lime-ink">상품 보러가기</Link>
         </div>
       ) : (
         <>
           <p className="mb-4 text-sm text-sub">총 {data.total}건 · {data.page} / {data.totalPages} 페이지</p>
           <ul className="space-y-4">
             {data.items.map((order) => <li key={order.id}>
-              <Link href={`/mypage/orders/${order.id}`} className="block rounded-2xl border border-line bg-panel p-4 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet sm:p-5">
+              <Link href={`/mypage/orders/${order.id}`} className="block pixel-panel p-4 hover:border-violet/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet sm:p-5">
                 <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-xs text-dim">
                   <time dateTime={order.createdAt}>{formatDate(order.createdAt)}</time>
                   <span className="font-pixel">ORDER #{order.id}</span>

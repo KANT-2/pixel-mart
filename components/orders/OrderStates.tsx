@@ -6,11 +6,11 @@ interface OrderLoginPromptProps {
 }
 
 export function OrderLoginPrompt({ next }: OrderLoginPromptProps) {
-  return <div className="rounded-2xl border border-line bg-panel px-5 py-16 text-center">
+  return <div className="pixel-panel px-5 py-16 text-center">
     <p className="mb-3 font-pixel text-violet" aria-hidden="true">PLAYER LOGIN</p>
     <h2 className="text-xl font-extrabold">로그인하고 주문을 확인해 보세요</h2>
     <p className="mt-3 text-sm leading-relaxed text-sub">주문 내역과 배송 진행 상황은 로그인한 계정에 저장돼요.</p>
-    <Link href={`/login?next=${encodeURIComponent(safeNextPath(next))}`} className="mt-7 inline-flex rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">로그인하기</Link>
+    <Link href={`/login?next=${encodeURIComponent(safeNextPath(next))}`} className="mt-7 inline-flex btn-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">로그인하기</Link>
   </div>;
 }
 
@@ -26,10 +26,10 @@ export function OrderSkeleton() {
 }
 
 export function OrderNotFound() {
-  return <div className="rounded-2xl border border-line bg-panel px-5 py-16 text-center">
+  return <div className="pixel-panel px-5 py-16 text-center">
     <p className="mb-3 font-pixel text-violet" aria-hidden="true">ORDER NOT FOUND</p>
     <h2 className="text-xl font-extrabold">주문을 찾을 수 없어요</h2>
     <p className="mt-3 text-sm leading-relaxed text-sub">주문 번호를 확인하거나 내 주문 목록에서 다시 선택해 주세요.</p>
-    <Link href="/mypage/orders" className="mt-7 inline-flex rounded-lg border border-line bg-panel-2 px-6 py-3 font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">주문 내역 보기</Link>
+    <Link href="/mypage/orders" className="mt-7 inline-flex btn-pixel px-6 py-3 font-bold focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">주문 내역 보기</Link>
   </div>;
 }

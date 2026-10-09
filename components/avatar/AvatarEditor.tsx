@@ -93,7 +93,7 @@ function AvatarForm({ user }: AvatarFormProps) {
 
   const preview = result?.dataUrl ?? user.avatarUrl;
   return <div className="space-y-6">
-    <div className="rounded-xl border border-line bg-panel p-5">
+    <div className="pixel-panel p-5">
       <label htmlFor="avatar-photo" className="mb-2 block font-bold">사진 선택</label>
       <input ref={input} id="avatar-photo" type="file" accept="image/*" disabled={saving || pending}
         onChange={(event) => choose(event.target.files?.[0])}
@@ -101,7 +101,7 @@ function AvatarForm({ user }: AvatarFormProps) {
       <p className="mt-3 text-xs text-dim">최대 10MB · 사진을 자르지 않고 비율 그대로 축소해요. 배경도 함께 픽셀로 변환됩니다.</p>
     </div>
     <div className="grid gap-5 sm:grid-cols-2">
-      <div className="rounded-xl border border-line bg-panel p-5">
+      <div className="pixel-panel p-5">
         <h2 className="mb-4 font-bold">원본 사진</h2>
         <div className="grid aspect-square place-items-center overflow-hidden rounded-lg bg-night">
           {original ? (
@@ -110,7 +110,7 @@ function AvatarForm({ user }: AvatarFormProps) {
           ) : <p className="px-4 text-center text-sm text-dim">사진을 선택하면 여기에 보여요.</p>}
         </div>
       </div>
-      <div className="rounded-xl border border-line bg-panel p-5">
+      <div className="pixel-panel p-5">
         <h2 className="mb-4 font-bold">무대 위 미리보기</h2>
         <MotionBoundary className="grid aspect-square place-items-center rounded-lg bg-night">
           {converting ? <div role="status" aria-label="픽셀 아바타 변환 중" className="size-40 animate-pulse bg-panel-2" /> : (
@@ -125,13 +125,13 @@ function AvatarForm({ user }: AvatarFormProps) {
         <p className="mt-3 text-xs text-sub">{result ? `${result.width} × ${result.height}px · PNG ${(result.bytes / 1024).toFixed(1)}KB / 50KB` : "저장 후 메인에서도 같은 모습으로 통통 뛰어요."}</p>
       </div>
     </div>
-    <fieldset disabled={saving || pending} className="grid gap-4 rounded-xl border border-line bg-panel p-5 sm:grid-cols-2">
+    <fieldset disabled={saving || pending} className="grid gap-4 pixel-panel p-5 sm:grid-cols-2">
       <legend className="px-2 font-bold">변환 옵션</legend>
       <label className="text-sm">도트 개수 (긴 쪽)
         <select aria-label="도트 개수" value={resolution} onChange={(event) => {
           const value = Number(event.target.value) as 16 | 24 | 32 | 48;
           setResolution(value); if (file) void convert(file, value, colors);
-        }} className="mt-2 block w-full rounded-lg border border-line bg-night p-3">
+        }} className="mt-2 block w-full pixel-input p-3">
           {[16, 24, 32, 48].map((value) => <option key={value} value={value}>{value}칸</option>)}
         </select>
       </label>
@@ -139,16 +139,16 @@ function AvatarForm({ user }: AvatarFormProps) {
         <select aria-label="색 수" value={colors} onChange={(event) => {
           const value = Number(event.target.value) as 8 | 16;
           setColors(value); if (file) void convert(file, resolution, value);
-        }} className="mt-2 block w-full rounded-lg border border-line bg-night p-3">
+        }} className="mt-2 block w-full pixel-input p-3">
           <option value={8}>8색</option><option value={16}>16색</option>
         </select>
       </label>
     </fieldset>
-    {error && <p role="alert" className="rounded-lg border border-line bg-panel p-4 text-sm text-pink">{error}</p>}
+    {error && <p role="alert" className="pixel-panel p-4 text-sm text-pink">{error}</p>}
     {message && <p role="status" className="text-sm text-mint">{message}</p>}
     <div className="flex flex-wrap gap-3">
-      <button type="button" disabled={!result || converting || saving || pending} onClick={() => void persist(false)} className="rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink disabled:opacity-50">{saving ? "반영 중…" : "아바타 저장"}</button>
-      <button type="button" disabled={!user.avatarUrl || converting || saving || pending} onClick={() => void persist(true)} className="rounded-lg border border-line bg-panel px-5 py-3 font-semibold disabled:opacity-50">기본으로 되돌리기</button>
+      <button type="button" disabled={!result || converting || saving || pending} onClick={() => void persist(false)} className="btn-lime px-6 py-3 font-bold text-lime-ink disabled:opacity-50">{saving ? "반영 중…" : "아바타 저장"}</button>
+      <button type="button" disabled={!user.avatarUrl || converting || saving || pending} onClick={() => void persist(true)} className="btn-pixel px-5 py-3 font-semibold disabled:opacity-50">기본으로 되돌리기</button>
       <Link href="/" className="rounded-lg px-4 py-3 text-sub underline">메인 무대 보기</Link>
     </div>
   </div>;
@@ -157,9 +157,9 @@ function AvatarForm({ user }: AvatarFormProps) {
 export default function AvatarEditor() {
   const { user, loading } = useAuth();
   if (loading) return <div role="status" aria-label="로그인 상태 확인 중" className="h-96 animate-pulse rounded-xl bg-panel" />;
-  if (!user) return <div className="rounded-xl border border-line bg-panel p-8 text-center">
+  if (!user) return <div className="pixel-panel p-8 text-center">
     <p className="mb-5 text-sub">아바타를 만들고 저장하려면 로그인해 주세요.</p>
-    <Link href="/login?next=/mypage/avatar" className="inline-block rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink">로그인하고 만들기</Link>
+    <Link href="/login?next=/mypage/avatar" className="inline-block btn-lime px-6 py-3 font-bold text-lime-ink">로그인하고 만들기</Link>
   </div>;
   return <AvatarForm key={user.id} user={user} />;
 }

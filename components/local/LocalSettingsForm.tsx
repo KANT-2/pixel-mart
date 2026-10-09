@@ -73,7 +73,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
 
   if (expired) return <LocalLogin next="/local/settings" />;
   return <form onSubmit={save} className="space-y-6" onChange={() => setSaved(false)}>
-    <fieldset id="region" disabled={disabled} className="scroll-mt-36 rounded-xl border border-line bg-panel p-5 sm:p-6">
+    <fieldset id="region" disabled={disabled} className="scroll-mt-36 pixel-panel p-5 sm:p-6">
       <legend className="px-2 text-lg font-bold">01 · 내 동네</legend>
       <p className="mb-4 text-sm leading-relaxed text-sub">시 › 구 › 동·생활권 중 원하는 범위까지 선택하세요. 지역은 사람을 연결하기 위한 정보이지, 개인을 특정하기 위한 정보가 아닙니다.</p>
       {candidate && !prefilled && <p role="status" className="mb-4 text-sm text-pink">링크의 지역을 찾지 못했어요. 아래에서 지역을 다시 선택해 주세요.</p>}
@@ -87,11 +87,11 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
       </div>
       <p className="mt-3 text-xs text-dim">지역을 미리 선택해 들어와도 자동 저장하지 않아요. 아래 ‘저장’을 눌러야 반영돼요.</p>
     </fieldset>
-    <fieldset id="interests" disabled={disabled} className="scroll-mt-36 rounded-xl border border-line bg-panel p-5 sm:p-6">
+    <fieldset id="interests" disabled={disabled} className="scroll-mt-36 pixel-panel p-5 sm:p-6">
       <legend className="px-2 text-lg font-bold">02 · 내 취향</legend>
       <InterestPicker selected={interests} onChange={(items) => { setInterests(items); setSaved(false); }} disabled={disabled} />
     </fieldset>
-    <fieldset disabled={disabled} className="space-y-5 rounded-xl border border-line bg-panel p-5 sm:p-6">
+    <fieldset disabled={disabled} className="space-y-5 pixel-panel p-5 sm:p-6">
       <legend className="px-2 text-lg font-bold">03 · 활용과 공개</legend>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={fandomOptIn} onChange={(event) => setFandomOptIn(event.target.checked)} aria-describedby="fandom-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />

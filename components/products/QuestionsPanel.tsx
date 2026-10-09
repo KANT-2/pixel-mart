@@ -72,21 +72,21 @@ function AccountQuestions({ productId, viewer }: AccountQuestionsProps) {
     {listError && <div role="alert" className="rounded-xl border border-pink/30 bg-panel p-5 text-sm text-pink">
       <p>{listError}</p><button type="button" onClick={() => { const signal = lifetime.current?.signal; if (signal) void load(signal); }} className="mt-2 min-h-11 font-bold underline">질문 다시 불러오기</button>
     </div>}
-    {items ? items.length ? <QuestionEntries items={items} /> : <p className="rounded-xl border border-line bg-panel p-8 text-center text-sm text-sub">아직 질문이 없어요.</p> : !listError && <FeedbackSkeleton label="질문 불러오는 중" />}
-    {!viewer ? <FeedbackLogin section="qna" /> : <form onSubmit={submit} noValidate className="rounded-xl border border-line bg-panel p-5 sm:p-6">
+    {items ? items.length ? <QuestionEntries items={items} /> : <p className="pixel-panel p-8 text-center text-sm text-sub">아직 질문이 없어요.</p> : !listError && <FeedbackSkeleton label="질문 불러오는 중" />}
+    {!viewer ? <FeedbackLogin section="qna" /> : <form onSubmit={submit} noValidate className="pixel-panel p-5 sm:p-6">
       <h3 className="text-lg font-bold">질문 쓰기</h3>
       <fieldset disabled={busy || authPending} className="mt-5 space-y-4">
         <div><label htmlFor={`${id}-title`} className="mb-2 block text-sm font-semibold">질문 제목</label>
-          <input id={`${id}-title`} value={title} maxLength={questionLimits.title} onChange={(event) => setTitle(event.target.value)} aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} className="min-h-11 w-full min-w-0 rounded-lg border border-line bg-night px-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
+          <input id={`${id}-title`} value={title} maxLength={questionLimits.title} onChange={(event) => setTitle(event.target.value)} aria-invalid={Boolean(errors.title)} aria-describedby={errors.title ? `${id}-title-error` : undefined} className="min-h-11 w-full min-w-0 pixel-input px-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
           {errors.title && <p id={`${id}-title-error`} role="alert" className="mt-2 text-sm text-pink">{errors.title}</p>}
         </div>
         <div><label htmlFor={`${id}-content`} className="mb-2 block text-sm font-semibold">질문 내용</label>
-          <textarea id={`${id}-content`} value={content} rows={4} maxLength={questionLimits.content} onChange={(event) => setContent(event.target.value)} aria-invalid={Boolean(errors.content)} aria-describedby={`${id}-count${errors.content ? ` ${id}-content-error` : ""}`} className="w-full min-w-0 resize-y rounded-lg border border-line bg-night p-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
+          <textarea id={`${id}-content`} value={content} rows={4} maxLength={questionLimits.content} onChange={(event) => setContent(event.target.value)} aria-invalid={Boolean(errors.content)} aria-describedby={`${id}-count${errors.content ? ` ${id}-content-error` : ""}`} className="w-full min-w-0 resize-y pixel-input p-3 text-sm focus-visible:outline-2 focus-visible:outline-mint" />
           <p id={`${id}-count`} className="mt-1 text-right text-xs text-dim">{Array.from(content).length} / {questionLimits.content}자</p>
           {errors.content && <p id={`${id}-content-error`} role="alert" className="mt-2 text-sm text-pink">{errors.content}</p>}
         </div>
         <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={isSecret} onChange={(event) => setIsSecret(event.target.checked)} className="size-4 accent-mint" />비밀글 (나만 보기)</label>
-        <button type="submit" className="min-h-11 rounded-lg bg-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "저장 중…" : questions.mode === "demo" ? "데모 질문 저장" : "질문 등록"}</button>
+        <button type="submit" className="min-h-11 btn-lime px-5 py-3 text-sm font-bold text-lime-ink disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">{busy ? "저장 중…" : questions.mode === "demo" ? "데모 질문 저장" : "질문 등록"}</button>
       </fieldset>
       {error && <p role="alert" className="mt-3 text-sm text-pink">{error}</p>}
       {success && <p role="status" className="mt-3 text-sm text-mint">{questions.mode === "demo" ? "데모 질문을 화면에 저장했어요. 새로고침하면 사라져요." : "질문을 등록했어요."}</p>}

@@ -14,13 +14,107 @@
   --color-violet: #a78bff;
   --color-mint: #6ef2d6;
   --color-pink: #ff7ab6;
+  /* 게임 UI 프레임 — 두꺼운 테두리와 딱딱한 그림자 */
+  --color-frame: #3a3170;
+  --color-shadow: #06050d;
 
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-pixel: "Galmuri11", ui-monospace, monospace;
 }
 
 body {
+  /* 게임 속 밤하늘: 아주 옅은 픽셀 격자 + 드문드문 별 (메인 무대와 같은 분위기) */
   background-color: var(--color-night);
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgb(255 255 255 / 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 68% 9%, rgb(182 255 92 / 0.35) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 84% 42%, rgb(167 139 255 / 0.4) 50%, transparent 51%),
+    radial-gradient(1px 1px at 33% 71%, rgb(110 242 214 / 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 56% 88%, rgb(255 255 255 / 0.25) 50%, transparent 51%),
+    linear-gradient(rgb(180 160 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(180 160 255 / 0.025) 1px, transparent 1px);
+  background-size: 420px 420px, 420px 420px, 420px 420px, 420px 420px, 420px 420px, 24px 24px, 24px 24px;
+  background-attachment: fixed;
   color: var(--color-ink);
   word-break: keep-all;
+}
+
+/* 스크롤바도 게임 UI 색으로 (흰 기본 스크롤바 방지) */
+html {
+  color-scheme: dark;
+  scrollbar-color: var(--color-frame) transparent;
+}
+
+@layer components {
+  /* 게임 창처럼 보이는 패널 — 두꺼운 픽셀 테두리, 안쪽 하이라이트, 딱딱한 그림자 */
+  .pixel-panel {
+    border: 2px solid var(--color-frame);
+    border-radius: 6px;
+    background-color: var(--color-panel);
+    box-shadow:
+      inset 2px 2px 0 rgb(255 255 255 / 0.04),
+      inset -2px -2px 0 rgb(0 0 0 / 0.22),
+      4px 4px 0 var(--color-shadow);
+  }
+
+  /* 누르면 쑥 들어가는 게임 버튼 (주 버튼) */
+  .btn-lime {
+    border: 2px solid #0b0f1e;
+    border-radius: 6px;
+    background-color: var(--color-lime);
+    color: var(--color-lime-ink);
+    box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 4px 0 #4f7d1c;
+    transition: transform 90ms steps(2), box-shadow 90ms steps(2);
+  }
+  .btn-lime:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 5px 0 #4f7d1c;
+  }
+  .btn-lime:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 1px 0 #4f7d1c;
+  }
+
+  /* 보조 게임 버튼 */
+  .btn-pixel {
+    border: 2px solid var(--color-frame);
+    border-radius: 6px;
+    background-color: var(--color-panel-2);
+    color: var(--color-ink);
+    box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 3px 0 var(--color-shadow);
+    transition: transform 90ms steps(2), box-shadow 90ms steps(2), border-color 90ms steps(2);
+  }
+  .btn-pixel:hover:not(:disabled) {
+    border-color: var(--color-violet);
+    transform: translateY(-1px);
+    box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 4px 0 var(--color-shadow);
+  }
+  .btn-pixel:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 1px 0 var(--color-shadow);
+  }
+
+  /* 움푹 들어간 입력 칸 */
+  .pixel-input {
+    border: 2px solid var(--color-frame);
+    border-radius: 6px;
+    background-color: var(--color-night);
+    box-shadow: inset 2px 2px 0 rgb(0 0 0 / 0.35);
+  }
+  .pixel-input:focus {
+    border-color: var(--color-mint);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-lime,
+  .btn-pixel {
+    transition: none;
+  }
+  .btn-lime:hover:not(:disabled),
+  .btn-lime:active:not(:disabled),
+  .btn-pixel:hover:not(:disabled),
+  .btn-pixel:active:not(:disabled) {
+    transform: none;
+  }
 }

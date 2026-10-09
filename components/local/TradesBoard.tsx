@@ -24,7 +24,7 @@ export default function TradesBoard() {
   function change(patch: Partial<TradeQuery>) { router.push(tradeHref(changeTradeQuery(effective, patch)), { scroll: false }); }
   return <div className="space-y-6">
     {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택할 수 있어요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
-    <section aria-label="게시판 필터" className="space-y-4 rounded-xl border border-line bg-panel p-5">
+    <section aria-label="게시판 필터" className="space-y-4 pixel-panel p-5">
       <RegionSelector regions={catalog.data} value={selected?.code ?? null} onChange={(region) => change({ region })} />
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
       <label className="block max-w-xs text-sm font-semibold">글 종류<select aria-label="글 종류 필터" value={query.kind ?? ""} onChange={(event) => change({ kind: event.target.value as TradeKind || undefined })} className={`${localInput} mt-2`}><option value="">전체</option>{TRADE_KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
@@ -48,7 +48,7 @@ function TradesResults({ query, regions, ownRegion }: TradesResultsProps) {
   return data.items.length ? <><p className="text-sm text-sub">진행 중인 글 {data.total}개 · 최신순</p>
     <ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} /></li>)}</ul>
     <Pagination currentPage={data.page} totalPages={data.totalPages} basePath="/local/trades" query={tradeQueryParams(query).toString()} />
-  </> : <div className="rounded-xl border border-line bg-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 구하는 물건을 남겨 보세요.</p>
+  </> : <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 구하는 물건을 남겨 보세요.</p>
     <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=want" className={localButton}>WANT 글쓰기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>
   </div>;
 }
