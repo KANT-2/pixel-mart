@@ -62,10 +62,9 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
           placeholder="캐릭터·작품·스타일 이름" autoComplete="off" className="pixel-input min-h-11 min-w-0 flex-1 px-3 text-sm text-ink" />
         <button type="submit" disabled={!text.trim() || !list.length} className="btn-lime min-h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>
       </form>
-      <div role="tablist" aria-label="취향 종류" className="mt-3 flex flex-wrap gap-1.5">
+      <div role="tablist" aria-label="취향 종류" className="segmented mt-3 h-8 max-w-full overflow-x-auto text-xs font-bold">
         {[{ value: "all" as const, label: "전체" }, ...INTEREST_TYPES].map((item) => <button key={item.value} type="button" role="tab"
-          aria-selected={type === item.value} onClick={() => setType(item.value)}
-          className="btn-pixel toggle-outline h-8 px-2.5 text-xs font-bold text-sub hover:text-ink">{item.label}</button>)}
+          aria-selected={type === item.value} onClick={() => setType(item.value)}>{item.label}</button>)}
       </div>
       <ul className="mt-3 grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3">
         {list.map((item) => <li key={item.id}>

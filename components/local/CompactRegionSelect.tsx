@@ -58,9 +58,10 @@ export default function CompactRegionSelect({ regions, value, onChange, ownRegio
       {notFound && <p role="status" className="absolute left-0 top-full z-20 mt-1 rounded bg-night px-2 py-1 text-xs text-pink">없는 동네예요. 다른 이름으로 찾아 보세요.</p>}
     </div>
     <button type="button" disabled={disabled} onMouseDown={(event) => event.preventDefault()} onClick={search} className="btn-lime h-10 shrink-0 px-3 text-xs font-bold">찾기</button>
-    {ownRegion && <button type="button" disabled={disabled} aria-pressed={value === ownRegion} onClick={() => pick(ownRegion)}
-      className="btn-pixel toggle-outline h-10 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink">내 동네</button>}
-    <button type="button" disabled={disabled} aria-pressed={value === null} onClick={() => pick(null)}
-      className="btn-pixel toggle-outline h-10 shrink-0 px-3 text-xs font-bold text-sub hover:text-ink">전체 지역</button>
+    {/* 지역 범위는 하나만 — 한 덩어리 버튼 */}
+    <div role="group" aria-label="지역 범위" className="segmented h-10 text-xs font-bold">
+      {ownRegion && <button type="button" disabled={disabled} aria-pressed={value === ownRegion} onClick={() => pick(ownRegion)}>내 동네</button>}
+      <button type="button" disabled={disabled} aria-pressed={value === null} onClick={() => pick(null)}>전체 지역</button>
+    </div>
   </div>;
 }
