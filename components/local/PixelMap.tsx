@@ -14,6 +14,8 @@ export interface MapBlock {
   pins: (string | null)[];
   sample: boolean;
   hint?: string;
+  /** 인원 대신 세는 단위 (위시맵: "개") */
+  unit?: string;
 }
 
 interface PixelMapProps {
@@ -143,7 +145,7 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
       const block = blockByCode.get(code);
       if (!cell || !block) return null;
       return <button key={code} type="button" className={styles.label} aria-pressed={selected === code} onClick={() => onSelect(code)}
-        aria-label={namesOnly ? `${block.name} 지도로 이동` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}명` : " · 소수의 이웃"}${block.sample ? " · 샘플 데이터" : ""}`}
+        aria-label={namesOnly ? `${block.name} 지도로 이동` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 소수의 이웃"}${block.sample ? " · 샘플 데이터" : ""}`}
         style={{ left: percent(cell[0] + 0.5, view.cols), top: percent(cell[1] + 0.5, view.rows) }}>
         <span className={`${styles.labelName} font-pixel`}>{block.name}</span>
         {!namesOnly && (block.count ? <span className={styles.labelCount}>{block.count}</span> : <span className={styles.labelFew}>·</span>)}
