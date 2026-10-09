@@ -138,11 +138,25 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
   const template = (rows: string[], palette: Record<string, string>) => commit(stamp(createGrid(grid.cols, grid.rows), rows, palette), grid);
   const toolButton = "btn-pixel min-h-10 px-3 py-1.5 text-sm font-bold aria-pressed:border-lime aria-pressed:text-lime";
 
-  return <div className="grid gap-5 lg:grid-cols-[auto_minmax(0,1fr)]">
-    <div className="pixel-panel w-fit max-w-full self-start overflow-auto p-3">
-      <canvas ref={canvas} role="img" aria-label={`픽셀 캔버스 ${grid.cols}×${grid.rows}${isEmpty(grid) ? " (비어 있음)" : ""}`}
-        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
-        className={`block max-w-full touch-none [image-rendering:pixelated] ${disabled ? "opacity-60" : "cursor-crosshair"}`} />
+  // 색은 캔버스 바로 오른쪽(좁으면 아래), 나머지 도구는 캔버스 아래 — 편집기 자체 폭(container query) 기준
+  return <div className="@container space-y-4">
+    <div className="flex flex-col items-start gap-3 @sm:flex-row">
+      <div className="pixel-panel w-fit max-w-full min-w-0 shrink overflow-auto p-3">
+        <canvas ref={canvas} role="img" aria-label={`픽셀 캔버스 ${grid.cols}×${grid.rows}${isEmpty(grid) ? " (비어 있음)" : ""}`}
+          onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}
+          className={`block max-w-full touch-none [image-rendering:pixelated] ${disabled ? "opacity-60" : "cursor-crosshair"}`} />
+      </div>
+      <fieldset disabled={disabled} className="shrink-0">
+        <legend className="mb-2 text-sm font-bold">색</legend>
+        <div className="flex flex-wrap gap-1.5 @sm:grid @sm:grid-cols-3">
+          {PALETTE.map((hex) => <button key={hex} type="button" aria-label={`색 ${hex}`} aria-pressed={color === hex}
+            onClick={() => { setColor(hex); if (tool !== "fill") setTool("pen"); }}
+            className="size-8 rounded border-2 border-frame aria-pressed:border-lime aria-pressed:ring-2 aria-pressed:ring-lime" style={{ backgroundColor: hex }} />)}
+        </div>
+        <label className="mt-2 flex items-center gap-2 text-xs text-sub">직접 고르기
+          <input type="color" value={color} onChange={(event) => setColor(event.target.value)} className="size-8 cursor-pointer rounded border-2 border-frame bg-transparent" />
+        </label>
+      </fieldset>
     </div>
     <div className="space-y-4">
       <div role="toolbar" aria-label="그리기 도구" className="flex flex-wrap gap-2">
@@ -155,18 +169,7 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
         <button type="button" disabled={disabled || !future.length} onClick={redo} className={toolButton}>↷ 다시</button>
         <button type="button" disabled={disabled} onClick={() => commit(createGrid(grid.cols, grid.rows), grid)} className={toolButton}>🗑 모두 지우기</button>
       </div>
-      <fieldset disabled={disabled}>
-        <legend className="mb-2 text-sm font-bold">색</legend>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {PALETTE.map((hex) => <button key={hex} type="button" aria-label={`색 ${hex}`} aria-pressed={color === hex}
-            onClick={() => { setColor(hex); if (tool !== "fill") setTool("pen"); }}
-            className="size-8 rounded border-2 border-frame aria-pressed:border-lime aria-pressed:ring-2 aria-pressed:ring-lime" style={{ backgroundColor: hex }} />)}
-          <label className="ml-1 flex items-center gap-2 text-xs text-sub">직접 고르기
-            <input type="color" value={color} onChange={(event) => setColor(event.target.value)} className="size-8 cursor-pointer rounded border-2 border-frame bg-transparent" />
-          </label>
-        </div>
-      </fieldset>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 @md:grid-cols-2">
         <label className="text-sm font-bold">캔버스 크기
           <select disabled={disabled} value={`${grid.cols}x${grid.rows}`} onChange={(event) => { const [c, r] = event.target.value.split("x").map(Number); resize(c, r); }}
             className="pixel-input mt-2 block min-h-11 w-full px-3 text-sm">
@@ -177,7 +180,7 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
         <div className="text-sm font-bold">템플릿
           <div className="mt-2 flex flex-wrap gap-2">
             <button type="button" disabled={disabled} onClick={() => template(SLIME, SLIME_PAL)} className={toolButton}>슬라임</button>
-            <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className={toolButton}>기본 캐릭터</button>
+            <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className={`${toolButton} whitespace-nowrap`}>기본 캐릭터</button>
           </div>
         </div>
       </div>

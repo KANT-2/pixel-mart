@@ -56,6 +56,23 @@ test("마젠타 배경은 투명, 캐릭터 색은 유지", () => {
   assert.deepEqual([keyed[3], keyed[7], keyed[11]], [0, 0, 255]);
 });
 
+test("배경 지우기: 테두리에서 이어진 단색 배경만 투명, 캐릭터 안 같은 색은 유지", () => {
+  // 5×5: 바깥은 청록 배경(살짝 흔들림), 가운데 3×3은 초록 캐릭터, 그 한가운데 청록 한 칸(눈 하이라이트)
+  const w = 5, h = 5, CYAN = [0, 250, 255, 255], CYAN2 = [10, 240, 245, 255], GREEN = [80, 200, 60, 255];
+  const pixels = new Uint8ClampedArray(w * h * 4);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const inside = x >= 1 && x <= 3 && y >= 1 && y <= 3;
+    pixels.set(inside ? (x === 2 && y === 2 ? [0, 120, 130, 255] : GREEN) : ((x + y) % 2 ? CYAN : CYAN2), (y * w + x) * 4);
+  }
+  c.borderColor(pixels, w, h).forEach((v, i) => assert.ok(Math.abs(v - [5, 245, 250][i]) <= 10));
+  const keyed = c.keyOutBackground(pixels, w, h);
+  const alpha = (x, y) => keyed[(y * w + x) * 4 + 3];
+  assert.equal(alpha(0, 0), 0);
+  assert.equal(alpha(4, 2), 0);
+  assert.equal(alpha(1, 1), 255);
+  assert.equal(alpha(2, 2), 255); // 배경과 다른 어두운 청록 — 캐릭터 일부라 남김
+});
+
 test("불투명 영역 경계와 격자 정리(최빈값·투명 칸)", () => {
   // 8×4 이미지: 왼쪽 4×4는 빨강 3 + 파랑 1, 오른쪽 4×4는 투명
   const w = 8, h = 4;

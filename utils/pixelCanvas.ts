@@ -120,6 +120,53 @@ export function keyOutMagenta(pixels: Uint8ClampedArray, tolerance = 90): Uint8C
   return result;
 }
 
+/** 테두리 픽셀 중 가장 흔한 색(16단계로 묶어 셈) — AI가 깐 단색 배경 */
+export function borderColor(pixels: Uint8ClampedArray, width: number, height: number): [number, number, number] {
+  const counts = new Map<number, { n: number; sum: [number, number, number] }>();
+  const add = (x: number, y: number) => {
+    const i = (y * width + x) * 4;
+    const key = ((pixels[i] >> 4) << 8) | ((pixels[i + 1] >> 4) << 4) | (pixels[i + 2] >> 4);
+    const entry = counts.get(key) ?? { n: 0, sum: [0, 0, 0] };
+    entry.n++; entry.sum[0] += pixels[i]; entry.sum[1] += pixels[i + 1]; entry.sum[2] += pixels[i + 2];
+    counts.set(key, entry);
+  };
+  for (let x = 0; x < width; x++) { add(x, 0); add(x, height - 1); }
+  for (let y = 1; y < height - 1; y++) { add(0, y); add(width - 1, y); }
+  let best = { n: 0, sum: [0, 0, 0] as [number, number, number] };
+  for (const entry of counts.values()) if (entry.n > best.n) best = entry;
+  return best.sum.map((v) => Math.round(v / Math.max(1, best.n))) as [number, number, number];
+}
+
+/**
+ * 배경 지우기 — 테두리에서 이어진 배경색 영역만 투명으로 (캐릭터 안의 같은 색은 남김).
+ * 배경색과 아주 가까운 색으로 갇힌 틈(팔·다리 사이)은 좁은 기준으로 한 번 더 지운다.
+ */
+export function keyOutBackground(pixels: Uint8ClampedArray, width: number, height: number, tolerance = 80): Uint8ClampedArray {
+  const result = new Uint8ClampedArray(pixels);
+  const [br, bg, bb] = borderColor(pixels, width, height);
+  const near = (i: number, limit: number) => Math.hypot(result[i] - br, result[i + 1] - bg, result[i + 2] - bb) < limit;
+  const seen = new Uint8Array(width * height);
+  const stack: number[] = [];
+  const push = (x: number, y: number) => {
+    const p = y * width + x;
+    if (seen[p] || !near(p * 4, tolerance)) return;
+    seen[p] = 1; stack.push(p);
+  };
+  for (let x = 0; x < width; x++) { push(x, 0); push(x, height - 1); }
+  for (let y = 0; y < height; y++) { push(0, y); push(width - 1, y); }
+  while (stack.length) {
+    const p = stack.pop()!;
+    result[p * 4 + 3] = 0;
+    const x = p % width, y = (p - x) / width;
+    if (x > 0) push(x - 1, y);
+    if (x < width - 1) push(x + 1, y);
+    if (y > 0) push(x, y - 1);
+    if (y < height - 1) push(x, y + 1);
+  }
+  for (let i = 0; i < result.length; i += 4) if (result[i + 3] && near(i, tolerance / 3)) result[i + 3] = 0;
+  return result;
+}
+
 /** 불투명 픽셀을 감싸는 최소 사각형 (없으면 null) */
 export function opaqueBounds(pixels: Uint8ClampedArray, width: number, height: number) {
   let minX = width, minY = height, maxX = -1, maxY = -1;

@@ -249,3 +249,6 @@ export interface ApiNicknameCheck { nickname: string; available: boolean; sugges
 
 /** 구글 확인은 끝났고 닉네임만 고르면 되는 가입 대기 상태 */
 export interface ApiSignupPending { email: string; googleName: string; }
+
+/** AI 픽셀 아바타 설정 — 동의 문구의 제공자 이름, 보내기 전 사진 긴 변 */
+export interface ApiAiAvatarStatus { enabled: boolean; provider: "cloudflare" | "gemini" | null; providerName: string | null; maxPhotoSide: number; }
