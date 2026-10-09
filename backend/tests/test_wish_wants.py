@@ -72,7 +72,7 @@ async def wants(c: AsyncClient, **params) -> list[dict]:
     return res.json()["items"]
 
 
-async def test_author_only_for_opted_in_want_posts(users):
+async def test_author_only_for_opted_in_authors(users):
     hidden = await users("숨은픽셀")
     shown = await users("공개픽셀", public=True)
     await post(hidden)
@@ -82,7 +82,7 @@ async def test_author_only_for_opted_in_want_posts(users):
     rows = (await shown.get("/api/local/trades", params={"region": "WSW"})).json()["items"]
     by_id = {r["id"]: r["author"] for r in rows}
     assert by_id[shown_want] == {"nickname": "공개픽셀", "avatarUrl": None}
-    assert by_id[shown_have] is None  # HAVE·SELL은 계속 익명
+    assert by_id[shown_have] == {"nickname": "공개픽셀", "avatarUrl": None}  # 동의하면 HAVE·SELL도
     assert "숨은픽셀" not in json.dumps(rows)
 
 
@@ -93,6 +93,11 @@ async def test_nickname_search_matches_only_opted_in_authors(users):
 
     assert [r["author"]["nickname"] for r in await wants(viewer, nickname="픽셀곰")] == ["픽셀곰"]
     assert await wants(viewer, nickname="%") == []  # LIKE 와일드카드는 글자 그대로
+    # 거래·교환 탭: 동의한 이웃의 HAVE·SELL도 닉네임으로 찾는다
+    seller = await users("픽셀상인", public=True)
+    have = await post(seller, kind="have", name="교환할 키캡", product=None)
+    res = await viewer.get("/api/local/trades", params=[("nickname", "픽셀상인"), ("kind", "have"), ("kind", "sell")])
+    assert [r["id"] for r in res.json()["items"]] == [have]
     res = await viewer.get("/api/local/trades", params={"nickname": "x" * 31})
     assert res.status_code == 422
 

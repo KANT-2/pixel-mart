@@ -51,8 +51,8 @@ def post_out(post: TradePost, tree: RegionTree, viewer_id: int | None) -> TradeP
 
 
 def author_out(post: TradePost) -> TradeAuthorOut | None:
-    """위시맵 닉네임 공개에 동의한 사람의 WANT 글만 작성자를 보여 준다 (샘플 글은 항상 익명)"""
-    if post.kind != "want" or post.is_sample or not post.author.nickname_public:
+    """닉네임 공개에 동의한 사람의 글(위시·HAVE·SELL)만 작성자를 보여 준다 (샘플 글은 항상 익명)"""
+    if post.is_sample or not post.author.nickname_public:
         return None
     return TradeAuthorOut(nickname=post.author.nickname, avatar_url=post.author.avatar_url)
 
@@ -85,7 +85,7 @@ async def list_trades(
     ] = None,
     nickname: Annotated[
         str | None,
-        Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 WANT 글만"),
+        Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 글만"),
     ] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     size: Annotated[int, Query(ge=1, le=60)] = 12,
@@ -116,7 +116,8 @@ async def list_trades(
         author_ids = select(User.id).where(
             User.nickname_public.is_(True), User.nickname.ilike(like_pattern(nickname.strip()), escape="\\")
         )
-        filters += [TradePost.kind == "want", TradePost.is_sample.is_(False), TradePost.user_id.in_(author_ids)]
+        # 글 종류는 kind로 따로 거른다 (거래·교환 탭은 HAVE·SELL, 위시맵은 want)
+        filters += [TradePost.is_sample.is_(False), TradePost.user_id.in_(author_ids)]
 
     total = await db.scalar(select(func.count()).select_from(TradePost).where(*filters)) or 0
     posts = await db.scalars(

@@ -65,11 +65,11 @@
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
-| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`)·위시맵 닉네임 공개(`nicknamePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
+| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`)·닉네임 공개(`nicknamePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
 | GET | /api/interests?type=&q= | 취향 태그 검색 (type: `work/character/style/product_type`) | ✅ |
 | GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 5명 미만은 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
 | GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (5명 이상만, `rank`·`isSample`) | ✅ |
-| GET · POST | /api/local/trades?region=&kind=&q=&productId=&interestId=&nickname= 🔒(POST) | 거래(`sell`)·교환(`have/want`) 글 (Prototype). 목록은 진행 중 글, 상위 지역은 하위 포함, 작성자 정보는 닉네임 공개 동의자의 WANT 글에만 `author {nickname, avatarUrl}`(그 외 null), `nickname`은 동의자 WANT 글만 부분 검색, `q`는 물건 이름·연결 상품 이름·설명 부분 검색(1~40자), `kind`는 여러 번 넘기면 OR(거래·교환 탭은 `kind=have&kind=sell`, 위시 `want`는 위시맵 탭), 샘플은 `isSample`, 시연용 데모 이웃 글은 `isDemo`. POST는 내 지역으로 작성 — 지역 미설정 400, have·sell 상태 미선택·연락처/정확한 장소 422, 같은 물건 진행 중 글 400 | ✅ |
+| GET · POST | /api/local/trades?region=&kind=&q=&productId=&interestId=&nickname= 🔒(POST) | 거래(`sell`)·교환(`have/want`) 글 (Prototype). 목록은 진행 중 글, 상위 지역은 하위 포함, 작성자 정보는 닉네임 공개 동의자의 글에만 `author {nickname, avatarUrl}`(그 외·샘플 null), `nickname`은 동의자 글만 부분 검색(종류는 `kind`로), `q`는 물건 이름·연결 상품 이름·설명 부분 검색(1~40자), `kind`는 여러 번 넘기면 OR(거래·교환 탭은 `kind=have&kind=sell`, 위시 `want`는 위시맵 탭), 샘플은 `isSample`, 시연용 데모 이웃 글은 `isDemo`. POST는 내 지역으로 작성 — 지역 미설정 400, have·sell 상태 미선택·연락처/정확한 장소 422, 같은 물건 진행 중 글 400 | ✅ |
 | GET | /api/local/trades/mine 🔒 | 내 글 (완료·숨김 포함) | ✅ |
 | GET | /api/local/trades/{id} | 거래글 하나 (진행 중이거나 내 글, 그 외 404) | ✅ |
 | GET | /api/local/wish-wants?codes=a,b | 위시맵 지역 블록별 진행 중 WANT 수·핀 이미지(최대 4, 하위 지역 포함), 없는 지역 404, 최대 40개 | ✅ |
