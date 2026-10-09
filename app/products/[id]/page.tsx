@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import AddToCartButton from "@/components/AddToCartButton";
+import WishButton from "@/components/WishButton";
 import ProductCard from "@/components/ProductCard";
 import { formatPrice } from "@/utils/formatPrice";
 import { getProduct, getProducts, getProductParams } from "@/lib/products";
@@ -74,7 +75,10 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
 
         <div className="flex flex-col">
           <p className="mb-2 text-sm font-semibold text-mint">{product.category}</p>
-          <h1 className="mb-4 text-3xl font-extrabold leading-snug md:text-4xl">{product.name}</h1>
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <h1 className="text-3xl font-extrabold leading-snug md:text-4xl">{product.name}</h1>
+            <WishButton productId={product.id} productName={product.name} />
+          </div>
           <p className="mb-6 text-3xl font-extrabold text-lime">{formatPrice(product.price)}</p>
           <p className="mb-8 leading-relaxed text-sub">{product.description}</p>
 
