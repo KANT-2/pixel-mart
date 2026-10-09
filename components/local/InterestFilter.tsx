@@ -57,8 +57,11 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
     </div>
     {open && <div id={panelId} role="dialog" aria-label="취향 찾기" className="pixel-panel absolute inset-x-0 top-full z-30 mt-2 p-4 sm:right-auto sm:w-[28rem]">
       <label htmlFor={`${panelId}-search`} className="sr-only">취향 이름 검색</label>
-      <input ref={search} id={`${panelId}-search`} value={text} onChange={(event) => setText(event.target.value.slice(0, 30))}
-        placeholder="캐릭터·작품·스타일 이름" autoComplete="off" className="pixel-input min-h-11 w-full px-3 text-sm text-ink" />
+      <form role="search" aria-label="취향 이름 찾기" className="flex gap-1.5" onSubmit={(event) => { event.preventDefault(); if (list[0]) pick(list[0].id); }}>
+        <input ref={search} id={`${panelId}-search`} value={text} onChange={(event) => setText(event.target.value.slice(0, 30))} enterKeyHint="search"
+          placeholder="캐릭터·작품·스타일 이름" autoComplete="off" className="pixel-input min-h-11 min-w-0 flex-1 px-3 text-sm text-ink" />
+        <button type="submit" disabled={!text.trim() || !list.length} className="btn-lime min-h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>
+      </form>
       <div role="tablist" aria-label="취향 종류" className="mt-3 flex flex-wrap gap-1.5">
         {[{ value: "all" as const, label: "전체" }, ...INTEREST_TYPES].map((item) => <button key={item.value} type="button" role="tab"
           aria-selected={type === item.value} onClick={() => setType(item.value)}

@@ -96,12 +96,14 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
   const [text, setText] = useState(nickname ?? "");
   const keyword = text.trim();
   const matches = mode === "region" && keyword ? regions.filter((region) => region.fullName.includes(keyword)).slice(0, 6) : [];
-  const pick = (code: string) => { onRegion(code); setText(""); };
+  const [notFound, setNotFound] = useState(false);
+  const pick = (code: string) => { onRegion(code); setText(""); setNotFound(false); };
   const tab = "h-11 px-3 text-xs font-bold aria-pressed:bg-lime aria-pressed:text-lime-ink";
   return <form role="search" aria-label="위시맵 찾기" className="flex w-full gap-1.5 sm:w-auto" onSubmit={(event) => {
     event.preventDefault();
     if (mode === "nickname" && keyword) onNickname(keyword);
     else if (matches[0]) pick(matches[0].code);
+    else if (keyword) setNotFound(true);
   }}>
     <div className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-panel">
       <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>📍 동네</button>
@@ -109,7 +111,7 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
     </div>
     <div className="relative min-w-0 flex-1 sm:w-52 sm:flex-none">
       <label htmlFor="wish-search" className="sr-only">{mode === "region" ? "동네 이름" : "닉네임"}</label>
-      <input id="wish-search" value={text} onChange={(event) => setText(event.target.value.slice(0, mode === "region" ? 20 : 30))}
+      <input id="wish-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, mode === "region" ? 20 : 30)); setNotFound(false); }}
         placeholder={mode === "region" ? "동네 검색 (예: 판교)" : "닉네임으로 찾기"} autoComplete="off" enterKeyHint="search"
         onKeyDown={(event) => { if (event.key === "Escape") setText(""); }} className={localInput} />
       {matches.length > 0 && <ul aria-label="동네 검색 결과" className="pixel-panel absolute inset-x-0 top-full z-20 mt-1 overflow-hidden">
@@ -117,8 +119,9 @@ function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps
           <button type="button" onClick={() => pick(region.code)} className="block w-full px-3 py-2 text-left text-sm hover:bg-panel-2">{region.fullName}</button>
         </li>)}
       </ul>}
+      {notFound && <p role="status" className="absolute left-0 top-full z-20 mt-1 rounded bg-night px-2 py-1 text-xs text-pink">없는 동네예요.</p>}
     </div>
-    {mode === "nickname" && <button type="submit" disabled={!keyword} className="btn-lime h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>}
+    <button type="submit" disabled={!keyword} className="btn-lime h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>
   </form>;
 }
 
@@ -165,7 +168,8 @@ function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps)
 function WantRow({ post }: { post: ApiTradePost }) {
   const rarity = rarityOf(post.price ?? post.product?.price);
   const name = containsContact(post.itemName) ? "물건명 비공개" : post.itemName;
-  const giftable = !post.isMine && !post.isSample && post.status === "open";
+  // 선물은 사이트 상품을 위시한 이웃의 글에만
+  const giftable = !post.isMine && !post.isSample && post.status === "open" && Boolean(post.product);
   return <article className="flex gap-2.5 rounded-md border-2 border-frame bg-night/60 p-2">
     <div className="relative grid size-12 shrink-0 place-items-end justify-center overflow-hidden rounded bg-[linear-gradient(#17123a,#2a1f5c)]">
       {post.author?.avatarUrl ? <PixelAvatar src={post.author.avatarUrl} alt="" className="size-10 object-bottom" /> : (
@@ -177,12 +181,13 @@ function WantRow({ post }: { post: ApiTradePost }) {
       <p className="truncate text-xs text-dim">
         <span className={post.author ? "font-bold text-ink" : ""}>{post.isMine ? "나" : post.author?.nickname ?? "이웃 플레이어"}</span> · {post.regionName.split(" ").at(-1)}
         {post.isSample && <span className="ml-1 text-violet">· 샘플 데이터</span>}
+        {post.isDemo && <span className="ml-1 rounded border border-mint/40 px-1 text-[10px] font-bold text-mint">데모 이웃</span>}
       </p>
       <p className="truncate font-bold" style={{ color: rarity.color }}><span aria-hidden="true">💗 </span>{name}</p>
       <p className="truncate text-[11px] text-dim">{post.price !== null ? `희망가 ${formatPrice(post.price)}` : post.product ? `연결 상품 ${post.product.name}` : "가격 제안"}</p>
     </div>
     {giftable
       ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold">🎁 선물</Link>
-      : <span title={post.isMine ? "내 글" : "샘플 글에는 선물할 수 없어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">🎁 선물</span>}
+      : <span title={post.isMine ? "내 글" : post.isSample ? "샘플 글에는 선물할 수 없어요" : "PIXEL MART 상품을 위시한 글에만 선물할 수 있어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">🎁 선물</span>}
   </article>;
 }

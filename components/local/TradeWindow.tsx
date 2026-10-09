@@ -26,10 +26,10 @@ export default function TradeWindow({ match, me }: TradeWindowProps) {
     </header>
     <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-2 p-3 sm:gap-3 sm:p-4">
       <TraderPanel name={me.nickname} subtitle="나 · 구하는 아이템" avatar={me.avatarUrl} anonymous={false}
-        item={postItem(match.want)} active={picked === "want"} onPick={() => setPicked("want")} priceText="—" />
+        item={postItem(match.want)} active={picked === "want"} onPick={() => setPicked("want")} priceText="—" flow="in" />
       <p aria-hidden="true" className="self-center font-pixel text-xl text-lime motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">⇄</p>
       <TraderPanel name="이웃 플레이어" subtitle="같은 동네 · 가진 아이템" avatar={null} anonymous
-        item={postItem(match.offer)} active={picked === "offer"} onPick={() => setPicked("offer")}
+        item={postItem(match.offer)} active={picked === "offer"} onPick={() => setPicked("offer")} flow="out"
         priceText={match.offer.price === null ? "가격 제안" : formatPrice(match.offer.price)} />
     </div>
     <div className="border-t-2 border-frame bg-night/60 p-3 sm:p-4">
@@ -61,10 +61,18 @@ interface TraderPanelProps {
   onPick: () => void;
   priceLabel?: string;
   priceText: string;
+  /** 이 칸의 아이템이 떠나는지(out: 보냄) 들어오는지(in: 받음) — 선물·교환에서 방향 표시 */
+  flow?: "out" | "in";
 }
 
+const FLOW = {
+  out: { badge: "−1 보냄", tone: "bg-pink text-night", slot: "border-dashed opacity-80" },
+  in: { badge: "+1 받음", tone: "bg-lime text-lime-ink", slot: "shadow-[0_0_12px_rgb(182_255_92/0.55)]" },
+} as const;
+
 /** 교환 창 한쪽 — 캐릭터, 이름, 아이템 칸 6개, 가격 줄 */
-export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, onPick, priceLabel = "희망가", priceText }: TraderPanelProps) {
+export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, onPick, priceLabel = "희망가", priceText, flow }: TraderPanelProps) {
+  const direction = flow && item ? FLOW[flow] : null;
   const rarity = rarityOf(item?.price);
   const itemName = item?.name ?? "빈 칸";
   return <div className="flex min-w-0 flex-col rounded-md border-2 border-frame bg-panel">
@@ -85,12 +93,13 @@ export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, o
     </div>
     <div className="grid grid-cols-[repeat(3,minmax(0,4.5rem))] justify-center gap-1 px-2" aria-label={`${name}의 아이템 칸`}>
       {Array.from({ length: SLOTS }, (_, index) => index === 0
-        ? <button key={index} type="button" onClick={onPick} aria-pressed={active} aria-label={`${itemName} 정보 보기`} title={itemName}
-          className={`item-slot grid aspect-square place-items-center overflow-hidden ${active ? "ring-2 ring-lime" : ""}`} style={item ? { ["--rarity" as string]: rarity.color } : undefined}>
+        ? <button key={index} type="button" onClick={onPick} aria-pressed={active} aria-label={`${itemName}${direction ? ` (${direction.badge})` : ""} 정보 보기`} title={itemName}
+          className={`item-slot relative grid aspect-square place-items-center overflow-hidden ${active ? "ring-2 ring-lime" : ""} ${direction?.slot ?? ""}`} style={item ? { ["--rarity" as string]: rarity.color } : undefined}>
           {item ? (
             // eslint-disable-next-line @next/next/no-img-element -- 상품 이미지 또는 보물상자
             <img src={item.imageUrl ?? "/images/hero-chest.svg"} alt="" className={item.imageUrl ? "size-full object-cover" : "size-3/5 [image-rendering:pixelated]"} />
           ) : <span aria-hidden="true" className="font-pixel text-lg text-dim">+</span>}
+          {direction && <span className={`absolute inset-x-0 bottom-0 py-0.5 text-center text-[10px] font-extrabold leading-none ${direction.tone} ${flow === "in" ? "motion-safe:animate-[pulse_1.2s_steps(2)_infinite]" : ""}`}>{direction.badge}</span>}
         </button>
         : <span key={index} aria-hidden="true" className="aspect-square rounded border-2 border-frame bg-night" />)}
     </div>

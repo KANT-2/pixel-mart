@@ -69,8 +69,9 @@ test("필터 URL은 잘못된 종류·id·페이지를 정리하고 변경 시 �
   assert.equal(tradeHref(query), "/local/trades?region=41135&kind=have&productId=3&interestId=11&page=2");
   const next = changeTradeQuery(query, { kind: "want" }); assert.equal(next.page, 1); assert.equal(next.productId, 3); assert.equal(next.region, "41135");
   assert.equal(tradeQueryParams(next).has("page"), false);
-  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, productId: undefined, interestId: undefined, page: 1 });
+  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, q: undefined, productId: undefined, interestId: undefined, page: 1 });
   assert.equal(parseTradeQuery(new URLSearchParams()).hasRegion, false);
+  assert.equal(tradeHref(parseTradeQuery(new URLSearchParams("q=%20%ED%82%A4%EB%A7%81%20&kind=sell"))), "/local/trades?kind=sell&q=%ED%82%A4%EB%A7%81");
   assert.equal(parseTradeQuery(new URLSearchParams("page=999999999999999999")).page, 1);
 });
 
@@ -91,7 +92,7 @@ test("거래 카드는 텍스트로만 렌더링하고 작성자·계정·지역
   assert.doesNotMatch(redacted, /010-1234-5678|카톡 id pixel/);
 });
 
-test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·상품 검색 최대 6개", async (t) => {
+test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·상품 검색 24개씩(더 보기)", async (t) => {
   const previous = globalThis.fetch; t.after(() => { globalThis.fetch = previous; });
   const calls = []; globalThis.fetch = async (url, init) => { calls.push({ url, ...init }); return new Response("{}"); };
   await localApi.trades(parseTradeQuery(new URLSearchParams("region=41135&kind=have&productId=3&interestId=11&page=2")));
@@ -100,7 +101,7 @@ test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·
   assert.equal(calls[1].url, "/api/local/trades/mine"); assert.equal(calls[2].method, "POST"); assert.equal(JSON.parse(calls[2].body).regionCode, undefined);
   assert.equal(calls[3].method, "PATCH"); assert.deepEqual(JSON.parse(calls[3].body), { status: "hidden" });
   assert.equal(calls[4].url, "/api/local/trades/matches"); assert.match(calls[5].url, /wish-map\?region=41135&limit=10/);
-  assert.equal(new URL(calls[6].url, "http://local").searchParams.get("size"), "6");
+  assert.equal(new URL(calls[6].url, "http://local").searchParams.get("size"), "24");
   for (const call of calls) { assert.equal(call.credentials, "same-origin"); assert.equal(call.cache, "no-store"); }
 });
 

@@ -104,19 +104,23 @@ function RegionSearch({ regions, onPick }: RegionSearchProps) {
   const [text, setText] = useState("");
   const keyword = text.trim();
   const matches = keyword ? regions.filter((region) => region.fullName.includes(keyword)).slice(0, 6) : [];
-  const pick = (code: string) => { onPick(code); setText(""); };
-  return <div className="relative min-w-0 flex-1 sm:w-56 sm:flex-none">
+  const [notFound, setNotFound] = useState(false);
+  const pick = (code: string) => { onPick(code); setText(""); setNotFound(false); };
+  const search = () => { if (matches[0]) pick(matches[0].code); else if (keyword) setNotFound(true); };
+  return <form role="search" aria-label="동네 검색" onSubmit={(event) => { event.preventDefault(); search(); }} className="relative flex min-w-0 flex-1 gap-1.5 sm:w-72 sm:flex-none">
     <label htmlFor="region-search" className="sr-only">동네 검색</label>
-    <input id="region-search" value={text} onChange={(event) => setText(event.target.value.slice(0, 20))} placeholder="동네 검색 (예: 판교)"
-      autoComplete="off" role="combobox" aria-expanded={matches.length > 0} aria-controls="region-search-list"
-      onKeyDown={(event) => { if (event.key === "Enter" && matches[0]) { event.preventDefault(); pick(matches[0].code); } if (event.key === "Escape") setText(""); }}
-      className={localInput} />
+    <input id="region-search" value={text} onChange={(event) => { setText(event.target.value.slice(0, 20)); setNotFound(false); }} placeholder="동네 검색 (예: 판교)"
+      autoComplete="off" role="combobox" aria-expanded={matches.length > 0} aria-controls="region-search-list" enterKeyHint="search"
+      onKeyDown={(event) => { if (event.key === "Escape") setText(""); }}
+      className={`${localInput} min-w-0 flex-1`} />
+    <button type="submit" className="btn-lime min-h-11 shrink-0 px-3 text-sm font-bold">찾기</button>
+    {notFound && <p role="status" className="absolute left-0 top-full z-20 mt-1 rounded bg-night px-2 py-1 text-xs text-pink">없는 동네예요.</p>}
     {matches.length > 0 && <ul id="region-search-list" role="listbox" className="absolute inset-x-0 top-full z-20 mt-1 overflow-hidden pixel-panel">
       {matches.map((region) => <li key={region.code} role="option" aria-selected={false}>
         <button type="button" onClick={() => pick(region.code)} className="block w-full px-3 py-2 text-left text-sm hover:bg-panel-2">{region.fullName}</button>
       </li>)}
     </ul>}
-  </div>;
+  </form>;
 }
 
 interface PlacePanelProps {

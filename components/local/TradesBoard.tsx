@@ -28,11 +28,27 @@ export default function TradesBoard() {
     {/* 거래소 도구 막대 — 지역 · 종류를 한 줄에 */}
     <section aria-label="게시판 필터" className="space-y-2">
       <div className="pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2">
+        {/* 사거나 팔고 싶은 물건 이름으로 찾기 — 물건 이름·연결 상품·설명에서 */}
+        <form role="search" aria-label="물건 찾기" className="flex w-full min-w-0 gap-2" onSubmit={(event) => {
+          event.preventDefault();
+          const q = String(new FormData(event.currentTarget).get("q") ?? "").trim().slice(0, 40);
+          change({ q: q || undefined });
+        }}>
+          <label htmlFor="trade-q" className="sr-only">찾는 물건</label>
+          <div className="relative min-w-0 flex-1">
+            <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-3 grid place-items-center text-sm">🔎</span>
+            <input key={query.q ?? ""} id="trade-q" name="q" type="search" defaultValue={query.q ?? ""} maxLength={40} enterKeyHint="search"
+              placeholder="사거나 팔고 싶은 물건 찾기 (예: 키링, 장패드)" className="pixel-input h-10 w-full min-w-0 py-0 pl-9 pr-3 text-sm text-ink" />
+          </div>
+          <button type="submit" className="btn-lime h-10 shrink-0 px-4 text-sm font-bold">찾기</button>
+          {query.q && <button type="button" onClick={() => change({ q: undefined })} className="btn-pixel h-10 shrink-0 px-3 text-xs font-bold">✕ 검색 지우기</button>}
+        </form>
         <div className="min-w-0 flex-[1_1_22rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={(region) => change({ region })} /></div>
-        <div role="group" aria-label="글 종류 필터" className="flex flex-wrap gap-1.5">
-          {[{ value: undefined, label: "전체" }, ...TRADE_KINDS.map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}` }))].map((item) =>
-            <button key={item.label} type="button" aria-pressed={query.kind === item.value} onClick={() => change({ kind: item.value as TradeKind | undefined })}
-              className="h-10 btn-pixel px-3 font-pixel text-xs text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">{item.label}</button>)}
+        {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
+        <div role="group" aria-label="글 종류 필터" className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-night">
+          {[{ value: undefined, label: "ALL", name: "모든 글" }, ...TRADE_KINDS.map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}`, name: item.label }))].map((item, index) =>
+            <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
+              className={`h-9 px-3 font-pixel text-xs text-sub hover:bg-panel-2 hover:text-ink aria-pressed:bg-lime aria-pressed:text-lime-ink ${index ? "border-l-2 border-frame" : ""}`}>{item.label}</button>)}
         </div>
       </div>
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
