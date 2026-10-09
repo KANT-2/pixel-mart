@@ -1,5 +1,6 @@
 import { api, ApiError } from "@/lib/api";
 import type { ApiReview, ApiReviewPage } from "@/types/api";
+import { reviewPageAfterReload } from "@/utils/productFeedback";
 
 export interface ReviewInput { rating: number; content: string; }
 
@@ -13,6 +14,8 @@ export const reviewsApi = {
     api.get<ApiReviewPage>(`/products/${productId}/reviews?page=${page}&size=10`, options(signal)),
   create: (productId: number, input: ReviewInput, signal?: AbortSignal) =>
     api.post<ApiReview>(`/products/${productId}/reviews`, input, options(signal)),
+  remove: (productId: number, reviewId: number, signal?: AbortSignal) =>
+    api.delete<{ message: string }>(`/products/${productId}/reviews/${reviewId}`, options(signal)),
 };
 
 interface ReviewSnapshot {
@@ -22,7 +25,7 @@ interface ReviewSnapshot {
   requestedPage: number;
 }
 
-// 공개 목록도 상품 서버 캐시와 분리하고, 늦은 페이지 응답으로 덮어쓰지 않습니다.
+// isMine은 사용자별 값이므로 서버 캐시와 분리하고, 늦은 응답으로 덮어쓰지 않습니다.
 export function createReviewStore(productId: number, transport = reviewsApi) {
   let snapshot: ReviewSnapshot = { data: null, loading: true, error: null, requestedPage: 1 };
   let active = false;
@@ -44,7 +47,11 @@ export function createReviewStore(productId: number, transport = reviewsApi) {
     try {
       let data = await transport.list(productId, requestedPage, signal);
       if (!active || token !== generation) return;
-      if (data.page > data.totalPages) data = await transport.list(productId, Math.max(1, data.totalPages), signal);
+      const correctedPage = reviewPageAfterReload(data);
+      if (correctedPage !== data.page) {
+        publish({ ...snapshot, requestedPage: correctedPage });
+        data = await transport.list(productId, correctedPage, signal);
+      }
       if (!active || token !== generation) return;
       publish({ data, loading: false, error: null, requestedPage: data.page });
     } catch (cause) {

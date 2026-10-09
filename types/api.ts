@@ -107,6 +107,7 @@ export interface ApiReview {
   content: string;
   nickname: string;
   createdAt: string;
+  isMine: boolean;
 }
 
 export interface ApiReviewPage extends Page<ApiReview> {
