@@ -4,6 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 
 from app.core.config import settings
 from app.routers import (
+    ai_avatar,
     auth,
     cancel_requests,
     cart,
@@ -56,6 +57,7 @@ for router in (
     cancel_requests.router,
     cancel_requests.dev_router,
     users.router,
+    ai_avatar.router,
     wishlist.router,
     local.router,
     local_trades.router,
