@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import { formatPrice } from "@/utils/formatPrice";
 import { getProduct, getProducts, getProductParams } from "@/lib/products";
 import { ProductFallbackNotice } from "@/components/products/ProductStates";
+import ProductDetailTabs from "@/components/products/ProductDetailTabs";
 
 // API가 꺼져 있어도 정적 상품 ID로 상세 경로를 생성합니다.
 export function generateStaticParams() {
@@ -100,6 +101,12 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
       </section>
+
+      <ProductDetailTabs productId={product.id}>
+        <h2 className="mb-4 text-xl font-bold">상품정보</h2>
+        <p className="whitespace-pre-line break-words leading-relaxed text-sub">{product.description}</p>
+        <p className="mt-5 text-sm text-dim">상품 번호 PM-{String(product.id).padStart(3, "0")} · {product.category}</p>
+      </ProductDetailTabs>
 
       {/* 같은 카테고리 상품 */}
       {related.length > 0 && (

@@ -145,7 +145,6 @@ function OrderDetailContents({ id, placed }: OrderDetailProps) {
                   <p className="mt-2 text-xs leading-relaxed text-sub">{formatPrice(item.unitPrice)} · {item.quantity}개</p>
                   <p className="mt-2 text-sm font-extrabold">{formatPrice(item.subtotal)}</p>
                   {order.status === "delivered" && <>
-                    {/* TODO(#43): 상품 상세 리뷰 작성 영역 연결 */}
                     <Link href={`/products/${item.product.id}#reviews`} className={`mt-3 inline-flex rounded-lg border border-line bg-panel-2 px-3 py-2 text-xs font-bold text-mint ${focusClass}`}>리뷰 쓰기</Link>
                   </>}
                 </div>
