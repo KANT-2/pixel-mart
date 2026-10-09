@@ -4,7 +4,7 @@ from math import ceil
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from app.deps import CurrentUser, DbSession, OptionalUser
 from app.models import Interest, Product, TradePost, User, Wishlist, WishSample
@@ -74,6 +74,12 @@ async def list_trades(
     kind: Literal["have", "want", "sell"] | None = None,
     product_id: Annotated[int | None, Query(alias="productId")] = None,
     interest_id: Annotated[int | None, Query(alias="interestId")] = None,
+    q: Annotated[
+        str | None,
+        Query(
+            min_length=1, max_length=40, description="물건 이름·연결 상품 이름·설명 일부 (사거나 팔고 싶은 물건 찾기)"
+        ),
+    ] = None,
     nickname: Annotated[
         str | None,
         Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 WANT 글만"),
@@ -93,6 +99,16 @@ async def list_trades(
         filters.append(TradePost.product_id == product_id)
     if interest_id is not None:
         filters.append(TradePost.interest_id == interest_id)
+    if q is not None and q.strip():
+        pattern = like_pattern(q.strip())
+        product_ids = select(Product.id).where(Product.name.ilike(pattern, escape="\\"))
+        filters.append(
+            or_(
+                TradePost.item_name.ilike(pattern, escape="\\"),
+                TradePost.content.ilike(pattern, escape="\\"),
+                TradePost.product_id.in_(product_ids),
+            )
+        )
     if nickname is not None and nickname.strip():
         author_ids = select(User.id).where(
             User.nickname_public.is_(True), User.nickname.ilike(like_pattern(nickname.strip()), escape="\\")

@@ -125,3 +125,22 @@ async def test_get_single_trade_hides_closed_posts_from_others(users):
     assert (await other.get(f"/api/local/trades/{post_id}")).status_code == 404
     assert (await owner.get(f"/api/local/trades/{post_id}")).status_code == 200
     assert (await other.get("/api/local/trades/99999999")).status_code == 404
+
+
+async def test_item_keyword_search(users):
+    """사거나 팔고 싶은 물건을 이름으로 — 물건 이름·연결 상품 이름·설명에서 찾는다"""
+    c = await users("검색러")
+    named = await post(c, name="반짝이 키링 구해요", product=None)
+    by_product = await post(c, name="그거", product=PRODUCT)  # 상품 이름으로만 찾을 수 있는 글
+    seller = await post(c, kind="sell", name="중고 장패드", product=None)
+
+    async def ids(q):
+        res = await c.get("/api/local/trades", params={"region": "WSW", "q": q})
+        assert res.status_code == 200, res.text
+        return {r["id"] for r in res.json()["items"]}
+
+    assert await ids("키링") == {named}
+    product_name = (await c.get(f"/api/local/trades/{by_product}")).json()["product"]["name"]
+    assert by_product in await ids(product_name[:3])
+    assert await ids("장패드") >= {seller}
+    assert await ids("%") == set()  # 와일드카드는 글자 그대로
