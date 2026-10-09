@@ -236,3 +236,6 @@ export interface ApiGift {
   orderId: number | null;
   createdAt: string;
 }
+
+/** AI 픽셀 아바타 설정 — 동의 문구의 제공자 이름, 보내기 전 사진 긴 변 */
+export interface ApiAiAvatarStatus { enabled: boolean; provider: "cloudflare" | "gemini" | null; providerName: string | null; maxPhotoSide: number; }

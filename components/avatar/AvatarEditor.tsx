@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { api, ApiError } from "@/lib/api";
-import { aiImageToGrid, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
+import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
 import { assertAvatarSize, getOutputSize, getPngByteSize } from "@/utils/pixelate";
 import { isEmpty, type PixelGridData } from "@/utils/pixelCanvas";
-import type { ApiUser } from "@/types/api";
+import type { ApiAiAvatarStatus, ApiUser } from "@/types/api";
 import PixelAvatar from "./PixelAvatar";
 import PixelCanvasEditor from "./PixelCanvasEditor";
 import MotionBoundary from "@/components/hero/MotionBoundary";
@@ -130,17 +130,26 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
   const [working, setWorking] = useState(false);
   const [result, setResult] = useState<{ grid: PixelGridData; preview: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<ApiAiAvatarStatus | null>(null);
   const request = useRef(0);
   useEffect(() => () => { request.current++; }, []);
+  // 동의 문구는 서버가 실제로 쓰는 제공자 이름을 그대로 보여 준다
+  useEffect(() => {
+    const controller = new AbortController();
+    aiAvatarStatus(controller.signal).then(setStatus).catch(() => undefined);
+    return () => controller.abort();
+  }, []);
+  const providerName = status?.providerName ?? "AI 제공자";
+  const unavailable = status !== null && !status.enabled;
 
   async function choose(file?: File) {
     if (!file) return;
     setError(null); setResult(null);
-    try { setPhoto(await preparePhoto(file)); } catch (cause) { setError(cause instanceof Error ? cause.message : "사진을 읽지 못했어요."); }
+    try { setPhoto(await preparePhoto(file, status?.maxPhotoSide ?? DEFAULT_PHOTO_SIDE)); } catch (cause) { setError(cause instanceof Error ? cause.message : "사진을 읽지 못했어요."); }
   }
 
   async function generate() {
-    if (!photo || !consent || working) return;
+    if (!photo || !consent || working || unavailable) return;
     const id = ++request.current;
     setWorking(true); setError(null); setResult(null);
     try {
@@ -165,9 +174,10 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
       <label className="flex cursor-pointer items-start gap-3 rounded-md bg-night p-3">
         <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} disabled={disabled || working}
           className="mt-0.5 size-5 shrink-0 accent-lime" />
-        <span className="text-xs leading-relaxed text-sub"><strong className="text-ink">사진이 Google Gemini로 전송되는 데 동의해요.</strong> 사진과 AI 원본 이미지는 PIXEL MART에 저장하지 않으며, 마음에 드는 결과를 저장할 때 최종 픽셀 이미지만 남아요. 다른 사람의 사진은 그 사람의 허락을 받은 경우에만 사용해 주세요.</span>
+        <span className="text-xs leading-relaxed text-sub"><strong className="text-ink">사진이 {providerName}로 전송되는 데 동의해요.</strong> 사진과 AI 원본 이미지는 PIXEL MART에 저장하지 않으며, 마음에 드는 결과를 저장할 때 최종 픽셀 이미지만 남아요. 다른 사람의 사진은 그 사람의 허락을 받은 경우에만 사용해 주세요.</span>
       </label>
-      <button type="button" onClick={() => void generate()} disabled={disabled || working || !photo || !consent}
+      {unavailable && <p role="status" className="text-sm text-pink">지금은 AI 만들기를 쓸 수 없어요. 픽셀 캔버스로 직접 그려 보세요.</p>}
+      <button type="button" onClick={() => void generate()} disabled={disabled || working || !photo || !consent || unavailable}
         className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{working ? "AI가 그리는 중… (최대 1분)" : "🤖 AI 픽셀 아바타 만들기"}</button>
       {error && <p role="alert" className="text-sm text-pink">{error}</p>}
     </div>
