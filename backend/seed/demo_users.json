@@ -1,0 +1,10 @@
+[
+  {"key": "pixelbear", "nickname": "픽셀곰", "regionCode": "41135-01", "wants": [[1, "회사 책상에 HP 하트 키캡 꽂고 싶어요"], [8, "밤에 켜 둘 인베이더 무드등 구해요"]]},
+  {"key": "slimeking", "nickname": "슬라임킹", "regionCode": "41135-02", "wants": [[9, "슬라임 아티산 키캡 모으는 중이에요"]]},
+  {"key": "dotcat", "nickname": "도트냥", "regionCode": "41135-03", "wants": [[13, "아침 커피용 슬라임 머그컵 갖고 싶어요"]]},
+  {"key": "retrobunny", "nickname": "레트로토끼", "regionCode": "11440-01", "wants": [[3, "던전 맵 장패드로 책상 꾸미고 싶어요"]]},
+  {"key": "keycapmaster", "nickname": "키캡장인", "regionCode": "11680-01", "wants": [[21, "골드 코인 스페이스바 찾고 있어요"], [15, "ESC 키를 루비 하트로 바꾸고 싶어요"]]},
+  {"key": "moodlover", "nickname": "무드등러버", "regionCode": "41465-01", "wants": [[11, "침대 옆에 둘 슬라임 미니 무드등 구해요"]]},
+  {"key": "heartcollector", "nickname": "하트수집가", "regionCode": "28185-01", "wants": [[19, "루비 하트 콜드컵 갖고 싶어요"]]},
+  {"key": "coinmoa", "nickname": "코인모아", "regionCode": "41117-01", "wants": [[22, "골드 코인 마우스패드 구해요"]]}
+]

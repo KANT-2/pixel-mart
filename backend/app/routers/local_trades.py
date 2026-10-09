@@ -23,7 +23,7 @@ from app.schemas.product import ProductOut
 from app.services import local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, rollup
 from app.services.regions import RegionTree, load_tree
-from app.services.trade_rules import contains_private_info, normalize, same_item
+from app.services.trade_rules import DEMO_EMAIL_DOMAIN, contains_private_info, normalize, same_item
 
 router = APIRouter(prefix="/local", tags=["local"])
 
@@ -44,6 +44,7 @@ def post_out(post: TradePost, tree: RegionTree, viewer_id: int | None) -> TradeP
         region_name=tree.full_name(post.region_code),
         is_mine=post.user_id == viewer_id,
         is_sample=post.is_sample,
+        is_demo=post.author.email.endswith(DEMO_EMAIL_DOMAIN),
         created_at=post.created_at,
         author=author_out(post),
     )

@@ -49,6 +49,7 @@ alembic upgrade head
 python -m scripts.seed
 ```
 - 시드에는 PIXEL LOCAL Cold Start용 **샘플**(덕력지도 집계 161칸, 거래글 7개)도 들어갑니다. 응답에 `isSample: true`로 표시되고, 실제 집계 참여자가 생긴 칸은 실제 값으로 바뀝니다.
+- **선물하기 시연용 데모 이웃**(선택): `python -m scripts.seed_demo` — 닉네임 공개한 데모 이웃 8명(`demo-<key>@demo.pixelmart.test`)과 사이트 상품을 위시한 WANT 글이 생깁니다(재실행 안전). 위시맵에서 닉네임(예: 픽셀곰)으로 찾아 선물해 보고, 개발용 로그인으로 `demo-pixelbear@demo.pixelmart.test`에 들어가면 받은 선물을 받기·거절할 수 있어요. 화면에는 "데모 이웃"으로 표시됩니다.
 - 덕력지도·Wish Map은 **테스트 계정(`.test` 이메일, dev-login 기본값)을 집계에서 뺍니다.** 직접 숫자를 바꿔 보려면 dev-login 이메일을 `.test`가 아닌 주소로 쓰세요.
 
 ---

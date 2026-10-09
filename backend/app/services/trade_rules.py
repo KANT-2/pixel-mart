@@ -3,6 +3,9 @@
 import re
 from typing import Protocol
 
+# 시연용 데모 이웃 계정 (scripts/seed_demo.py) — 화면에 "데모 이웃"으로 표시, `.test`라 집계에서 빠진다
+DEMO_EMAIL_DOMAIN = "@demo.pixelmart.test"
+
 FORBIDDEN_PATTERNS = [
     re.compile(r"01[016789][\s.-]?\d{3,4}[\s.-]?\d{4}"),  # 휴대폰 번호
     re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+"),  # 이메일
