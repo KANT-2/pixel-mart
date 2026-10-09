@@ -3,11 +3,7 @@ import { Suspense } from "react";
 import CartButton from "@/components/CartButton";
 import HeaderSearch from "@/components/HeaderSearch";
 import UserMenu from "@/components/UserMenu";
-
-const navItems = [
-  { href: "/", label: "홈" },
-  { href: "/products", label: "전체 상품" },
-];
+import HeaderNav, { HeaderNavFallback } from "@/components/HeaderNav";
 
 export default function Header() {
   return (
@@ -19,27 +15,19 @@ export default function Header() {
           PIXEL MART
         </Link>
 
-        <div className="order-last flex w-full items-center gap-2 lg:order-none lg:ml-auto lg:w-auto lg:gap-4">
-          <nav className="flex flex-1 items-center justify-center gap-1 text-sm font-semibold text-sub">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="whitespace-nowrap rounded-lg px-2 py-2 transition-colors hover:bg-white/5 hover:text-ink sm:px-3"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="h-10 w-10 shrink-0 lg:w-56">
+        <nav aria-label="주 메뉴" className="order-last flex w-full min-w-0 items-center gap-1 overflow-x-auto overscroll-x-contain lg:order-none lg:ml-auto lg:w-auto lg:flex-1">
+          <Suspense fallback={<HeaderNavFallback />}><HeaderNav /></Suspense>
+        </nav>
+
+        <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
+          <CartButton />
+          <div className="h-10 w-10 shrink-0 lg:w-48 xl:w-56">
             <Suspense fallback={<div role="status" aria-label="검색창 불러오는 중" className="h-full w-full animate-pulse rounded-lg bg-panel" />}>
               <HeaderSearch />
             </Suspense>
           </div>
+          <UserMenu compact />
         </div>
-
-        {/* 도전 과제 B: 장바구니 담은 개수 뱃지 (클라이언트 컴포넌트) */}
-        <div className="ml-auto flex items-center gap-2 lg:ml-0"><CartButton /><UserMenu /></div>
       </div>
     </header>
   );

@@ -113,3 +113,56 @@ export interface ApiReview {
 export interface ApiReviewPage extends Page<ApiReview> {
   averageRating: number | null;
 }
+
+export type RegionLevel = "sido" | "sigungu" | "zone";
+export type InterestType = "work" | "character" | "style" | "product_type";
+export type FandomPeriod = "30d" | "90d" | "all";
+
+export interface ApiRegion {
+  code: string;
+  level: RegionLevel;
+  parentCode: string | null;
+  name: string;
+  fullName: string;
+}
+
+export interface ApiInterest {
+  id: number;
+  type: InterestType;
+  name: string;
+  parentId: number | null;
+}
+
+export interface ApiLocalProfile {
+  region: ApiRegion | null;
+  interests: ApiInterest[];
+  fandomOptIn: boolean;
+  profilePublic: boolean;
+}
+
+export interface LocalProfileInput {
+  regionCode: string | null;
+  interestIds: number[];
+  fandomOptIn: boolean;
+  profilePublic: boolean;
+}
+
+export interface ApiFandom {
+  regionCode: string;
+  regionName: string;
+  interestId: number;
+  interest: string;
+  interestType: InterestType;
+  count: number | null;
+  belowThreshold: boolean;
+  isSample: boolean;
+}
+
+export interface ApiFandomRank {
+  rank: number;
+  interestId: number;
+  interest: string;
+  interestType: InterestType;
+  count: number;
+  isSample: boolean;
+}

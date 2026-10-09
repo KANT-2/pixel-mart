@@ -6,7 +6,9 @@ import { useAuth } from "@/components/AuthProvider";
 import { ApiError } from "@/lib/api";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
 
-export default function UserMenu() {
+interface UserMenuProps { compact?: boolean; }
+
+export default function UserMenu({ compact = false }: UserMenuProps) {
   const { user, loading, pending, error, refresh, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
@@ -31,7 +33,7 @@ export default function UserMenu() {
   }
 
   return (
-    <div ref={root} className="relative w-28 shrink-0 sm:w-36"
+    <div ref={root} className={`relative shrink-0 sm:w-36 ${compact ? "w-10" : "w-28"}`}
       onBlur={(event) => { if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}
       onKeyDown={(event) => {
         if (event.key === "Escape" && open) { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
@@ -48,7 +50,7 @@ export default function UserMenu() {
             // eslint-disable-next-line @next/next/no-img-element -- 기존 픽셀 스프라이트 재사용
             <img src="/images/hero-slime.svg" alt="" className="size-6 shrink-0 object-contain" />
           )}
-          <span className="min-w-0 flex-1 truncate">{user.nickname}</span><span aria-hidden="true">▾</span>
+          <span className={`min-w-0 flex-1 truncate ${compact ? "hidden sm:block" : ""}`}>{user.nickname}</span><span aria-hidden="true" className={compact ? "hidden sm:inline" : ""}>▾</span>
         </button>
       ) : (
         <Link href="/login" className="flex h-10 w-full items-center justify-center rounded-lg border border-line bg-panel text-sm font-semibold">로그인</Link>
