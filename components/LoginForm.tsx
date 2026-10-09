@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ApiError } from "@/lib/api";
+import NicknameField from "@/components/profile/NicknameField";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 interface LoginFormProps { next?: string; devLoginEnabled: boolean; }
@@ -11,6 +12,8 @@ interface LoginFormProps { next?: string; devLoginEnabled: boolean; }
 export default function LoginForm({ next, devLoginEnabled }: LoginFormProps) {
   const { user, loading, pending, error: authError, login, refresh } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [nickname, setNickname] = useState("");
+  const [rejected, setRejected] = useState<string | null>(null);
   const router = useRouter();
   const destination = safeNextPath(next);
   useEffect(() => { if (!loading && user) router.replace(destination); }, [user, loading, destination, router]);
@@ -20,8 +23,13 @@ export default function LoginForm({ next, devLoginEnabled }: LoginFormProps) {
     if (pending) return;
     const data = new FormData(event.currentTarget);
     setError(null);
-    try { await login(String(data.get("email") ?? "").trim(), String(data.get("nickname") ?? "").trim() || undefined); }
-    catch (cause) { setError(cause instanceof ApiError ? cause.message : "로그인하지 못했어요. 연결을 확인하고 다시 시도해 주세요."); }
+    const name = nickname.trim();
+    try { await login(String(data.get("email") ?? "").trim(), name || undefined); }
+    catch (cause) {
+      // 새 계정인데 닉네임이 겹치면 가입되지 않는다 — 추천 닉네임 칩으로 다시 고르기
+      if (cause instanceof ApiError && cause.status === 409) { setRejected(name); return; }
+      setError(cause instanceof ApiError ? cause.message : "로그인하지 못했어요. 연결을 확인하고 다시 시도해 주세요.");
+    }
   }
 
   if (loading || user) return <div role="status" aria-label={user ? "원래 페이지로 이동 중" : "로그인 상태 확인 중"} className="h-80 animate-pulse rounded-xl bg-panel" />;
@@ -41,9 +49,10 @@ export default function LoginForm({ next, devLoginEnabled }: LoginFormProps) {
       <label htmlFor="email" className="mb-2 block text-sm font-semibold">이메일</label>
       <input id="email" name="email" type="email" required maxLength={320} autoComplete="email" disabled={pending}
         className="mb-4 w-full pixel-input px-3 py-3 text-ink" placeholder="player@example.com" />
-      <label htmlFor="nickname" className="mb-2 block text-sm font-semibold">닉네임 <span className="font-normal text-dim">(선택)</span></label>
-      <input id="nickname" name="nickname" maxLength={30} autoComplete="nickname" disabled={pending}
-        className="mb-5 w-full pixel-input px-3 py-3 text-ink" placeholder="나의 플레이어 이름" />
+      <label htmlFor="nickname" className="mb-2 block text-sm font-semibold">닉네임 <span className="font-normal text-dim">(처음 가입할 때만 · 비우면 이메일 앞부분)</span></label>
+      <div className="mb-5">
+        <NicknameField id="nickname" value={nickname} onChange={(next) => { setNickname(next); setError(null); }} disabled={pending} rejected={rejected} placeholder="나의 플레이어 이름" />
+      </div>
       {error && <p role="alert" className="mb-4 text-sm text-pink">{error}</p>}
       <button type="submit" disabled={pending} className="w-full btn-lime px-4 py-3 font-bold text-lime-ink disabled:opacity-50">{pending ? "로그인 중…" : "이메일로 로그인"}</button>
     </form> : <p className="pixel-panel p-5 text-sm text-sub">로그인 서비스를 준비하고 있어요. 조금만 기다려 주세요.</p>}

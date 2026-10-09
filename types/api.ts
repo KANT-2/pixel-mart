@@ -243,3 +243,9 @@ export interface ApiGift {
   orderId: number | null;
   createdAt: string;
 }
+
+/** 닉네임 중복 확인 — 겹치면 지금 쓸 수 있는 추천 닉네임 (최대 3개) */
+export interface ApiNicknameCheck { nickname: string; available: boolean; suggestions: string[]; }
+
+/** 구글 확인은 끝났고 닉네임만 고르면 되는 가입 대기 상태 */
+export interface ApiSignupPending { email: string; googleName: string; }
