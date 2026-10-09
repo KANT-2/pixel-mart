@@ -76,7 +76,7 @@ data/                      1차 과제 정적 데이터 (상품 폴백용으로 
 - 로딩은 스켈레톤(`animate-pulse bg-panel`), 빈 상태와 에러 상태 문구를 반드시 만든다
 
 ## 기능별 원칙 (임의로 바꾸지 말 것)
-- **픽셀 아바타**: 사진 → Canvas로 축소(32×32) → 색 줄이기(16색) → 확대. **원본 사진은 서버로 보내지 않는다.** PNG data URL(50KB 이하)만 `PUT /api/users/me/avatar`
+- **픽셀 아바타** (`docs/AVATAR_POLICY.md`): 픽셀 캔버스(사진 없음) 또는 AI 픽셀 아바타(**동의 체크 후에만** 사진을 `POST /api/avatars/ai`로 전송, 저장 안 함). 결과는 브라우저에서 격자로 정리해 PNG data URL(50KB 이하)만 `PUT /api/users/me/avatar`. 수위를 넘는 아바타 제재 안내 표시
 - **데스크 꾸미기**: Snap Zone 방식(LEFT/CENTER/RIGHT/KEYBOARD/FRONT). 규칙(3~7개, DP 100 이하 등)은 화면에서 미리 보여 주되 **최종 판단은 `POST /api/desks/validate`** 결과를 따른다
 - **토너먼트 투표 화면**: 투표 종료 전 작성자 이름·상품 가격 숨김
 - **PIXEL LOCAL** (`docs/PIXEL_LOCAL_POLICY.md`, `docs/DUKRYEOK_MAP_POLICY.md`): GPS는 "내 위치로 보기/찾기" 버튼을 눌렀을 때만 요청하고 좌표는 브라우저 안에서 가까운 지역 찾기에만 사용(전송·저장·URL·로그 금지, 정책 4.1). 덕력지도는 실제 지역 모양 픽셀 지도 + 아바타 핀(동의자 5명 이상만, 무작위 최대 6명, 닉네임·위치 없음, 부족하면 집계 기반 슬라임) — 사용자 목록·프로필 링크 X(정책 4.2), 5명 미만은 숫자 비공개, `isSample` 데이터는 "샘플" 표시, 빈 화면엔 다음 행동(상위 지역 보기·관련 상품·취향 등록) 제공

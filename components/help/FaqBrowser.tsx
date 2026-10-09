@@ -108,7 +108,7 @@ export default function FaqBrowser({ items, fallback }: FaqBrowserProps) {
       <form role="search" aria-label="FAQ 검색" onSubmit={(event) => event.preventDefault()} className="mb-5 pixel-panel p-4 sm:p-5">
         <label htmlFor="faq-search" className="mb-2 block text-sm font-semibold text-sub">질문·답변 검색</label>
         <div className="relative">
-          <input ref={input} id="faq-search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 pixel-input py-3 pr-12 pl-3 text-sm outline-none placeholder:text-dim focus-visible:ring-2 focus-visible:ring-violet [&::-webkit-search-cancel-button]:appearance-none" />
+          <input ref={input} id="faq-search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 pixel-input py-3 pr-12 pl-3 text-sm placeholder:text-dim [&::-webkit-search-cancel-button]:appearance-none" />
           {search && <button type="button" aria-label="검색어 지우기" onClick={() => { changeSearch(""); input.current?.focus(); }} className="absolute inset-y-0 right-0 w-11 rounded-lg text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet"><span aria-hidden="true">×</span></button>}
         </div>
       </form>

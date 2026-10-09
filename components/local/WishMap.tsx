@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLocalSelection } from "@/components/local/useLocalSelection";
 import { useLocalResource } from "@/components/local/useLocalResource";
-import RegionSelector from "@/components/local/RegionSelector";
+import CompactRegionSelect from "@/components/local/CompactRegionSelect";
 import { LocalError, LocalSkeleton, localButton } from "@/components/local/LocalStates";
 import ProductCard from "@/components/ProductCard";
 import { localApi } from "@/lib/local";
@@ -20,7 +20,7 @@ export default function WishMap() {
   if (loading || !catalog.data) return <LocalSkeleton />;
   return <div className="space-y-8">
     {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택해 주세요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
-    <section aria-label="Wish Map 지역" className="pixel-panel p-5"><RegionSelector regions={catalog.data} value={selected?.code ?? null} onChange={choose} />{invalid && <p role="status" className="mt-4 text-sm text-pink">없는 지역이에요. 지역을 다시 선택해 주세요.</p>}<p className="mt-4 text-xs leading-relaxed text-dim">집계 참여자의 익명 찜 인원만 표시해요. 5명 미만 상품은 순위에 나타나지 않아요. 하위 지역을 합산하며 개인 찜 목록은 공개하지 않아요.</p></section>
+    <section aria-label="Wish Map 지역" className="space-y-2"><div className="pixel-panel p-2"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={choose} /></div>{invalid && <p role="status" className="text-sm text-pink">없는 지역이에요. 지역을 다시 선택해 주세요.</p>}<p className="text-xs leading-relaxed text-dim">집계 참여자의 익명 찜 인원만 표시해요. 5명 미만 상품은 순위에 나타나지 않아요. 하위 지역을 합산하며 개인 찜 목록은 공개하지 않아요.</p></section>
     {selected ? <WishMapResults key={selected.code} region={selected} onParent={() => choose(selected.parentCode)} /> : <div className="pixel-panel p-10 text-center"><h2 className="text-xl font-bold">궁금한 동네를 먼저 골라 보세요</h2><p className="mt-3 text-sm text-sub">우리 동네에서 관심을 모으는 아이템을 살펴보세요.</p></div>}
   </div>;
 }
