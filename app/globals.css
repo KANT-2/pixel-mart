@@ -94,6 +94,30 @@ html {
     box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.05), 0 1px 0 var(--color-shadow);
   }
 
+  /* 게임 아이템 칸 — 등급 색(--rarity) 테두리와 은은한 빛 */
+  .item-slot {
+    position: relative;
+    border: 3px solid var(--rarity, var(--color-frame));
+    border-radius: 6px;
+    background:
+      radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--rarity, transparent) 22%, transparent), transparent 70%),
+      var(--color-night);
+    box-shadow: inset 0 0 0 2px #0b0f1e, 0 0 14px color-mix(in srgb, var(--rarity, transparent) 35%, transparent), 4px 4px 0 var(--color-shadow);
+  }
+
+  /* 내구도 바 (거래 물건 상태) */
+  .durability {
+    height: 10px;
+    border: 2px solid #0b0f1e;
+    border-radius: 3px;
+    background: var(--color-night);
+  }
+  .durability > span {
+    display: block;
+    height: 100%;
+    background: repeating-linear-gradient(90deg, var(--color-lime) 0 6px, #8fd03f 6px 8px);
+  }
+
   /* 페이지 머리 라벨 — 퀘스트 표시 */
   .stage-kicker::before {
     content: "▶ ";
