@@ -3,13 +3,13 @@
 import { useCallback, useId, useState } from "react";
 import type { ApiInterest, InterestType } from "@/types/api";
 import { localApi } from "@/lib/local";
-import { INTEREST_TYPES, toggleInterest } from "@/utils/local";
+import { INTEREST_TYPES, interestLabel, toggleInterest } from "@/utils/local";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { LocalError, localButton, localInput } from "@/components/local/LocalStates";
 
-interface InterestPickerProps { selected: ApiInterest[]; onChange: (items: ApiInterest[]) => void; disabled?: boolean; }
+interface InterestPickerProps { selected: ApiInterest[]; onChange: (items: ApiInterest[]) => void; disabled?: boolean; single?: boolean; }
 
-export default function InterestPicker({ selected, onChange, disabled = false }: InterestPickerProps) {
+export default function InterestPicker({ selected, onChange, disabled = false, single = false }: InterestPickerProps) {
   const id = useId();
   const [q, setQ] = useState("");
   const [type, setType] = useState<InterestType | "">("");
@@ -18,15 +18,15 @@ export default function InterestPicker({ selected, onChange, disabled = false }:
   // 키 입력마다 이전 타이머·요청을 폐기하고 300ms 후 마지막 검색만 실행합니다.
   const results = useLocalResource(load, 300);
   function toggle(item: ApiInterest) {
-    const next = toggleInterest(selected, item);
+    const next = toggleInterest(selected, item, single);
     setError(next.error);
     onChange(next.items);
   }
   return <div className="space-y-4">
-    <p className="text-sm text-sub" aria-live="polite">선택한 취향 <strong className="text-mint">{selected.length} / 20개</strong></p>
+    <p className="text-sm text-sub" aria-live="polite">선택한 취향 <strong className="text-mint">{selected.length} / {single ? 1 : 20}개</strong>{single && " · 선택 사항"}</p>
     <ul aria-label="선택한 취향" className="flex flex-wrap gap-2">
-      {selected.map((item) => <li key={item.id}><button type="button" disabled={disabled} onClick={() => toggle(item)} aria-label={`${item.name} 선택 해제`} className={`${localButton} border-mint/40 text-mint`}>
-        {item.name}<span aria-hidden="true" className="ml-2">×</span>
+      {selected.map((item) => <li key={item.id}><button type="button" disabled={disabled} onClick={() => toggle(item)} aria-label={`${interestLabel(item)} 선택 해제`} className={`${localButton} border-mint/40 text-mint`}>
+        {interestLabel(item)}<span aria-hidden="true" className="ml-2">×</span>
       </button></li>)}
     </ul>
     {selected.length === 0 && <p className="text-sm text-dim">좋아하는 캐릭터나 스타일을 찾아 선택해 보세요.</p>}

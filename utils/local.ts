@@ -29,8 +29,13 @@ export function changeRegion(regions: ApiRegion[], current: string | null, level
   return selected && selected.parentCode === (parent?.code ?? null) ? selected.code : current;
 }
 
-export function toggleInterest(selected: ApiInterest[], item: ApiInterest): { items: ApiInterest[]; error: string | null } {
+export function interestLabel(item: Pick<ApiInterest, "name" | "type">): string {
+  return `${item.name} · ${INTEREST_TYPES.find((type) => type.value === item.type)?.label ?? item.type}`;
+}
+
+export function toggleInterest(selected: ApiInterest[], item: ApiInterest, single = false): { items: ApiInterest[]; error: string | null } {
   if (selected.some((value) => value.id === item.id)) return { items: selected.filter((value) => value.id !== item.id), error: null };
+  if (single) return { items: [item], error: null };
   if (selected.length >= 20) return { items: selected, error: "취향은 최대 20개까지 선택할 수 있어요." };
   return { items: [...selected, item], error: null };
 }

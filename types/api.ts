@@ -166,3 +166,47 @@ export interface ApiFandomRank {
   count: number;
   isSample: boolean;
 }
+
+export type TradeKind = "have" | "want" | "sell";
+export type TradeCondition = "new" | "like_new" | "used";
+export type TradeMethod = "direct" | "delivery" | "both";
+export type TradeStatus = "open" | "done" | "hidden";
+export type TradeProximity = "same_zone" | "same_district";
+
+export interface TradeInput {
+  kind: TradeKind;
+  itemName: string;
+  productId: number | null;
+  interestId: number | null;
+  condition: TradeCondition | null;
+  price: number | null;
+  tradeMethod: TradeMethod;
+  content: string;
+}
+
+export interface ApiTradePost {
+  id: number;
+  kind: TradeKind;
+  status: TradeStatus;
+  itemName: string;
+  condition: TradeCondition | null;
+  price: number | null;
+  tradeMethod: TradeMethod;
+  content: string;
+  product: ApiProduct | null;
+  interest: ApiInterest | null;
+  regionCode: string;
+  regionName: string;
+  isMine: boolean;
+  isSample: boolean;
+  createdAt: string;
+}
+
+export interface ApiTradeMatch {
+  want: ApiTradePost;
+  offer: ApiTradePost;
+  proximity: TradeProximity;
+  mutual: boolean;
+}
+
+export interface ApiWishMapItem { rank: number; product: ApiProduct; count: number; }
