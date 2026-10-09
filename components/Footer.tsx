@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="border-t border-line py-10 text-sm text-sub">
@@ -10,7 +12,7 @@ export default function Footer() {
           <ul className="flex gap-5">
             <li>이용약관</li>
             <li className="font-bold text-ink">개인정보처리방침</li>
-            <li>고객센터</li>
+            <li><Link href="/help" className="rounded hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">고객센터</Link></li>
           </ul>
         </div>
         <p className="mb-2 text-xs leading-relaxed text-dim">
