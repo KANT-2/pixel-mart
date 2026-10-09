@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AvatarShortcut from "@/components/avatar/AvatarShortcut";
+import NicknameEditor from "@/components/profile/NicknameEditor";
 
 export const metadata: Metadata = { title: "마이페이지 | PIXEL MART" };
 
@@ -10,6 +11,7 @@ export default function MyPage() {
     <p className="stage-kicker mb-3 font-pixel text-mint">MY PLAYER</p>
     <h1 className="mb-4 text-3xl font-extrabold">마이페이지</h1>
     <p className="mb-8 text-sub">프로필과 뱃지를 모아 볼 공간을 준비 중이에요.</p>
+    <NicknameEditor />
     <AvatarShortcut />
     <Link href="/local/settings" className="mb-6 flex items-center gap-4 pixel-panel p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">
       <span aria-hidden="true" className="grid size-16 shrink-0 place-items-center rounded-lg bg-panel-2 font-pixel text-mint">LOC</span>
