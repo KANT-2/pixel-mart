@@ -67,7 +67,7 @@ tests/test_<기능>.py 테스트
 ### 설계 원칙 (임의로 바꾸지 말 것 — `docs/backend/ARCHITECTURE.md`)
 - 로그인: FastAPI가 구글 OAuth 직접 처리 → `pm_session` httpOnly 쿠키(JWT). NextAuth 사용 안 함
 - 픽셀 아바타: 서버는 최종 PNG data URL만 저장(50KB 이하). 사진은 **AI 픽셀 아바타(`POST /api/avatars/ai`)에서 사용자 동의가 있을 때만** 받아 Gemini로 넘기고 **저장·로그 금지**, `GEMINI_API_KEY`는 `.env`에만 (`docs/AVATAR_POLICY.md`)
-- PIXEL LOCAL (`docs/PIXEL_LOCAL_POLICY.md`, `docs/DUKRYEOK_MAP_POLICY.md`): **GPS 좌표·주소 저장 금지**(GPS는 프론트에서 지역 찾기에만, 정책 4.1), 지역(시 › 구 › 동·생활권) 직접 선택, 집계는 **사용자 수 기준·5명 미만 숫자 비공개**, 집계 결과에서 **사용자 목록 반환 금지**(예외: `map-avatars`는 동의자 아바타 이미지만, 5명 이상·무작위 6개·id/닉네임 없음 — 정책 4.2), Mock 데이터는 `isSample`, 거래글에 연락처 금지
+- PIXEL LOCAL (`docs/PIXEL_LOCAL_POLICY.md`, `docs/DUKRYEOK_MAP_POLICY.md`): **GPS 좌표·주소 저장 금지**(GPS는 프론트에서 지역 찾기에만, 정책 4.1), 지역(시 › 구 › 동·생활권) 직접 선택, 집계는 **사용자 수 기준·5명 미만 숫자 비공개**, 집계 결과에서 **사용자 목록 반환 금지**(예외: `map-avatars`는 동의자 아바타 이미지만, 5명 이상·무작위 6개·id/닉네임 없음 — 정책 4.2), Mock 데이터는 `isSample`, 거래글에 연락처 금지, 거래글 작성자는 **`nicknamePublic` 동의자의 WANT 글에만** 닉네임·아바타 노출(정책 15-1)
 - 작품·캐릭터는 텍스트 태그만. 공식 이미지·로고, 실존 브랜드·캐릭터 이름의 **판매 상품** 생성 금지
 - 주문은 결제 없는 가상 주문. 리뷰는 배송 완료 상품만
 - 토너먼트 규칙(상품 3~7개, DP ≤ 100, 중복 금지, 카테고리 제한, Zone, 투표 제한)은 **서버에서 검사**

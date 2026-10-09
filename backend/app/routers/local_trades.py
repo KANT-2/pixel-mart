@@ -11,11 +11,13 @@ from app.models import Interest, Product, TradePost, User, Wishlist, WishSample
 from app.schemas.common import Page
 from app.schemas.local import (
     InterestOut,
+    TradeAuthorOut,
     TradeMatchOut,
     TradePostIn,
     TradePostOut,
     TradeStatusIn,
     WishMapOut,
+    WishWantsOut,
 )
 from app.schemas.product import ProductOut
 from app.services import local_stats
@@ -43,7 +45,20 @@ def post_out(post: TradePost, tree: RegionTree, viewer_id: int | None) -> TradeP
         is_mine=post.user_id == viewer_id,
         is_sample=post.is_sample,
         created_at=post.created_at,
+        author=author_out(post),
     )
+
+
+def author_out(post: TradePost) -> TradeAuthorOut | None:
+    """위시맵 닉네임 공개에 동의한 사람의 WANT 글만 작성자를 보여 준다 (샘플 글은 항상 익명)"""
+    if post.kind != "want" or post.is_sample or not post.author.nickname_public:
+        return None
+    return TradeAuthorOut(nickname=post.author.nickname, avatar_url=post.author.avatar_url)
+
+
+def like_pattern(text: str) -> str:
+    escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
 
 
 def subtree(tree: RegionTree, code: str) -> list[str]:
@@ -58,6 +73,10 @@ async def list_trades(
     kind: Literal["have", "want", "sell"] | None = None,
     product_id: Annotated[int | None, Query(alias="productId")] = None,
     interest_id: Annotated[int | None, Query(alias="interestId")] = None,
+    nickname: Annotated[
+        str | None,
+        Query(min_length=1, max_length=30, description="닉네임 일부 — 닉네임 공개에 동의한 사람의 WANT 글만"),
+    ] = None,
     page: Annotated[int, Query(ge=1)] = 1,
     size: Annotated[int, Query(ge=1, le=60)] = 12,
 ):
@@ -73,6 +92,11 @@ async def list_trades(
         filters.append(TradePost.product_id == product_id)
     if interest_id is not None:
         filters.append(TradePost.interest_id == interest_id)
+    if nickname is not None and nickname.strip():
+        author_ids = select(User.id).where(
+            User.nickname_public.is_(True), User.nickname.ilike(like_pattern(nickname.strip()), escape="\\")
+        )
+        filters += [TradePost.kind == "want", TradePost.is_sample.is_(False), TradePost.user_id.in_(author_ids)]
 
     total = await db.scalar(select(func.count()).select_from(TradePost).where(*filters)) or 0
     posts = await db.scalars(
@@ -231,3 +255,46 @@ async def wish_map(
         WishMapOut(rank=rank, product=ProductOut.from_model(products[pid]), count=n, is_sample=sample)
         for rank, (n, pid, sample) in enumerate(ranked, 1)
     ]
+
+
+@router.get(
+    "/wish-wants",
+    response_model=list[WishWantsOut],
+    summary="위시맵 지역 블록별 진행 중 WANT 글 수와 핀 이미지 (하위 지역 포함)",
+)
+async def wish_wants(
+    db: DbSession,
+    codes: Annotated[str, Query(max_length=600, description="쉼표로 구분한 지역 코드 (최대 40개)")],
+):
+    tree = await load_tree(db)
+    wanted = [c for c in dict.fromkeys(codes.split(",")) if c][:40]
+    if not wanted or any(c not in tree.by_code for c in wanted):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "존재하지 않는 지역입니다.")
+    posts = list(
+        await db.scalars(
+            select(TradePost)
+            .where(TradePost.status == "open", TradePost.kind == "want")
+            .order_by(TradePost.created_at.desc(), TradePost.id.desc())
+        )
+    )
+    out = []
+    for code in wanted:
+        inside = [p for p in posts if code in tree.ancestors(p.region_code)]
+        out.append(
+            WishWantsOut(
+                region_code=code,
+                count=len(inside),
+                images=[p.product.image_url if p.product else None for p in inside[:4]],
+                sample=bool(inside) and all(p.is_sample for p in inside),
+            )
+        )
+    return out
+
+
+@router.get("/trades/{post_id}", response_model=TradePostOut, summary="거래글 하나 (진행 중이거나 내 글)")
+async def get_trade(post_id: int, db: DbSession, viewer: OptionalUser):
+    post = await db.get(TradePost, post_id)
+    viewer_id = viewer.id if viewer else None
+    if post is None or (post.status != "open" and post.user_id != viewer_id):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "거래글을 찾을 수 없습니다.")
+    return post_out(post, await load_tree(db), viewer_id)
