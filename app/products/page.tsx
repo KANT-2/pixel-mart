@@ -36,9 +36,9 @@ export default function ProductsPage({ searchParams }: PageProps<"/products">) {
 async function ProductQueryBoundary({ searchParams }: ProductQueryProps) {
   const raw = await searchParams;
   const query = normalizeProductQuery(raw);
-  // API를 기다리기 전에 경계를 교체해 이전 조건의 상품이 남지 않게 합니다.
+  // 조건을 바꿔도 경계를 새로 만들지 않아, 새 결과가 준비될 때까지 지금 화면을 두었다가 한 번에 바꿉니다 (깜빡임 없음).
   return (
-    <Suspense key={productQueryParams(query).toString()} fallback={<ProductSkeleton count={PAGE_SIZE} />}>
+    <Suspense fallback={<ProductSkeleton count={PAGE_SIZE} />}>
       <ProductResults query={query} raw={raw} />
     </Suspense>
   );
@@ -67,7 +67,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
         </p>
       </header>
 
-      <ProductFilters key={canonical.toString()} query={currentQuery} categories={categoryResult.data} />
+      <ProductFilters key={canonical.toString()} query={currentQuery} />
       <CategoryTabs current={query.category} categories={categoryResult.data} query={currentQuery} />
       {(result.fallback || categoryResult.fallback) && <ProductFallbackNotice />}
       {result.fallback && query.sort === "popular" && (
@@ -80,7 +80,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
           <p className="mt-2 text-sm text-sub">가격 범위를 넓히거나 다른 카테고리의 아이템을 만나보세요.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             {categoryResult.data.slice(0, 3).map((item) => (
-              <Link key={item.slug} href={productHref({ sort: "id", page: 1, category: item.slug })} className="rounded-full border border-line px-4 py-2 text-sm text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
+              <Link key={item.slug} href={productHref({ sort: "id", page: 1, category: item.slug })} className="btn-pixel px-4 py-2 text-sm text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
                 {item.name} 둘러보기
               </Link>
             ))}

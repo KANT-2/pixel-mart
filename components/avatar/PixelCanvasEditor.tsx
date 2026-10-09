@@ -136,10 +136,24 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
 
   const resize = (cols: number, rows: number) => commit(createGrid(cols, rows), grid);
   const template = (rows: string[], palette: Record<string, string>) => commit(stamp(createGrid(grid.cols, grid.rows), rows, palette), grid);
-  const toolButton = "btn-pixel min-h-10 px-3 py-1.5 text-sm font-bold aria-pressed:border-lime aria-pressed:text-lime";
+  const toolButton = "btn-pixel toggle-outline min-h-10 px-3 py-1.5 text-sm font-bold";
+  const small = "btn-pixel h-8 px-2 text-xs font-bold disabled:opacity-40";
 
-  // 색은 캔버스 바로 오른쪽(좁으면 아래), 나머지 도구는 캔버스 아래 — 편집기 자체 폭(container query) 기준
+  // 위: 캔버스 크기·템플릿 한 줄 / 가운데: 캔버스 + 오른쪽 색(그 아래 되돌리기·다시·모두 지우기) / 아래: 그리기 도구
   return <div className="@container space-y-4">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-bold">
+      <label className="flex items-center gap-2">캔버스 크기
+        <select disabled={disabled} value={`${grid.cols}x${grid.rows}`} onChange={(event) => { const [c, r] = event.target.value.split("x").map(Number); resize(c, r); }}
+          className="pixel-input h-9 w-28 px-2 text-sm">
+          {SIZES.map((size) => <option key={size.label} value={`${size.cols}x${size.rows}`}>{size.label}</option>)}
+          {!SIZES.some((size) => size.cols === grid.cols && size.rows === grid.rows) && <option value={`${grid.cols}x${grid.rows}`}>{grid.cols} × {grid.rows} (AI)</option>}
+        </select>
+      </label>
+      <div className="flex items-center gap-2">템플릿
+        <button type="button" disabled={disabled} onClick={() => template(SLIME, SLIME_PAL)} className="btn-pixel h-9 px-3 text-xs font-bold">슬라임</button>
+        <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className="btn-pixel h-9 whitespace-nowrap px-3 text-xs font-bold">기본 캐릭터</button>
+      </div>
+    </div>
     <div className="flex flex-col items-start gap-3 @sm:flex-row">
       <div className="pixel-panel w-fit max-w-full min-w-0 shrink overflow-auto p-3">
         <canvas ref={canvas} role="img" aria-label={`픽셀 캔버스 ${grid.cols}×${grid.rows}${isEmpty(grid) ? " (비어 있음)" : ""}`}
@@ -156,33 +170,19 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
         <label className="mt-2 flex items-center gap-2 text-xs text-sub">직접 고르기
           <input type="color" value={color} onChange={(event) => setColor(event.target.value)} className="size-8 cursor-pointer rounded border-2 border-frame bg-transparent" />
         </label>
+        {/* 되돌리기·다시는 화살표만, 모두 지우기는 그 아래 작게 — 색표 칸 안에 */}
+        <div className="mt-3 flex gap-1.5">
+          <button type="button" disabled={disabled || !past.length} onClick={undo} aria-label="되돌리기 (Ctrl+Z)" title="되돌리기 (Ctrl+Z)" className={`${small} w-9 text-base`}>↶</button>
+          <button type="button" disabled={disabled || !future.length} onClick={redo} aria-label="다시 (Ctrl+Y)" title="다시 (Ctrl+Y)" className={`${small} w-9 text-base`}>↷</button>
+        </div>
+        <button type="button" disabled={disabled} onClick={() => commit(createGrid(grid.cols, grid.rows), grid)} className={`${small} mt-1.5 w-full`}>모두 지우기</button>
       </fieldset>
     </div>
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div role="toolbar" aria-label="그리기 도구" className="flex flex-wrap gap-2">
-        {([["pen", "✏️ 펜 (B)"], ["eraser", "🧽 지우개 (E)"], ["fill", "🪣 채우기 (G)"], ["picker", "💧 스포이드 (I)"]] as [Tool, string][]).map(([value, label]) =>
+        {([["pen", "펜 (B)"], ["eraser", "지우개 (E)"], ["fill", "채우기 (G)"], ["picker", "스포이드 (I)"]] as [Tool, string][]).map(([value, label]) =>
           <button key={value} type="button" aria-pressed={tool === value} disabled={disabled} onClick={() => setTool(value)} className={toolButton}>{label}</button>)}
-        <button type="button" aria-pressed={mirror} disabled={disabled} onClick={() => setMirror((value) => !value)} className={toolButton}>🪞 좌우 대칭 (M)</button>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <button type="button" disabled={disabled || !past.length} onClick={undo} className={toolButton}>↶ 되돌리기</button>
-        <button type="button" disabled={disabled || !future.length} onClick={redo} className={toolButton}>↷ 다시</button>
-        <button type="button" disabled={disabled} onClick={() => commit(createGrid(grid.cols, grid.rows), grid)} className={toolButton}>🗑 모두 지우기</button>
-      </div>
-      <div className="grid gap-3 @md:grid-cols-2">
-        <label className="text-sm font-bold">캔버스 크기
-          <select disabled={disabled} value={`${grid.cols}x${grid.rows}`} onChange={(event) => { const [c, r] = event.target.value.split("x").map(Number); resize(c, r); }}
-            className="pixel-input mt-2 block min-h-11 w-full px-3 text-sm">
-            {SIZES.map((size) => <option key={size.label} value={`${size.cols}x${size.rows}`}>{size.label}</option>)}
-            {!SIZES.some((size) => size.cols === grid.cols && size.rows === grid.rows) && <option value={`${grid.cols}x${grid.rows}`}>{grid.cols} × {grid.rows} (AI)</option>}
-          </select>
-        </label>
-        <div className="text-sm font-bold">템플릿
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button type="button" disabled={disabled} onClick={() => template(SLIME, SLIME_PAL)} className={toolButton}>슬라임</button>
-            <button type="button" disabled={disabled} onClick={() => template(PLAYER, PLAYER_PAL)} className={`${toolButton} whitespace-nowrap`}>기본 캐릭터</button>
-          </div>
-        </div>
+        <button type="button" aria-pressed={mirror} disabled={disabled} onClick={() => setMirror((value) => !value)} className={toolButton}>좌우 대칭 (M)</button>
       </div>
       <p className="text-xs leading-relaxed text-dim">크기를 바꾸면 새 캔버스로 시작해요 (되돌리기 가능). 단축키: B 펜 · E 지우개 · G 채우기 · I 스포이드 · M 대칭 · Ctrl+Z 되돌리기</p>
     </div>

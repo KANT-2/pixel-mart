@@ -30,14 +30,15 @@ export default function CategoryTabs({ current, categories, query }: CategoryTab
               <Link
                 href={query ? productHref(changeProductQuery(query, { category: tab.slug })) : tab.slug ? `/products?category=${tab.slug}` : "/products"}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                scroll={false}
+                className={`btn-pixel toggle-outline flex items-center gap-1.5 whitespace-nowrap px-4 py-2 text-sm font-semibold ${
                   active
-                    ? "border-lime bg-lime text-lime-ink"
-                    : "border-line bg-panel text-sub hover:border-violet/40 hover:text-ink"
+                    ? ""
+                    : "text-sub hover:text-ink"
                 }`}
               >
                 {tab.name}
-                <span className={active ? "text-lime-ink/70" : "text-dim"}>{tab.count}</span>
+                <span className={active ? "text-mint" : "text-dim"}>{tab.count}</span>
               </Link>
             </li>
           );

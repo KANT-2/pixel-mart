@@ -63,3 +63,18 @@ export async function aiImageToGrid(image: string, longCells = 48): Promise<Pixe
   const cleaned = despeckle(quantizeColors(grid.pixels, 16), grid.cols, grid.rows);
   return { ...grid, pixels: cleaned };
 }
+
+/** AI 없이 사진을 그대로 픽셀 격자로 — 브라우저 안에서만 처리하고 아무 데도 보내지 않는다 (AI가 못 그렸을 때 대안) */
+export async function photoToGrid(photo: string, longCells = 48): Promise<PixelGridData> {
+  const element = await loadImage(photo);
+  const canvas = document.createElement("canvas");
+  canvas.width = element.naturalWidth;
+  canvas.height = element.naturalHeight;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("이 브라우저에서는 이미지를 처리할 수 없어요.");
+  context.drawImage(element, 0, 0);
+  const data = context.getImageData(0, 0, canvas.width, canvas.height);
+  const grid = snapToGrid(data.data, canvas.width, { x: 0, y: 0, width: canvas.width, height: canvas.height }, longCells);
+  const cleaned = despeckle(quantizeColors(grid.pixels, 16), grid.cols, grid.rows);
+  return { ...grid, pixels: cleaned };
+}

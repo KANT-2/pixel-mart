@@ -18,7 +18,7 @@ export default function WorldMapTeaser() {
       <h2 className="text-2xl font-extrabold md:text-3xl">우리 동네에도<br />같은 덕후가 있을까?</h2>
       <p className="mt-3 text-sm leading-relaxed text-sub">픽셀 지도에서 동네를 탐험하고, 같은 취향 이웃의 아바타와 교환글을 만나 보세요.</p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <Link href="/local" className="btn-lime inline-flex min-h-11 items-center px-5 py-2 text-sm font-extrabold">🗺 월드맵 열기</Link>
+        <Link href="/local" className="btn-lime inline-flex min-h-11 items-center px-5 py-2 text-sm font-extrabold">월드맵 열기</Link>
         <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 py-2 text-sm font-bold">동네 교환글</Link>
       </div>
     </div>

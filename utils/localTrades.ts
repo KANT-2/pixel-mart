@@ -2,7 +2,7 @@ import type { ApiRegion, TradeCondition, TradeInput, TradeKind, TradeMethod, Tra
 import { regionPath } from "@/utils/local";
 
 export const TRADE_KINDS: { value: TradeKind; label: string }[] = [
-  { value: "have", label: "가진 물건 HAVE" }, { value: "want", label: "구해요 WANT" }, { value: "sell", label: "판매 SELL" },
+  { value: "have", label: "가진 물건 HAVE" }, { value: "want", label: "위시 WISH" }, { value: "sell", label: "판매 SELL" },
 ];
 export const TRADE_CONDITIONS: { value: TradeCondition; label: string }[] = [
   { value: "new", label: "새 상품" }, { value: "like_new", label: "거의 새 상품" }, { value: "used", label: "사용감 있음" },
@@ -50,17 +50,20 @@ export function validateTrade(draft: TradeDraft) {
   return { values, errors, valid: Object.keys(errors).length === 0 };
 }
 
-export interface TradeQuery { region: string | null; hasRegion: boolean; kind?: TradeKind; productId?: number; interestId?: number; page: number; }
+/** q: 사거나 팔고 싶은 물건 이름 (물건 이름·연결 상품·설명에서 찾음) */
+export interface TradeQuery { region: string | null; hasRegion: boolean; kind?: TradeKind; q?: string; nickname?: string; productId?: number; interestId?: number; page: number; }
 function positive(value: string | null): number | undefined { return value && /^[1-9]\d*$/.test(value) && Number.isSafeInteger(Number(value)) ? Number(value) : undefined; }
 export function parseTradeQuery(params: { get(key: string): string | null }): TradeQuery {
   const region = params.get("region"), kind = params.get("kind");
   return { region: region && region.length <= 12 ? region : null, hasRegion: region !== null,
-    kind: TRADE_KINDS.find((item) => item.value === kind)?.value, productId: positive(params.get("productId")), interestId: positive(params.get("interestId")), page: positive(params.get("page")) ?? 1 };
+    kind: TRADE_KINDS.find((item) => item.value === kind)?.value, q: params.get("q")?.trim().slice(0, 40) || undefined, nickname: params.get("nickname")?.trim().slice(0, 30) || undefined, productId: positive(params.get("productId")), interestId: positive(params.get("interestId")), page: positive(params.get("page")) ?? 1 };
 }
 export function tradeQueryParams(query: TradeQuery) {
   const params = new URLSearchParams();
   if (query.hasRegion) params.set("region", query.region ?? "");
   if (query.kind) params.set("kind", query.kind);
+  if (query.q) params.set("q", query.q);
+  if (query.nickname) params.set("nickname", query.nickname);
   if (query.productId) params.set("productId", String(query.productId));
   if (query.interestId) params.set("interestId", String(query.interestId));
   if (query.page > 1) params.set("page", String(query.page));

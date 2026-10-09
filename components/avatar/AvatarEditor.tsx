@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { api, ApiError } from "@/lib/api";
-import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
+import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
 import { assertAvatarSize, getOutputSize, getPngByteSize } from "@/utils/pixelate";
 import { isEmpty, type PixelGridData } from "@/utils/pixelCanvas";
 import type { ApiAiAvatarStatus, ApiUser } from "@/types/api";
@@ -79,13 +79,13 @@ function AvatarForm({ user }: AvatarFormProps) {
     } finally { busy.current = false; setSaving(false); }
   }
 
-  const tab = "btn-pixel min-h-11 px-4 py-2 text-sm font-bold aria-selected:border-lime aria-selected:text-lime";
+  const tab = "btn-pixel toggle-outline min-h-11 px-4 py-2 text-sm font-bold";
   return <div className="space-y-6">
     <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
       <div>
         <div role="tablist" aria-label="아바타 만드는 방법" className="mb-4 flex flex-wrap gap-2">
-          <button type="button" role="tab" aria-selected={mode === "ai"} onClick={() => setMode("ai")} className={tab}>🤖 AI로 만들기</button>
-          <button type="button" role="tab" aria-selected={mode === "canvas"} onClick={() => setMode("canvas")} className={tab}>🎨 픽셀 캔버스</button>
+          <button type="button" role="tab" aria-selected={mode === "ai"} onClick={() => setMode("ai")} className={tab}>AI로 만들기</button>
+          <button type="button" role="tab" aria-selected={mode === "canvas"} onClick={() => setMode("canvas")} className={tab}>픽셀 캔버스</button>
         </div>
         {mode === "ai" ? <AiPanel disabled={saving || pending} onSave={(grid) => void save(grid, true)}
           onEdit={(grid) => { setCanvasSeed((seed) => ({ key: seed.key + 1, grid, large: true })); setMode("canvas"); }} />
@@ -148,13 +148,13 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
     try { setPhoto(await preparePhoto(file, status?.maxPhotoSide ?? DEFAULT_PHOTO_SIDE)); } catch (cause) { setError(cause instanceof Error ? cause.message : "사진을 읽지 못했어요."); }
   }
 
-  async function generate() {
-    if (!photo || !consent || working || unavailable) return;
+  // AI가 그리거나(동의 필요), 사진을 브라우저에서 바로 픽셀로 바꾼다(전송 없음)
+  async function run(kind: "ai" | "local") {
+    if (!photo || working || (kind === "ai" && (!consent || unavailable))) return;
     const id = ++request.current;
     setWorking(true); setError(null); setResult(null);
     try {
-      const image = await requestAiAvatar(photo);
-      const grid = await aiImageToGrid(image);
+      const grid = kind === "ai" ? await aiImageToGrid(await requestAiAvatar(photo)) : await photoToGrid(photo);
       if (id !== request.current) return;
       const small = document.createElement("canvas");
       small.width = grid.cols; small.height = grid.rows;
@@ -177,8 +177,12 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
         <span className="text-xs leading-relaxed text-sub"><strong className="text-ink">사진이 {providerName}로 전송되는 데 동의해요.</strong> 사진과 AI 원본 이미지는 PIXEL MART에 저장하지 않으며, 마음에 드는 결과를 저장할 때 최종 픽셀 이미지만 남아요. 다른 사람의 사진은 그 사람의 허락을 받은 경우에만 사용해 주세요.</span>
       </label>
       {unavailable && <p role="status" className="text-sm text-pink">지금은 AI 만들기를 쓸 수 없어요. 픽셀 캔버스로 직접 그려 보세요.</p>}
-      <button type="button" onClick={() => void generate()} disabled={disabled || working || !photo || !consent || unavailable}
-        className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{working ? "AI가 그리는 중… (최대 1분)" : "🤖 AI 픽셀 아바타 만들기"}</button>
+      <button type="button" onClick={() => void run("ai")} disabled={disabled || working || !photo || !consent || unavailable}
+        className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{working ? "만드는 중… (최대 1분)" : "AI 픽셀 아바타 만들기"}</button>
+      {/* AI 없이 바로 — 사진은 브라우저 밖으로 나가지 않는다 */}
+      <button type="button" onClick={() => void run("local")} disabled={disabled || working || !photo}
+        className="btn-pixel ml-2 min-h-11 px-4 py-2 text-sm font-bold disabled:opacity-50">사진을 바로 픽셀로 바꾸기</button>
+      <p className="text-xs text-dim">&lsquo;바로 픽셀로&rsquo;는 AI 없이 이 기기에서만 바꿔요. 사진을 어디에도 보내지 않아 동의가 필요 없어요.</p>
       {error && <p role="alert" className="text-sm text-pink">{error}</p>}
     </div>
     <div className="grid gap-4 sm:grid-cols-2">
@@ -198,8 +202,8 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
         </div>
         {result && <div className="mt-3 flex flex-wrap gap-2">
           <button type="button" disabled={disabled} onClick={() => onSave(result.grid)} className="btn-lime min-h-10 px-4 py-1.5 text-sm font-bold">이대로 저장</button>
-          <button type="button" disabled={disabled} onClick={() => onEdit(result.grid)} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">🎨 캔버스에서 다듬기</button>
-          <button type="button" disabled={disabled || working} onClick={() => void generate()} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">다시 만들기</button>
+          <button type="button" disabled={disabled} onClick={() => onEdit(result.grid)} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">캔버스에서 다듬기</button>
+          <button type="button" disabled={disabled || working} onClick={() => void run("ai")} className="btn-pixel min-h-10 px-4 py-1.5 text-sm font-bold">다시 만들기</button>
         </div>}
       </figure>
     </div>

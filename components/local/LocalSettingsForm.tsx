@@ -108,7 +108,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
       </label>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={nicknamePublic} onChange={(event) => setNicknamePublic(event.target.checked)} aria-describedby="nickname-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
-        <span><span className="block font-bold">위시맵에 닉네임 공개</span><span id="nickname-purpose" className="mt-2 block text-sm leading-relaxed text-sub">내 WANT(구해요) 글에 닉네임과 픽셀 아바타가 보이고, 이웃이 닉네임으로 찾아 선물할 수 있어요. 끄면 &lsquo;이웃 플레이어&rsquo;로 보이고 검색되지 않아요. 주소·받는 이름은 어느 쪽이든 공개되지 않아요.</span></span>
+        <span><span className="block font-bold">닉네임 공개</span><span id="nickname-purpose" className="mt-2 block text-sm leading-relaxed text-sub">내 WISH·HAVE·SELL 글에 닉네임과 픽셀 아바타가 보이고, 위시맵·거래·교환에서 이웃이 닉네임으로 찾을 수 있어요. 끄면 &lsquo;이웃 플레이어&rsquo;로 보이고 검색되지 않아요. 주소·받는 이름은 어느 쪽이든 공개되지 않아요.</span></span>
       </label>
       <p className="rounded-lg bg-panel-2 p-4 text-xs leading-relaxed text-sub">개인의 구매 행동을 그대로 노출하지 않고, 필요한 경우 익명 집계된 형태로만 서비스에 활용합니다. 구매금액·장바구니·정확한 위치·검색 기록은 공개하지 않아요. 네 설정은 처음에는 꺼져 있고 언제든 변경할 수 있어요.</p>
     </fieldset>

@@ -212,6 +212,8 @@ export interface ApiTradePost {
   regionName: string;
   isMine: boolean;
   isSample: boolean;
+  /** 시연용 데모 이웃의 글 (실제 계정이라 선물 가능) */
+  isDemo?: boolean;
   createdAt: string;
   /** 위시맵 닉네임 공개에 동의한 사람의 WANT 글에만 (그 외 null) */
   author?: { nickname: string; avatarUrl: string | null } | null;

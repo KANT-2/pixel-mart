@@ -105,17 +105,20 @@ export default function FaqBrowser({ items, fallback }: FaqBrowserProps) {
   return (
     <div ref={container}>
       {fallback && <p role="status" className="mb-6 pixel-panel p-4 text-sm leading-relaxed text-sub">최신 FAQ를 불러오지 못해 기본 안내를 보여드리고 있어요. 잠시 후 새로고침해 주세요.</p>}
-      <form role="search" aria-label="FAQ 검색" onSubmit={(event) => event.preventDefault()} className="mb-5 pixel-panel p-4 sm:p-5">
+      <form role="search" aria-label="FAQ 검색" onSubmit={(event) => { event.preventDefault(); input.current?.blur(); }} className="mb-5 pixel-panel p-4 sm:p-5">
         <label htmlFor="faq-search" className="mb-2 block text-sm font-semibold text-sub">질문·답변 검색</label>
-        <div className="relative">
-          <input ref={input} id="faq-search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 pixel-input py-3 pr-12 pl-3 text-sm placeholder:text-dim [&::-webkit-search-cancel-button]:appearance-none" />
+        <div className="flex gap-1.5">
+        <div className="relative min-w-0 flex-1">
+          <input ref={input} id="faq-search" enterKeyHint="search" type="search" value={search} onChange={(event) => changeSearch(event.target.value)} placeholder="예: 배송, 키보드, 주문 취소" className="min-h-11 w-full min-w-0 pixel-input py-3 pr-12 pl-3 text-sm placeholder:text-dim [&::-webkit-search-cancel-button]:appearance-none" />
           {search && <button type="button" aria-label="검색어 지우기" onClick={() => { changeSearch(""); input.current?.focus(); }} className="absolute inset-y-0 right-0 w-11 rounded-lg text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet"><span aria-hidden="true">×</span></button>}
+        </div>
+        <button type="submit" className="btn-lime min-h-11 shrink-0 px-4 text-sm font-bold">찾기</button>
         </div>
       </form>
 
       <nav aria-label="FAQ 분류" className="-mx-4 overflow-x-auto px-4 pb-2 [scrollbar-width:thin]">
         <div className="flex w-max gap-2">
-          {tabs.map((tab) => <button key={tab.category ?? "all"} type="button" aria-pressed={category === tab.category} onClick={() => selectCategory(tab.category)} className={`flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet ${category === tab.category ? "border-violet bg-violet/15 text-ink" : "border-line bg-panel text-sub hover:text-ink"}`}>
+          {tabs.map((tab) => <button key={tab.category ?? "all"} type="button" aria-pressed={category === tab.category} onClick={() => selectCategory(tab.category)} className="btn-pixel flex min-h-10 items-center gap-2 px-4 text-sm font-semibold whitespace-nowrap text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet">
             {tab.label}<span className="text-dim">{tab.count}</span>
           </button>)}
         </div>

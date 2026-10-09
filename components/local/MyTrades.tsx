@@ -56,12 +56,12 @@ function AccountTrades({ created }: AccountTradesProps) {
         {result.data.posts.length ? <ul aria-label="내 거래글" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.data.posts.map((post) => <li key={post.id}><TradeCard post={post} actions={post.isMine ? <TradeStatusButtons key={`${post.id}:${post.status}`} status={post.status} disabled={pending !== null || auth.pending} pending={pending === post.id} onConfirm={(status) => update(post.id, status)} /> : null} /></li>)}</ul>
           : <div className="pixel-panel p-8 text-center"><p>아직 작성한 글이 없어요.</p><Link href="/local/trades/new" className={`${localButton} mt-4`}>첫 글 쓰기</Link></div>}
       </section>
-      <section aria-labelledby="trade-matches-title"><h2 id="trade-matches-title" className="mb-2 text-xl font-bold">⇄ 교환 제안 · 내 WANT와 맞는 이웃 아이템</h2><p className="mb-5 text-sm text-sub">같은 구·생활권에서 조건이 맞는 물건을 찾아요. 연락 수단과 작성자 정보는 제공하지 않아요.</p>
-        {!result.data.posts.some((post) => post.kind === "want" && post.status === "open") ? <div className="pixel-panel p-8 text-center"><p>구하는 물건을 먼저 알려 주세요.</p><Link href="/local/trades/new?kind=want" className={`${localButton} mt-4`}>WANT 글쓰기</Link></div>
+      <section aria-labelledby="trade-matches-title"><h2 id="trade-matches-title" className="mb-2 text-xl font-bold">⇄ 교환 제안 · 내 WISH와 맞는 이웃 아이템</h2><p className="mb-5 text-sm text-sub">같은 구·생활권에서 조건이 맞는 물건을 찾아요. 연락 수단과 작성자 정보는 제공하지 않아요.</p>
+        {!result.data.posts.some((post) => post.kind === "want" && post.status === "open") ? <div className="pixel-panel p-8 text-center"><p>구하는 물건을 먼저 알려 주세요.</p><Link href="/local/trades/new?kind=want" className={`${localButton} mt-4`}>WISH 글쓰기</Link></div>
           : result.data.matches.length ? <ul aria-label="이웃 매칭" className="grid gap-5 xl:grid-cols-2">{result.data.matches.map((match) => <li key={`${match.want.id}:${match.offer.id}`} className="min-w-0">
             <TradeWindow match={match} me={{ nickname: auth.user?.nickname ?? "나", avatarUrl: auth.user?.avatarUrl ?? null }} />
           </li>)}</ul>
-            : <div className="pixel-panel p-8 text-center"><p>아직 맞는 물건을 찾지 못했어요.</p><p className="mt-2 text-sm text-sub">게시판을 둘러보거나 다른 WANT를 남겨 보세요.</p><Link href="/local/trades" className={`${localButton} mt-4`}>거래·교환 둘러보기</Link></div>}
+            : <div className="pixel-panel p-8 text-center"><p>아직 맞는 물건을 찾지 못했어요.</p><p className="mt-2 text-sm text-sub">게시판을 둘러보거나 다른 WISH를 남겨 보세요.</p><Link href="/local/trades" className={`${localButton} mt-4`}>거래·교환 둘러보기</Link></div>}
       </section>
     </>}
   </div>;

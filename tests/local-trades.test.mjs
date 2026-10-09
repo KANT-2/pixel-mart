@@ -21,11 +21,12 @@ const { createLocalResource } = await import(await moduleUrl("../lib/localResour
 const { default: TradeCard } = await import(await moduleUrl("../components/local/TradeCard.tsx", {
   "@/utils/local": localUrl, "@/utils/localTrades": rulesUrl,
   "@/utils/formatDate": await moduleUrl("../utils/formatDate.ts"), "@/utils/formatPrice": await moduleUrl("../utils/formatPrice.ts"), "@/utils/gameItem": await moduleUrl("../utils/gameItem.ts"), "@/utils/gift": await moduleUrl("../utils/gift.ts"),
+  "@/components/PixelIcon": await moduleUrl("../components/PixelIcon.tsx", { "react/jsx-runtime": import.meta.resolve("react/jsx-runtime") }),
   "react/jsx-runtime": import.meta.resolve("react/jsx-runtime"), "next/link": import.meta.resolve("next/link.js"),
 }));
 const draft = { kind: "have", itemName: "  QA 키링  ", condition: "new", price: "", tradeMethod: "direct", content: "첫 줄\n둘째 줄", productId: null, interestId: null };
 
-test("HAVE·SELL 상태 필수, WANT 선택 가능, trim·길이·방식 검증", () => {
+test("HAVE·SELL 상태 필수, WISH 선택 가능, trim·길이·방식 검증", () => {
   for (const kind of ["have", "sell"]) assert.ok(validateTrade({ ...draft, kind, condition: "" }).errors.condition);
   assert.equal(validateTrade({ ...draft, kind: "want", condition: "" }).valid, true);
   const result = validateTrade(draft);
@@ -69,8 +70,9 @@ test("필터 URL은 잘못된 종류·id·페이지를 정리하고 변경 시 �
   assert.equal(tradeHref(query), "/local/trades?region=41135&kind=have&productId=3&interestId=11&page=2");
   const next = changeTradeQuery(query, { kind: "want" }); assert.equal(next.page, 1); assert.equal(next.productId, 3); assert.equal(next.region, "41135");
   assert.equal(tradeQueryParams(next).has("page"), false);
-  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, productId: undefined, interestId: undefined, page: 1 });
+  assert.deepEqual(parseTradeQuery(new URLSearchParams("region=&kind=no&productId=-1&interestId=1.2&page=0")), { region: null, hasRegion: true, kind: undefined, q: undefined, nickname: undefined, productId: undefined, interestId: undefined, page: 1 });
   assert.equal(parseTradeQuery(new URLSearchParams()).hasRegion, false);
+  assert.equal(tradeHref(parseTradeQuery(new URLSearchParams("q=%20%ED%82%A4%EB%A7%81%20&kind=sell"))), "/local/trades?kind=sell&q=%ED%82%A4%EB%A7%81");
   assert.equal(parseTradeQuery(new URLSearchParams("page=999999999999999999")).page, 1);
 });
 
@@ -85,13 +87,13 @@ test("매칭 배지는 서버 proximity·mutual을 사용하고 게시판은 확
 test("거래 카드는 텍스트로만 렌더링하고 작성자·계정·지역명·연락처를 노출하지 않음", () => {
   const post = { id: 1, kind: "have", status: "open", itemName: "<b>키링</b>", condition: "new", price: 0, tradeMethod: "direct", content: "<script>alert(1)</script>\n둘째 줄", product: null, interest: null, regionCode: "privateCode", regionName: "PRIVATE_LOCATION", nickname: "PRIVATE_AUTHOR", email: "PRIVATE_ACCOUNT", isMine: false, isSample: true, createdAt: "2026-10-09T00:00:00Z" };
   const html = renderToStaticMarkup(createElement(TradeCard, { post, proximity: "same_zone" }));
-  assert.match(html, /&lt;b&gt;키링/); assert.match(html, /&lt;script&gt;/); assert.match(html, /whitespace-pre-line/); assert.match(html, /샘플 데이터/); assert.match(html, /같은 생활권/); assert.match(html, /0원/);
+  assert.match(html, /&lt;b&gt;키링/); assert.match(html, /&lt;script&gt;/); assert.match(html, /whitespace-pre-line/); assert.doesNotMatch(html, /샘플|데모/); assert.match(html, /같은 생활권/); assert.match(html, /0원/);
   assert.doesNotMatch(html, /PRIVATE_|privateCode|<script>|<b>/);
   const redacted = renderToStaticMarkup(createElement(TradeCard, { post: { ...post, content: "010-1234-5678", itemName: "카톡 id pixel" } }));
   assert.doesNotMatch(redacted, /010-1234-5678|카톡 id pixel/);
 });
 
-test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·상품 검색 최대 6개", async (t) => {
+test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·상품 검색 24개씩(더 보기)", async (t) => {
   const previous = globalThis.fetch; t.after(() => { globalThis.fetch = previous; });
   const calls = []; globalThis.fetch = async (url, init) => { calls.push({ url, ...init }); return new Response("{}"); };
   await localApi.trades(parseTradeQuery(new URLSearchParams("region=41135&kind=have&productId=3&interestId=11&page=2")));
@@ -100,7 +102,7 @@ test("거래 API 계약: 배열·Page 구분, 전체 입력 POST·상태 PATCH·
   assert.equal(calls[1].url, "/api/local/trades/mine"); assert.equal(calls[2].method, "POST"); assert.equal(JSON.parse(calls[2].body).regionCode, undefined);
   assert.equal(calls[3].method, "PATCH"); assert.deepEqual(JSON.parse(calls[3].body), { status: "hidden" });
   assert.equal(calls[4].url, "/api/local/trades/matches"); assert.match(calls[5].url, /wish-map\?region=41135&limit=10/);
-  assert.equal(new URL(calls[6].url, "http://local").searchParams.get("size"), "6");
+  assert.equal(new URL(calls[6].url, "http://local").searchParams.get("size"), "24");
   for (const call of calls) { assert.equal(call.credentials, "same-origin"); assert.equal(call.cache, "no-store"); }
 });
 
