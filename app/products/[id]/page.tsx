@@ -42,7 +42,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   if (!product) notFound();
 
   const category = { slug: product.categorySlug, name: product.category };
-  const relatedResult = await getProducts(product.categorySlug, 1, 5);
+  const relatedResult = await getProducts({ category: product.categorySlug, size: 5 });
   const related = relatedResult.data.items.filter((item) => item.id !== product.id).slice(0, 4);
 
   return (

@@ -1,61 +1,99 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import CategoryTabs from "@/components/CategoryTabs";
 import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
+import ProductFilters from "@/components/ProductFilters";
 import { getCategories, getProducts, PAGE_SIZE } from "@/lib/products";
-import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
+import { ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
+import { normalizeProductQuery, productHref, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
-export const metadata: Metadata = {
-  title: "전체 상품 | PIXEL MART",
-};
+export const metadata: Metadata = { title: "전체 상품 | PIXEL MART" };
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
+type QueryInput = Record<string, string | string[] | undefined>;
 
-// Next 16 + Cache Components: searchParams(?category=&page=)는 요청할 때 정해지는 값이라
-// 읽는 부분을 <Suspense> 안으로 내려야 나머지 화면을 미리 만들어 둘 수 있습니다.
+interface ProductQueryProps {
+  searchParams: Promise<QueryInput>;
+}
+
+interface ProductResultsProps {
+  query: ProductQuery;
+  raw: QueryInput;
+}
+
 export default function ProductsPage({ searchParams }: PageProps<"/products">) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 md:px-8">
       <Suspense fallback={<ProductSkeleton count={PAGE_SIZE} />}>
-        <ProductList searchParams={searchParams} />
+        <ProductQueryBoundary searchParams={searchParams} />
       </Suspense>
     </div>
   );
 }
 
-async function ProductList({ searchParams }: { searchParams: SearchParams }) {
-  const { category: categoryParam, page: pageParam } = await searchParams;
+async function ProductQueryBoundary({ searchParams }: ProductQueryProps) {
+  const raw = await searchParams;
+  const query = normalizeProductQuery(raw);
+  // API를 기다리기 전에 경계를 교체해 이전 조건의 상품이 남지 않게 합니다.
+  return (
+    <Suspense key={productQueryParams(query).toString()} fallback={<ProductSkeleton count={PAGE_SIZE} />}>
+      <ProductResults query={query} raw={raw} />
+    </Suspense>
+  );
+}
 
-  // 없는 카테고리 slug면 전체 상품을 보여 줌
+async function ProductResults({ query: requestedQuery, raw }: ProductResultsProps) {
   const categoryResult = await getCategories();
-  const category = categoryResult.data.find((item) => item.slug === categoryParam);
-
-  // page가 숫자가 아니거나 범위를 벗어나면 1 ~ 마지막 페이지 안으로 맞춤
-  const result = await getProducts(category?.slug, typeof pageParam === "string" ? Number(pageParam) : 1);
-  const { items: pageItems, page: currentPage, totalPages, total } = result.data;
+  const query = normalizeProductQuery(productQueryParams(requestedQuery), categoryResult.data.map((item) => item.slug));
+  const category = categoryResult.data.find((item) => item.slug === query.category);
+  const result = await getProducts(query);
+  const { items, page, totalPages, total } = result.data;
+  const currentQuery = { ...query, page };
+  const canonical = productQueryParams(currentQuery);
+  // 공유된 잘못된 URL도 화면과 같은 조건으로 정리합니다. 키 순서는 비교하지 않습니다.
+  if (Object.keys(raw).length !== canonical.size || Object.entries(raw).some(([key, value]) => value !== canonical.get(key))) {
+    redirect(productHref(currentQuery));
+  }
 
   return (
     <>
       <header className="mb-6">
         <p className="mb-2 font-pixel text-xs tracking-widest text-mint">{category ? category.slug.toUpperCase() : "ALL ITEMS"}</p>
         <h1 className="text-3xl font-extrabold">{category ? category.name : "전체 상품"}</h1>
-        <p className="mt-2 text-sm text-sub">
-          {category ? `${category.description} · ` : ""}총 {total}개 · {currentPage} / {totalPages} 페이지
+        <p className="mt-2 break-words text-sm text-sub" aria-live="polite">
+          {query.q ? `‘${query.q}’ 검색 결과 ${total}개` : `총 ${total}개`} · {page} / {totalPages} 페이지
         </p>
       </header>
 
-      <CategoryTabs current={category?.slug} categories={categoryResult.data} />
+      <ProductFilters key={canonical.toString()} query={currentQuery} categories={categoryResult.data} />
+      <CategoryTabs current={query.category} categories={categoryResult.data} query={currentQuery} />
       {(result.fallback || categoryResult.fallback) && <ProductFallbackNotice />}
-      {pageItems.length === 0 && <EmptyProducts />}
+      {result.fallback && query.sort === "popular" && (
+        <p role="status" className="mb-6 text-sm text-sub">인기순 정보를 불러오지 못해 기본순으로 표시합니다.</p>
+      )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {pageItems.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+      {items.length === 0 ? (
+        <section className="rounded-2xl border border-line bg-panel px-5 py-12 text-center">
+          <h2 className="text-xl font-bold">다른 키워드로 찾아보세요</h2>
+          <p className="mt-2 text-sm text-sub">가격 범위를 넓히거나 다른 카테고리의 아이템을 만나보세요.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {categoryResult.data.slice(0, 3).map((item) => (
+              <Link key={item.slug} href={productHref({ sort: "id", page: 1, category: item.slug })} className="rounded-full border border-line px-4 py-2 text-sm text-sub hover:text-ink focus-visible:outline-2 focus-visible:outline-violet">
+                {item.name} 둘러보기
+              </Link>
+            ))}
+          </div>
+          <Link href="/products" className="mt-6 inline-block rounded-lg bg-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">필터 초기화</Link>
+        </section>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {items.map((product) => <ProductCard key={product.id} product={product} />)}
+        </div>
+      )}
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} category={category?.slug} />
+      <Pagination currentPage={page} totalPages={totalPages} query={canonical.toString()} />
     </>
   );
 }

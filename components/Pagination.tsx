@@ -5,6 +5,7 @@ interface PaginationProps {
   totalPages: number;
   category?: string; // 카테고리 slug — 페이지를 넘겨도 필터 유지
   basePath?: string;
+  query?: string;
 }
 
 // 1 … 4 5 6 … 15 처럼 처음·끝·현재 주변만 보여 줌
@@ -20,18 +21,19 @@ function getPageNumbers(current: number, total: number): (number | "…")[] {
   return pages;
 }
 
-export default function Pagination({ currentPage, totalPages, category, basePath = "/products" }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, category, basePath = "/products", query }: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const pageHref = (page: number) => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(query);
     if (category) params.set("category", category);
+    params.delete("page");
     if (page > 1) params.set("page", String(page));
-    const query = params.toString();
-    return query ? `${basePath}?${query}` : basePath;
+    const search = params.toString();
+    return search ? `${basePath}?${search}` : basePath;
   };
 
-  const baseClass = "grid size-10 place-items-center rounded-lg text-sm font-semibold";
+  const baseClass = "grid h-10 w-8 place-items-center rounded-lg text-sm font-semibold sm:w-10";
 
   return (
     <nav aria-label="페이지 이동" className="mt-12 flex items-center justify-center gap-1">
