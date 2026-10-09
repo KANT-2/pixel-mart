@@ -3,7 +3,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { api, ApiError } from "@/lib/api";
 import type { ApiUser } from "@/types/api";
-import { useCart } from "@/components/CartProvider";
 
 interface AuthContextValue {
   user: ApiUser | null;
@@ -25,7 +24,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const sequence = useRef(0);
   const mutating = useRef(false);
-  const { resetCart } = useCart();
 
   const updateUser = useCallback((nextUser: ApiUser) => {
     // 로그아웃 중이거나 다른 사용자의 오래된 저장 응답이면 반영하지 않습니다.
@@ -46,7 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (signal?.aborted || request !== sequence.current) return;
       if (cause instanceof ApiError && cause.status === 401) {
         setUser(null);
-        resetCart();
         setError(null);
       } else {
         setError("로그인 상태를 확인하지 못했어요. 다시 시도해 주세요.");
@@ -54,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }).finally(() => {
       if (!signal?.aborted && request === sequence.current) setLoading(false);
     });
-  }, [resetCart]);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -69,7 +66,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setPending(true);
     try {
       const nextUser = await api.post<ApiUser>("/auth/dev-login", { email, ...(nickname ? { nickname } : {}) });
-      resetCart();
       setUser(nextUser);
       setError(null);
     } finally {
@@ -77,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setPending(false);
       setLoading(false);
     }
-  }, [resetCart]);
+  }, []);
 
   const logout = useCallback(async () => {
     if (mutating.current) return;
@@ -86,7 +82,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setPending(true);
     try {
       await api.post("/auth/logout");
-      resetCart();
       setUser(null);
       setError(null);
     } finally {
@@ -94,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setPending(false);
       setLoading(false);
     }
-  }, [resetCart]);
+  }, []);
 
   return <AuthContext.Provider value={{ user, loading, pending, error, login, logout, refresh, updateUser }}>{children}</AuthContext.Provider>;
 }
