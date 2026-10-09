@@ -7,6 +7,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import RegionSelector from "@/components/local/RegionSelector";
 import InterestPicker from "@/components/local/InterestPicker";
+import LocateRegionButton from "@/components/local/LocateRegionButton";
+import { useRegionLocator } from "@/components/local/useRegionLocator";
 import { LocalError, LocalLogin, LocalSkeleton, localButton } from "@/components/local/LocalStates";
 import { ApiError } from "@/lib/api";
 import { localApi } from "@/lib/local";
@@ -17,6 +19,7 @@ export default function LocalSettings() {
   const { user, loading } = useAuth();
   const profile = useLocalProfile();
   const regions = useRegions();
+  const locator = useRegionLocator(regions.data ?? []);
   const params = useSearchParams();
   const candidate = params.get("region");
   const next = `/local/settings${candidate ? `?region=${encodeURIComponent(candidate)}` : ""}`;
@@ -25,12 +28,12 @@ export default function LocalSettings() {
   if (profile.error) return <LocalError message={profile.error} onRetry={() => void profile.refresh()} busy={profile.loading} />;
   if (regions.error) return <LocalError message={regions.error} onRetry={() => void regions.refresh()} busy={regions.loading} />;
   if (!profile.data || !regions.data || profile.loading || regions.loading) return <LocalSkeleton />;
-  return <SettingsForm key={`${user.id}:${candidate ?? "saved"}`} profile={profile.data} regions={regions.data} candidate={candidate} />;
+  return <SettingsForm key={`${user.id}:${candidate ?? "saved"}`} profile={profile.data} regions={regions.data} candidate={candidate} locator={locator} />;
 }
 
-interface SettingsFormProps { profile: ApiLocalProfile; regions: ApiRegion[]; candidate: string | null; }
+interface SettingsFormProps { profile: ApiLocalProfile; regions: ApiRegion[]; candidate: string | null; locator: ReturnType<typeof useRegionLocator>; }
 
-function SettingsForm({ profile, regions, candidate }: SettingsFormProps) {
+function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProps) {
   const { pending: authPending, refresh: refreshAuth } = useAuth();
   const { replace } = useLocalProfile();
   const prefilled = regions.find((region) => region.code === candidate);
@@ -38,6 +41,7 @@ function SettingsForm({ profile, regions, candidate }: SettingsFormProps) {
   const [interests, setInterests] = useState(profile.interests);
   const [fandomOptIn, setFandomOptIn] = useState(profile.fandomOptIn);
   const [profilePublic, setProfilePublic] = useState(profile.profilePublic);
+  const [mapAvatarOptIn, setMapAvatarOptIn] = useState(profile.mapAvatarOptIn ?? false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -54,7 +58,7 @@ function SettingsForm({ profile, regions, candidate }: SettingsFormProps) {
     const signal = lifetime.current.signal;
     lock.current = true; setBusy(true); setError(null); setSaved(false);
     try {
-      const result = await localApi.save({ regionCode, interestIds: interests.map((item) => item.id), fandomOptIn, profilePublic }, signal);
+      const result = await localApi.save({ regionCode, interestIds: interests.map((item) => item.id), fandomOptIn, profilePublic, mapAvatarOptIn }, signal);
       if (signal.aborted) return;
       replace(result);
       setSaved(true);
@@ -74,6 +78,7 @@ function SettingsForm({ profile, regions, candidate }: SettingsFormProps) {
       <p className="mb-4 text-sm leading-relaxed text-sub">시 › 구 › 동·생활권 중 원하는 범위까지 선택하세요. 지역은 사람을 연결하기 위한 정보이지, 개인을 특정하기 위한 정보가 아닙니다.</p>
       {candidate && !prefilled && <p role="status" className="mb-4 text-sm text-pink">링크의 지역을 찾지 못했어요. 아래에서 지역을 다시 선택해 주세요.</p>}
       <RegionSelector regions={regions} value={regionCode} onChange={(code) => { setRegionCode(code); setSaved(false); }} disabled={disabled} />
+      <div className="mt-4"><LocateRegionButton label="내 위치로 찾기" locator={locator} disabled={disabled} onFound={(code) => { setRegionCode(code); setSaved(false); }} /></div>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p aria-live="polite" className="break-words text-sm text-sub">현재: <strong className="text-ink">{profile.region?.fullName ?? "미설정"}</strong>
           {regionCode !== (profile.region?.code ?? null) && <> → 변경: <strong className="text-mint">{selected?.fullName ?? "미설정"}</strong></>}
@@ -96,7 +101,11 @@ function SettingsForm({ profile, regions, candidate }: SettingsFormProps) {
         <input type="checkbox" role="switch" checked={profilePublic} onChange={(event) => setProfilePublic(event.target.checked)} aria-describedby="public-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
         <span><span className="block font-bold">취향 공개</span><span id="public-purpose" className="mt-2 block text-sm leading-relaxed text-sub">선택한 취향을 다른 사용자에게 공개하는 설정이에요. 현재는 다른 사용자에게 보여 주는 화면이 없으며, 이웃 매칭·프로필에서 쓰일 예정이에요.</span></span>
       </label>
-      <p className="rounded-lg bg-panel-2 p-4 text-xs leading-relaxed text-sub">개인의 구매 행동을 그대로 노출하지 않고, 필요한 경우 익명 집계된 형태로만 서비스에 활용합니다. 구매금액·장바구니·정확한 위치·검색 기록은 공개하지 않아요. 두 설정은 처음에는 꺼져 있고 언제든 변경할 수 있어요.</p>
+      <label className="flex cursor-pointer items-start gap-3">
+        <input type="checkbox" role="switch" checked={mapAvatarOptIn} onChange={(event) => setMapAvatarOptIn(event.target.checked)} aria-describedby="avatar-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
+        <span><span className="block font-bold">지도에 내 아바타 표시</span><span id="avatar-purpose" className="mt-2 block text-sm leading-relaxed text-sub">덕력지도의 내 동네에 내 픽셀 아바타(없으면 기본 슬라임)가 캐릭터로 나타나요. 같은 동네에서 표시에 동의한 이웃이 5명 이상일 때만, 무작위로 최대 6명이 보이며 닉네임·프로필·정확한 위치는 보여 주지 않아요.</span></span>
+      </label>
+      <p className="rounded-lg bg-panel-2 p-4 text-xs leading-relaxed text-sub">개인의 구매 행동을 그대로 노출하지 않고, 필요한 경우 익명 집계된 형태로만 서비스에 활용합니다. 구매금액·장바구니·정확한 위치·검색 기록은 공개하지 않아요. 세 설정은 처음에는 꺼져 있고 언제든 변경할 수 있어요.</p>
     </fieldset>
     {error && <p role="alert" className="rounded-lg border border-pink/30 bg-panel p-4 text-sm text-pink">{error}</p>}
     {saved && <p role="status" className="rounded-lg border border-mint/30 bg-panel p-4 text-sm text-mint">내 동네와 취향을 저장했어요.</p>}

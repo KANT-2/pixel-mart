@@ -138,6 +138,7 @@ export interface ApiLocalProfile {
   interests: ApiInterest[];
   fandomOptIn: boolean;
   profilePublic: boolean;
+  mapAvatarOptIn: boolean;
 }
 
 export interface LocalProfileInput {
@@ -145,6 +146,16 @@ export interface LocalProfileInput {
   interestIds: number[];
   fandomOptIn: boolean;
   profilePublic: boolean;
+  mapAvatarOptIn?: boolean;
+}
+
+/** 덕력지도 아바타 핀 — 동의한 이웃의 아바타만, 5명 미만은 비공개 (id·닉네임 없음) */
+export interface ApiMapAvatars {
+  regionCode: string;
+  regionName: string;
+  count: number | null;
+  belowThreshold: boolean;
+  avatars: (string | null)[];
 }
 
 export interface ApiFandom {
@@ -209,4 +220,4 @@ export interface ApiTradeMatch {
   mutual: boolean;
 }
 
-export interface ApiWishMapItem { rank: number; product: ApiProduct; count: number; }
+export interface ApiWishMapItem { rank: number; product: ApiProduct; count: number; isSample?: boolean; }

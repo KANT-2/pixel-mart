@@ -7,7 +7,7 @@ import { useLocalProfile } from "@/components/local/LocalProvider";
 const links = [{ href: "/local", label: "덕력지도" }, { href: "/local/trades", label: "거래·교환" }, { href: "/local/wish-map", label: "Wish Map" }];
 interface LocalNavLinksProps { pathname?: string; region?: string | null; }
 function LocalNavLinks({ pathname, region }: LocalNavLinksProps) {
-  return <nav aria-label="PIXEL LOCAL 메뉴" className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pt-6 md:px-8">
+  return <nav aria-label="PIXEL LOCAL 메뉴" className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 pt-3 md:px-8 md:pt-6">
     {links.map((item) => <Link key={item.href} href={`${item.href}${region !== undefined ? `?region=${encodeURIComponent(region ?? "")}` : ""}`}
       aria-current={pathname === item.href || (item.href === "/local/trades" && pathname?.startsWith("/local/trades/")) ? "page" : undefined}
       onFocus={(event) => event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" })}

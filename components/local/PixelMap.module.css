@@ -1,0 +1,134 @@
+.map {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 3px solid #0b0f1e;
+  border-radius: 14px;
+  background: #0f1a3a;
+  box-shadow: 0 0 0 3px #2b2552, 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  shape-rendering: crispEdges;
+}
+
+.block {
+  cursor: pointer;
+  transition: filter 120ms steps(2);
+}
+
+.block:hover {
+  filter: brightness(1.18);
+}
+
+.wave {
+  animation: wave 1.6s steps(2) infinite;
+}
+
+.selected {
+  animation: blink 0.9s steps(2) infinite;
+}
+
+.label {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 46%;
+  padding: 3px 7px;
+  border: 2px solid #0b0f1e;
+  border-radius: 6px;
+  background: rgb(20 16 42 / 88%);
+  box-shadow: 2px 2px 0 #0b0f1e;
+  color: #fff;
+  font-size: clamp(10px, 1.4vw, 13px);
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+.label:hover,
+.label[aria-pressed="true"] {
+  border-color: #b6ff5c;
+  color: #b6ff5c;
+}
+
+.label:focus-visible {
+  outline: 3px solid #6ef2d6;
+  outline-offset: 2px;
+}
+
+.labelName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.labelCount {
+  flex-shrink: 0;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: #b6ff5c;
+  color: #14102a;
+  font-weight: 800;
+}
+
+.labelFew {
+  flex-shrink: 0;
+  color: #a7a3c2;
+}
+
+.pin {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  transform: translate(-50%, -88%);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 55%));
+}
+
+.pinBody {
+  display: block;
+  width: 100%;
+  animation: bob 1.2s steps(2) infinite;
+}
+
+.pinImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.pinShadow {
+  position: absolute;
+  left: 18%;
+  bottom: -6%;
+  width: 64%;
+  height: 10%;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 35%);
+}
+
+@keyframes bob {
+  50% { transform: translateY(-14%); }
+}
+
+@keyframes wave {
+  50% { opacity: 0.25; }
+}
+
+@keyframes blink {
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pinBody,
+  .wave,
+  .selected {
+    animation: none;
+  }
+}

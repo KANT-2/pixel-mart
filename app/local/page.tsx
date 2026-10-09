@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
-import FandomExplorer from "@/components/local/FandomExplorer";
-import { LocalSkeleton, localButton } from "@/components/local/LocalStates";
+import FandomMapScreen from "@/components/local/FandomMapScreen";
 
 export const metadata: Metadata = { title: "PIXEL LOCAL · 덕력지도 | PIXEL MART" };
 
+function MapSkeleton() {
+  return <div role="status" aria-label="덕력지도 불러오는 중" className="mx-auto max-w-6xl px-4 pt-4 md:px-8">
+    <div className="mb-3 h-11 animate-pulse rounded-lg bg-panel" />
+    <div className="aspect-[4/3] max-h-[calc(100dvh-15rem)] animate-pulse rounded-2xl bg-panel" />
+  </div>;
+}
+
 export default function LocalPage() {
-  return <section className="mx-auto max-w-6xl px-4 py-10 md:px-8 md:py-14">
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-5">
-      <div className="max-w-2xl"><p className="mb-3 font-pixel text-sm text-mint">PIXEL LOCAL</p>
-        <h1 className="text-3xl font-extrabold sm:text-4xl">우리 동네 덕력지도</h1>
-        <p className="mt-4 text-sm leading-relaxed text-sub">내 주변에도 나와 같은 것을 좋아하는 사람이 있을까?<br />같은 지역 안에 존재하는 취향을 발견해 보세요.</p>
-      </div>
-      <Link href="/local/settings" className={localButton}>내 동네·취향 설정 →</Link>
-    </header>
-    <Suspense fallback={<LocalSkeleton />}><FandomExplorer /></Suspense>
-  </section>;
+  return <>
+    <h1 className="sr-only">PIXEL LOCAL 덕력지도</h1>
+    <Suspense fallback={<MapSkeleton />}><FandomMapScreen /></Suspense>
+  </>;
 }
