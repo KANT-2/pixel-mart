@@ -99,3 +99,16 @@ export interface ApiCancelRequest {
   statusLabel: string;
   createdAt: string;
 }
+
+export interface ApiReview {
+  id: number;
+  productId: number;
+  rating: number;
+  content: string;
+  nickname: string;
+  createdAt: string;
+}
+
+export interface ApiReviewPage extends Page<ApiReview> {
+  averageRating: number | null;
+}
