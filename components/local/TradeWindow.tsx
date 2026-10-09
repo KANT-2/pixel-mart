@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
-import { giftHref } from "@/utils/gift";
 import TradeCard from "@/components/local/TradeCard";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
 import { containsContact, matchLabels } from "@/utils/localTrades";
@@ -38,11 +36,8 @@ export default function TradeWindow({ match, me }: TradeWindowProps) {
       <p className="mb-2 font-pixel text-[10px] tracking-widest text-dim">▶ ITEM INFO · {picked === "want" ? "내가 구하는 아이템" : "이웃의 아이템"}</p>
       <TradeCard post={item} />
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        {match.offer.isSample
-          ? <span className="btn-pixel inline-flex h-10 cursor-not-allowed items-center px-4 text-sm font-bold opacity-50" title="샘플 글에는 선물할 수 없어요">🎁 선물하기</span>
-          : <Link href={giftHref(match.offer)} className="btn-lime inline-flex h-10 items-center px-4 text-sm font-bold">🎁 이 이웃에게 선물하기</Link>}
         <button type="button" disabled className="btn-pixel h-10 px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50">교환 신청 · 준비 중</button>
-        <p className="text-xs text-dim">선물은 데모 결제로 이어져요. 채팅·연락처 없이 아이템과 조건만 주고받아요.{match.offer.isSample ? " (샘플 글에는 선물할 수 없어요)" : ""}</p>
+        <p className="text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WANT 글에서 보낼 수 있어요.</p>
       </div>
     </div>
   </section>;

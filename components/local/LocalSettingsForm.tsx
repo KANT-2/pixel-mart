@@ -42,6 +42,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
   const [fandomOptIn, setFandomOptIn] = useState(profile.fandomOptIn);
   const [profilePublic, setProfilePublic] = useState(profile.profilePublic);
   const [mapAvatarOptIn, setMapAvatarOptIn] = useState(profile.mapAvatarOptIn ?? false);
+  const [nicknamePublic, setNicknamePublic] = useState(profile.nicknamePublic ?? false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -58,7 +59,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
     const signal = lifetime.current.signal;
     lock.current = true; setBusy(true); setError(null); setSaved(false);
     try {
-      const result = await localApi.save({ regionCode, interestIds: interests.map((item) => item.id), fandomOptIn, profilePublic, mapAvatarOptIn }, signal);
+      const result = await localApi.save({ regionCode, interestIds: interests.map((item) => item.id), fandomOptIn, profilePublic, mapAvatarOptIn, nicknamePublic }, signal);
       if (signal.aborted) return;
       replace(result);
       setSaved(true);
@@ -105,7 +106,11 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
         <input type="checkbox" role="switch" checked={mapAvatarOptIn} onChange={(event) => setMapAvatarOptIn(event.target.checked)} aria-describedby="avatar-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
         <span><span className="block font-bold">지도에 내 아바타 표시</span><span id="avatar-purpose" className="mt-2 block text-sm leading-relaxed text-sub">덕력지도의 내 동네에 내 픽셀 아바타(없으면 기본 슬라임)가 캐릭터로 나타나요. 같은 동네에서 표시에 동의한 이웃이 5명 이상일 때만, 무작위로 최대 6명이 보이며 닉네임·프로필·정확한 위치는 보여 주지 않아요.</span></span>
       </label>
-      <p className="rounded-lg bg-panel-2 p-4 text-xs leading-relaxed text-sub">개인의 구매 행동을 그대로 노출하지 않고, 필요한 경우 익명 집계된 형태로만 서비스에 활용합니다. 구매금액·장바구니·정확한 위치·검색 기록은 공개하지 않아요. 세 설정은 처음에는 꺼져 있고 언제든 변경할 수 있어요.</p>
+      <label className="flex cursor-pointer items-start gap-3">
+        <input type="checkbox" role="switch" checked={nicknamePublic} onChange={(event) => setNicknamePublic(event.target.checked)} aria-describedby="nickname-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
+        <span><span className="block font-bold">위시맵에 닉네임 공개</span><span id="nickname-purpose" className="mt-2 block text-sm leading-relaxed text-sub">내 WANT(구해요) 글에 닉네임과 픽셀 아바타가 보이고, 이웃이 닉네임으로 찾아 선물할 수 있어요. 끄면 &lsquo;이웃 플레이어&rsquo;로 보이고 검색되지 않아요. 주소·받는 이름은 어느 쪽이든 공개되지 않아요.</span></span>
+      </label>
+      <p className="rounded-lg bg-panel-2 p-4 text-xs leading-relaxed text-sub">개인의 구매 행동을 그대로 노출하지 않고, 필요한 경우 익명 집계된 형태로만 서비스에 활용합니다. 구매금액·장바구니·정확한 위치·검색 기록은 공개하지 않아요. 네 설정은 처음에는 꺼져 있고 언제든 변경할 수 있어요.</p>
     </fieldset>
     {error && <p role="alert" className="rounded-lg border border-pink/30 bg-panel p-4 text-sm text-pink">{error}</p>}
     {saved && <p role="status" className="rounded-lg border border-mint/30 bg-panel p-4 text-sm text-mint">내 동네와 취향을 저장했어요.</p>}

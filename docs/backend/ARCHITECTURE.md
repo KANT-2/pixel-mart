@@ -16,7 +16,7 @@
 ```
 [구글로 로그인] 클릭
 → GET /api/auth/google/login          (FastAPI → 구글 로그인 화면으로 이동)
-→ 구글 → GET /api/auth/google/callback (FastAPI가 사용자 확인, users 저장/조회)
+→ 구글 → GET /api/auth/google/callback (FastAPI가 사용자 확인 — 기존 회원은 로그인, 새 사용자는 /signup에서 닉네임을 고른 뒤 POST /api/auth/signup으로 users 저장)
 → pm_session 쿠키 설정 → 프론트 메인으로 이동
 → 이후 모든 /api 요청에 쿠키 자동 포함 → CurrentUser로 사용자 확인
 ```
@@ -33,8 +33,8 @@
 ## 4. 기능별 설계 결정
 
 ### 4-1. 픽셀 아바타
-- **픽셀 캔버스**(브라우저에서 직접 그림)와 **AI 픽셀 아바타**(Gemini, 동의 필수) 두 가지 — 결과는 브라우저에서 픽셀 격자로 정리해 PNG로 만듭니다.
-- 기본(픽셀 캔버스)은 사진을 쓰지 않습니다. **AI 픽셀 아바타**를 고르고 동의한 경우에만 사진을 서버를 거쳐 Gemini로 한 번 보내며, 사진·생성 원본은 **저장·로그하지 않습니다** (`docs/AVATAR_POLICY.md`).
+- **픽셀 캔버스**(브라우저에서 직접 그림)와 **AI 픽셀 아바타**(Cloudflare Workers AI 기본·Gemini 대체, 동의 필수) 두 가지 — 결과는 브라우저에서 픽셀 격자로 정리해 PNG로 만듭니다.
+- 기본(픽셀 캔버스)은 사진을 쓰지 않습니다. **AI 픽셀 아바타**를 고르고 동의한 경우에만 사진을 서버를 거쳐 AI 제공자로 한 번 보내며, 사진·생성 원본은 **저장·로그하지 않습니다** (`docs/AVATAR_POLICY.md`).
 - 서버에는 결과 PNG(수 KB)만 `users.avatar_url`에 data URL로 저장 → `PUT /api/users/me/avatar`.
 - 로그인 상태면 메인 배너의 슬라임 자리에 아바타 표시.
 

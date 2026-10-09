@@ -2,19 +2,22 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import ProductPicker from "@/components/local/ProductPicker";
 import { TraderPanel } from "@/components/local/TradeWindow";
 import { TradeLogin } from "@/components/local/TradeStates";
-import { api, ApiError } from "@/lib/api";
+import { useLocalResource } from "@/components/local/useLocalResource";
+import { LocalError, LocalSkeleton } from "@/components/local/LocalStates";
+import { localApi } from "@/lib/local";
+import { ApiError } from "@/lib/api";
 import { giftApi } from "@/lib/gifts";
 import { containsContact } from "@/utils/localTrades";
 import { formatPrice } from "@/utils/formatPrice";
 import { rarityOf } from "@/utils/gameItem";
-import type { ApiGift, ApiProduct } from "@/types/api";
+import type { ApiGift, ApiProduct, ApiTradePost } from "@/types/api";
 
-/** 이웃에게 선물 — 받는 사람은 거래글 작성자(익명), 결제는 데모 */
+/** 이웃에게 선물 — 받는 사람은 위시맵 WANT 글 작성자, 결제는 데모 */
 export default function GiftCheckout() {
   const { user, loading } = useAuth();
   const params = useSearchParams();
@@ -23,32 +26,37 @@ export default function GiftCheckout() {
   if (loading) return <div role="status" aria-label="불러오는 중" className="h-96 animate-pulse rounded-md bg-panel" />;
   if (!user) return <TradeLogin next={next} />;
   if (!Number.isSafeInteger(postId) || postId <= 0) return <div className="pixel-panel p-8 text-center">
-    <p>선물할 거래글을 찾지 못했어요.</p><Link href="/local/trades" className="btn-pixel mt-4 inline-flex min-h-11 items-center px-5">거래소로</Link>
+    <p>선물할 WANT 글을 찾지 못했어요.</p><Link href="/local/wish-map" className="btn-pixel mt-4 inline-flex min-h-11 items-center px-5">위시맵으로</Link>
   </div>;
-  return <GiftForm key={`${user.id}:${postId}`} postId={postId} itemName={params.get("item") ?? "이웃의 거래글"} productId={Number(params.get("product")) || null} />;
+  return <GiftTarget key={`${user.id}:${postId}`} postId={postId} />;
 }
 
-interface GiftFormProps { postId: number; itemName: string; productId: number | null; }
+function GiftTarget({ postId }: { postId: number }) {
+  const load = useCallback((signal: AbortSignal) => localApi.trade(postId, signal), [postId]);
+  const post = useLocalResource(load);
+  if (post.loading) return <LocalSkeleton label="WANT 글 불러오는 중" />;
+  if (post.error || !post.data) return <LocalError message={post.error ?? "WANT 글을 찾지 못했어요."} onRetry={() => void post.refresh()} />;
+  const reason = post.data.kind !== "want" ? "구하는 글(WANT)에만 선물할 수 있어요."
+    : post.data.isMine ? "내 글에는 선물할 수 없어요."
+      : post.data.isSample ? "샘플 글에는 선물할 수 없어요."
+        : post.data.status !== "open" ? "이미 끝난 글이에요." : null;
+  if (reason) return <div className="pixel-panel p-8 text-center">
+    <p>{reason}</p><Link href="/local/wish-map" className="btn-pixel mt-4 inline-flex min-h-11 items-center px-5">위시맵으로</Link>
+  </div>;
+  return <GiftForm post={post.data} />;
+}
 
-function GiftForm({ postId, itemName, productId }: GiftFormProps) {
+function GiftForm({ post }: { post: ApiTradePost }) {
+  const postId = post.id, itemName = post.itemName, linked = post.product;
   const { user } = useAuth();
-  const [linked, setLinked] = useState<ApiProduct | null>(null);
-  const [product, setProduct] = useState<ApiProduct | null>(null);
+  // 글에 연결된 상품이 있으면 기본 선물로
+  const [product, setProduct] = useState<ApiProduct | null>(linked);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<ApiGift | null>(null);
   const lock = useRef(false);
-
-  // 글에 연결된 상품이 있으면 기본 선물로
-  useEffect(() => {
-    if (!productId) return;
-    const controller = new AbortController();
-    api.get<ApiProduct>(`/products/${productId}`, { signal: controller.signal })
-      .then((found) => { setLinked(found); setProduct((current) => current ?? found); }).catch(() => undefined);
-    return () => controller.abort();
-  }, [productId]);
 
   const contact = containsContact(message);
   const total = (product?.price ?? 0) * quantity;
@@ -70,7 +78,7 @@ function GiftForm({ postId, itemName, productId }: GiftFormProps) {
     <p className="mt-1 text-sm text-sub">이웃이 받기를 누르면 배송이 시작돼요. 거절하면 데모 환불돼요.</p>
     <div className="mt-6 flex flex-wrap justify-center gap-3">
       <Link href="/mypage/gifts?box=sent" className="btn-lime inline-flex min-h-11 items-center px-5 font-bold">보낸 선물 보기</Link>
-      <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 font-bold">거래소로</Link>
+      <Link href="/local/wish-map" className="btn-pixel inline-flex min-h-11 items-center px-5 font-bold">위시맵으로</Link>
     </div>
   </div>;
 
@@ -81,16 +89,16 @@ function GiftForm({ postId, itemName, productId }: GiftFormProps) {
       <section aria-label="선물 창" className="pixel-panel overflow-hidden">
         <header className="flex items-center gap-2 border-b-2 border-frame bg-panel-2 px-4 py-2">
           <p className="font-pixel text-xs tracking-widest text-lime">🎁 GIFT</p>
-          <span className="text-[11px] text-dim">누구인지와 주소는 서로 공개되지 않아요</span>
+          <span className="text-[11px] text-dim">보내는 사람과 주소는 공개되지 않아요</span>
         </header>
         <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-2 p-3 sm:gap-3 sm:p-4">
           <TraderPanel name={user?.nickname ?? "나"} subtitle="나 · 보낼 선물" avatar={user?.avatarUrl ?? null} anonymous={false}
             item={product ? { name: product.name, imageUrl: product.imageUrl, price: product.price } : null} active onPick={() => undefined}
             priceLabel="선물 가격" priceText={product ? formatPrice(total) : "—"} />
           <p aria-hidden="true" className="self-center font-pixel text-xl text-lime motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">→</p>
-          <TraderPanel name="이웃 플레이어" subtitle={`'${itemName}' 글`} avatar={null} anonymous
+          <TraderPanel name={post.author?.nickname ?? "이웃 플레이어"} subtitle={`💗 '${itemName}' 구하는 중`} avatar={post.author?.avatarUrl ?? null} anonymous={!post.author}
             item={{ name: itemName, imageUrl: linked?.imageUrl ?? null, price: linked?.price ?? null }} active={false} onPick={() => undefined}
-            priceLabel="받는 이웃" priceText="이웃 플레이어" />
+            priceLabel="받는 이웃" priceText={post.regionName.split(" ").at(-1) ?? "이웃"} />
         </div>
       </section>
       <section className="pixel-panel space-y-4 p-5">

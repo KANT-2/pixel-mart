@@ -7,15 +7,19 @@
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/health, /api/health/db | 서버·DB 상태 | ✅ |
-| POST | /api/auth/dev-login | [로컬 전용] 이메일로 로그인 | ✅ |
+| POST | /api/auth/dev-login | [로컬 전용] 이메일로 로그인 (새 계정인데 닉네임이 겹치면 409 "이미 사용 중인 닉네임입니다.") | ✅ |
 | POST | /api/auth/logout | 로그아웃 (쿠키 삭제) | ✅ |
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
 | GET | /api/auth/google/login | 구글 로그인 시작 (키 없으면 503) | ✅ |
-| GET | /api/auth/google/callback | 구글 로그인 완료 → 쿠키 설정 → 메인 이동 (실패 시 `/?loginError=google`) | ✅ |
-| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자) | ✅ |
+| GET | /api/auth/google/callback | 구글 로그인 완료 → 기존 회원은 세션 쿠키·메인 이동, **새 사용자는 계정을 만들지 않고** 15분 가입 대기 쿠키(`pm_signup`)·`/signup` 이동 (실패 시 `/?loginError=google`) | ✅ |
+| GET | /api/auth/signup | 가입 대기 정보 `{email, googleName}` (대기 쿠키 없으면 404) | ✅ |
+| POST | /api/auth/signup | 닉네임을 골라 가입 완료 `{nickname}` → 201·세션 쿠키. 겹치면 409 "이미 사용 중인 닉네임입니다." (자동으로 바꾸지 않음), 대기 쿠키 없으면 404 | ✅ |
+| PATCH | /api/users/me 🔒 | 닉네임 변경 (앞뒤 공백 제거 후 1~30자, 대소문자 구분 없이 남이 쓰는 닉네임이면 409) | ✅ |
+| GET | /api/users/nickname-check?nickname= | 닉네임 사용 가능 여부 `{nickname, available, suggestions}` — 겹치면 지금 쓸 수 있는 추천 3개(예: `슬라임킹0421`, `슬라임킹_1`), 내 닉네임은 available | ✅ |
 | PUT | /api/users/me/avatar 🔒 | 픽셀 아바타 저장 (PNG data URL, 최대 50KB, 아니면 422) | ✅ |
 | DELETE | /api/users/me/avatar 🔒 | 아바타 삭제 (기본 슬라임으로) | ✅ |
-| POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Gemini 생성 원본, 저장 안 함). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과 429 | ✅ |
+| GET | /api/avatars/ai | AI 아바타 사용 가능 여부 `{enabled, provider: cloudflare\|gemini\|null, providerName, maxPhotoSide}` — 동의 문구·사진 축소 크기용 (키 값은 내보내지 않음) | ✅ |
+| POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Cloudflare FLUX.2 klein 또는 Gemini 생성 원본, 저장 안 함). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과(Cloudflare 일일 무료 할당 소진 포함) 429 | ✅ |
 | GET | /api/categories | 카테고리 6개 | ✅ |
 | GET | /api/products?category=&q=&minPrice=&maxPrice=&isNew=&sort=&page=&size= | 목록 (category는 쉼표로 여러 개, sort: `id/new/price_asc/price_desc/popular`(찜 많은 순), 응답에 `isWished`) | ✅ |
 | GET | /api/products/{id} | 상세 (없으면 404, 응답에 `isWished`) | ✅ |
