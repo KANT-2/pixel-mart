@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, false, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, Text, false, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -23,3 +23,7 @@ class User(Base):
     map_avatar_opt_in: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     # 위시맵 WANT 글에 내 닉네임·아바타 표시 + 닉네임 검색 허용 (opt-in). 선물 주소·받는 이름은 계속 비공개
     nickname_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+
+
+# 닉네임은 대소문자 구분 없이 하나뿐 (app/services/nickname.py)
+Index("uq_users_nickname_lower", func.lower(User.nickname), unique=True)

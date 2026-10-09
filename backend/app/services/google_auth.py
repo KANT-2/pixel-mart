@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models import User
+from app.services.nickname import MAX_LENGTH
 
 oauth = OAuth()
 oauth.register(
@@ -22,24 +23,22 @@ def google_callback_url() -> str:
     return f"{settings.frontend_url}/api/auth/google/callback"
 
 
-async def get_or_create_google_user(db: AsyncSession, userinfo: dict) -> tuple[User, bool]:
-    """(사용자, 새로 만들었는지) — 같은 이메일의 기존 계정(dev-login 등)이 있으면 구글 계정을 연결한다"""
+def verified_google_info(userinfo: dict) -> tuple[str, str, str]:
+    """(sub, email, 구글 이름) — 이메일 확인이 안 된 계정은 받지 않는다"""
     sub = userinfo.get("sub")
     email = userinfo.get("email")
     if not sub or not email or not userinfo.get("email_verified"):
         raise ValueError("구글 계정의 이메일을 확인할 수 없습니다.")
+    return sub, email, (userinfo.get("name") or "").strip()[:MAX_LENGTH]
 
+
+async def find_google_user(db: AsyncSession, sub: str, email: str) -> User | None:
+    """기존 회원이면 반환 (같은 이메일의 dev-login 계정은 구글 계정과 연결). 새 사용자는 None — 닉네임부터 고른다"""
     user = await db.scalar(select(User).where(User.google_sub == sub))
     if user is None:
         user = await db.scalar(select(User).where(User.email == email, User.google_sub.is_(None)))
         if user is not None:
             user.google_sub = sub
-    created = user is None
-    if created:
-        nickname = (userinfo.get("name") or email.split("@")[0]).strip()[:30] or email.split("@")[0][:30]
-        user = User(email=email, google_sub=sub, nickname=nickname)
-        db.add(user)
-
-    await db.commit()
-    await db.refresh(user)
-    return user, created
+            await db.commit()
+            await db.refresh(user)
+    return user
