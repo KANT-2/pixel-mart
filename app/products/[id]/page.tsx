@@ -111,16 +111,33 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
       </section>
 
       <ProductDetailTabs productId={product.id}>
-        <h2 className="mb-4 text-xl font-bold">상품정보</h2>
-        <p className="whitespace-pre-line break-words leading-relaxed text-sub">{product.description}</p>
-        <p className="mt-5 text-sm text-dim">상품 번호 PM-{String(product.id).padStart(3, "0")} · {product.category}</p>
+        <h2 className="sr-only">상품정보</h2>
+        <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_240px]">
+          <div>
+            <p className="mb-2 font-pixel text-[11px] tracking-widest text-dim">▶ DESCRIPTION</p>
+            <p className="whitespace-pre-line break-words border-l-4 border-frame pl-4 leading-relaxed text-ink/90">{product.description}</p>
+          </div>
+          <dl className="grid content-start gap-px overflow-hidden rounded-md border-2 border-frame bg-frame text-sm">
+            {[
+              ["ITEM ID", `PM-${String(product.id).padStart(3, "0")}`, undefined],
+              ["TYPE", product.category, undefined],
+              ["RARITY", rarity.label, rarity.color],
+              ["PRICE", formatPrice(product.price), "var(--color-lime)"],
+            ].map(([term, value, color]) => (
+              <div key={term} className="flex items-center justify-between gap-3 bg-night px-3 py-2">
+                <dt className="font-pixel text-[11px] tracking-widest text-dim">{term}</dt>
+                <dd className="truncate font-bold" style={color ? { color } : undefined}>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </ProductDetailTabs>
 
       {/* 같은 카테고리 상품 */}
       {related.length > 0 && (
         <section className="mt-16">
           <div className="mb-6 flex items-end justify-between">
-            <h2 className="text-xl font-extrabold">같은 카테고리 상품</h2>
+            <h2 className="text-xl font-extrabold"><span className="stage-kicker mb-1 block font-pixel text-xs font-normal text-mint">RELATED ITEMS</span>같은 카테고리 상품</h2>
             {category && (
               <Link href={`/products?category=${category.slug}`} className="text-sm font-semibold text-sub hover:text-ink">
                 {category.name} 더 보기 →

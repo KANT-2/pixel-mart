@@ -19,6 +19,12 @@ function subscribeHash(listener: () => void) {
 const getHash = () => window.location.hash;
 const serverHash = () => "";
 
+const TAB_META: Record<ProductTab, { icon: string; tag: string; label: string }> = {
+  info: { icon: "📜", tag: "ITEM INFO", label: "상품정보" },
+  reviews: { icon: "⭐", tag: "REVIEW", label: "리뷰" },
+  qna: { icon: "💬", tag: "Q&A", label: "문의" },
+};
+
 export default function ProductDetailTabs(props: ProductDetailTabsProps) {
   const pathname = usePathname();
   const { user, loading } = useAuth();
@@ -50,15 +56,28 @@ function DetailTabs({ productId, children }: ProductDetailTabsProps) {
   }
 
   return <section ref={root} aria-label="상품 상세 정보와 후기" className="mt-14 min-w-0 scroll-mt-28">
-    <div role="tablist" aria-label="상품 상세 탭" className="mb-6 grid grid-cols-3 gap-1 border-b border-line pb-2 sm:gap-2">
-      {PRODUCT_TABS.map((tab) => <button key={tab} ref={(element) => { buttons.current[tab] = element; }} type="button" role="tab" id={`product-${productId}-tab-${tab}`} aria-controls={tab} aria-selected={active === tab} tabIndex={active === tab ? 0 : -1}
-        onClick={() => select(tab)} onKeyDown={(event) => { const next = tabForKey(tab, event.key); if (next) { event.preventDefault(); select(next); buttons.current[next]?.focus(); } }}
-        className={`min-h-16 min-w-0 rounded-t-lg border-b-2 px-1 py-3 text-sm font-bold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint ${active === tab ? "border-mint bg-panel text-mint" : "border-transparent text-sub hover:bg-panel"}`}>
-        {tab === "info" ? "상품정보" : tab === "reviews" ? <>리뷰<span className="mt-1 block min-h-4 text-[11px] font-normal">{snapshot.data ? `★ ${snapshot.data.averageRating?.toFixed(1) ?? "—"} · ${snapshot.data.total}개` : snapshot.error ? "조회 실패" : "불러오는 중"}</span></> : <>Q&A{questions.mode === "demo" && <span className="mt-1 block text-[11px] font-normal text-violet">데모 데이터</span>}</>}
-      </button>)}
+    {/* 게임 메뉴 탭 — 고른 탭은 아래 창과 이어 붙는다 */}
+    <div role="tablist" aria-label="상품 상세 탭" className="relative z-10 -mb-0.5 flex gap-1 sm:gap-1.5">
+      {PRODUCT_TABS.map((tab) => {
+        const on = active === tab;
+        const meta = TAB_META[tab];
+        const sub = tab === "reviews" ? (snapshot.data ? `★ ${snapshot.data.averageRating?.toFixed(1) ?? "—"} · ${snapshot.data.total}개` : snapshot.error ? "조회 실패" : "불러오는 중")
+          : tab === "qna" && questions.mode === "demo" ? "데모 데이터" : null;
+        return <button key={tab} ref={(element) => { buttons.current[tab] = element; }} type="button" role="tab" id={`product-${productId}-tab-${tab}`} aria-controls={tab} aria-selected={on} tabIndex={on ? 0 : -1}
+          onClick={() => select(tab)} onKeyDown={(event) => { const next = tabForKey(tab, event.key); if (next) { event.preventDefault(); select(next); buttons.current[next]?.focus(); } }}
+          className={`group flex min-h-14 min-w-0 flex-1 items-center justify-center gap-2 rounded-t-md border-2 px-2 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint sm:flex-none sm:px-5 ${on ? "border-violet/70 border-b-panel bg-panel text-lime" : "border-frame bg-night text-sub hover:bg-panel-2 hover:text-ink"}`}>
+          <span aria-hidden="true" className={`text-lg leading-none ${on ? "" : "opacity-60 grayscale-[50%] group-hover:opacity-100 group-hover:grayscale-0"}`}>{meta.icon}</span>
+          <span className="min-w-0 text-left">
+            <span className="hidden whitespace-nowrap font-pixel text-[11px] tracking-widest sm:block">{on && <span aria-hidden="true" className="motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">▶ </span>}{meta.tag}</span>
+            <span className="block truncate text-sm font-bold sm:text-xs">{meta.label}{sub && <span className={`ml-1 hidden font-normal sm:inline ${tab === "qna" ? "text-violet" : "text-dim"}`}>{sub}</span>}</span>
+          </span>
+        </button>;
+      })}
     </div>
-    <div id="info" role="tabpanel" aria-labelledby={`product-${productId}-tab-info`} tabIndex={0} hidden={active !== "info"} className="pixel-panel p-5 focus-visible:outline-2 focus-visible:outline-mint sm:p-6">{children}</div>
+    <div className="rounded-md rounded-tl-none border-2 border-violet/70 bg-panel p-4 shadow-[4px_4px_0_0_rgba(0,0,0,0.45)] sm:p-6">
+    <div id="info" role="tabpanel" aria-labelledby={`product-${productId}-tab-info`} tabIndex={0} hidden={active !== "info"} className="focus-visible:outline-2 focus-visible:outline-mint">{children}</div>
     <div id="reviews" role="tabpanel" aria-labelledby={`product-${productId}-tab-reviews`} tabIndex={0} hidden={active !== "reviews"} className="focus-visible:outline-2 focus-visible:outline-mint"><ReviewsPanel productId={productId} snapshot={snapshot} load={reviews.load} /></div>
     <div id="qna" role="tabpanel" aria-labelledby={`product-${productId}-tab-qna`} tabIndex={0} hidden={active !== "qna"} className="focus-visible:outline-2 focus-visible:outline-mint"><QuestionsPanel productId={productId} /></div>
+    </div>
   </section>;
 }
