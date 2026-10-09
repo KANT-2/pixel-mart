@@ -65,16 +65,16 @@ export default function WishMap() {
 
   if (regions.error) return <LocalError message={regions.error} onRetry={() => void regions.refresh()} />;
   return <div className="space-y-3">
-    {/* 탭 공통 도구 막대 — 왼쪽 지도 위치, 오른쪽 동네·닉네임 찾기 */}
-    <div className={localToolbar}>
-      <nav aria-label="지도 위치" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 px-1 font-pixel text-sm">
-          <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
-          {trail.map((code) => <span key={code} className="flex items-center gap-1">
-            <span aria-hidden="true" className="text-dim">›</span>
-            <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
-              className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
-          </span>)}
-        </nav>
+    {/* 1줄: 지도 위치 / 2줄: 오른쪽 검색 — 덕력지도와 같은 줄 구성 */}
+    <nav aria-label="지도 위치" className="flex min-w-0 flex-wrap items-center gap-1 font-pixel text-sm">
+      <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
+      {trail.map((code) => <span key={code} className="flex items-center gap-1">
+        <span aria-hidden="true" className="text-dim">›</span>
+        <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
+          className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
+      </span>)}
+    </nav>
+    <div className={`${localToolbar} min-h-11 justify-end`}>
       <LocalSearch key={`${nickname ?? ""}|${item ?? ""}`} regions={catalog} mode={nickname ? "nickname" : item ? "item" : "region"} value={nickname ?? item ?? ""}
         onRegion={(code) => go(code)} onNickname={(value) => go(focus, { nickname: value })} onItem={(value) => go(focus, { item: value })} />
     </div>

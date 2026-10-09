@@ -35,16 +35,19 @@ export default function TradesBoard() {
         {/* 위시맵과 같은 검색 하나 — 동네 | 닉네임 | 아이템 */}
         <LocalSearch key={`${query.nickname ?? ""}|${query.q ?? ""}`} regions={catalog.data} mode={query.nickname ? "nickname" : query.q ? "item" : "region"} value={query.nickname ?? query.q ?? ""}
           onRegion={(region) => change({ region })} onNickname={(nickname) => change({ nickname, q: undefined })} onItem={(q) => change({ q, nickname: undefined })} />
-        {/* 지역 범위는 하나만 — 한 덩어리 버튼 */}
-        <div role="group" aria-label="지역 범위" className="segmented h-11 text-xs font-bold">
-          {ownRegion && <button type="button" aria-pressed={selected?.code === ownRegion} onClick={() => change({ region: ownRegion })}>내 동네</button>}
-          <button type="button" aria-pressed={!selected} onClick={() => change({ region: null })}>전체 지역</button>
-        </div>
-        {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
-        <div role="group" aria-label="글 종류 필터" className="segmented h-11 font-pixel text-xs">
-          {[{ value: undefined, label: "ALL", name: "모든 글", icon: undefined }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: TRADE_KIND_GAME[item.value].tag, name: item.label, icon: TRADE_KIND_GAME[item.value].icon }))].map((item) =>
-            <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
-              >{item.icon && <PixelIcon name={item.icon} className="mr-1.5 size-3.5" />}{item.label}</button>)}
+        {/* 지역 범위·글 종류는 오른쪽 끝에 */}
+        <div className="ml-auto flex flex-wrap gap-2">
+          {/* 지역 범위는 하나만 — 한 덩어리 버튼 */}
+          <div role="group" aria-label="지역 범위" className="segmented h-11 text-xs font-bold">
+            {ownRegion && <button type="button" aria-pressed={selected?.code === ownRegion} onClick={() => change({ region: ownRegion })}>내 동네</button>}
+            <button type="button" aria-pressed={!selected} onClick={() => change({ region: null })}>전체 지역</button>
+          </div>
+          {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
+          <div role="group" aria-label="글 종류 필터" className="segmented h-11 font-pixel text-xs">
+            {[{ value: undefined, label: "ALL", name: "모든 글", icon: undefined }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: TRADE_KIND_GAME[item.value].tag, name: item.label, icon: TRADE_KIND_GAME[item.value].icon }))].map((item) =>
+              <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
+                >{item.icon && <PixelIcon name={item.icon} className="mr-1.5 size-3.5" />}{item.label}</button>)}
+          </div>
         </div>
       </div>
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}

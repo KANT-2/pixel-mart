@@ -45,7 +45,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
   const list = interests.filter((item) => (type === "all" || item.type === type) && (!keyword || item.name.includes(keyword)));
   const pick = (id: number | null) => { onSelect(id); setOpen(false); setText(""); };
 
-  return <div ref={root} className="relative mb-3">
+  return <div ref={root} className="relative min-w-0">
     <div role="group" aria-label="취향 필터" className="flex flex-wrap items-center gap-2">
       <button type="button" onClick={() => pick(null)} aria-pressed={selected === null} className={`${chip} ${chipState}`}>전체 · 동네 인기 취향</button>
       {chips.map((item) => <button key={item.id} type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
