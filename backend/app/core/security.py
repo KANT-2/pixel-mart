@@ -24,6 +24,30 @@ def decode_access_token(token: str) -> int | None:
         return None
 
 
+SIGNUP_COOKIE = "pm_signup"
+SIGNUP_MINUTES = 15
+
+
+def create_signup_token(google_sub: str, email: str, name: str) -> str:
+    expire = datetime.now(UTC) + timedelta(minutes=SIGNUP_MINUTES)
+    payload = {"typ": "signup", "gsub": google_sub, "email": email, "name": name, "exp": expire}
+    return jwt.encode(payload, settings.jwt_secret, algorithm=ALGORITHM)
+
+
+def decode_signup_token(token: str) -> dict | None:
+    try:
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[ALGORITHM])
+    except jwt.PyJWTError:
+        return None
+    return payload if payload.get("typ") == "signup" else None
+
+
+def set_signup_cookie(response: Response, token: str) -> None:
+    response.set_cookie(
+        SIGNUP_COOKIE, token, max_age=SIGNUP_MINUTES * 60, httponly=True, samesite="lax", secure=not settings.is_local
+    )
+
+
 def set_session_cookie(response: Response, user_id: int) -> None:
     response.set_cookie(
         SESSION_COOKIE,
@@ -37,3 +61,4 @@ def set_session_cookie(response: Response, user_id: int) -> None:
 
 def clear_session_cookie(response: Response) -> None:
     response.delete_cookie(SESSION_COOKIE)
+    response.delete_cookie(SIGNUP_COOKIE)

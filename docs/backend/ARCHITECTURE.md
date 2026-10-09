@@ -16,7 +16,7 @@
 ```
 [구글로 로그인] 클릭
 → GET /api/auth/google/login          (FastAPI → 구글 로그인 화면으로 이동)
-→ 구글 → GET /api/auth/google/callback (FastAPI가 사용자 확인, users 저장/조회)
+→ 구글 → GET /api/auth/google/callback (FastAPI가 사용자 확인 — 기존 회원은 로그인, 새 사용자는 /signup에서 닉네임을 고른 뒤 POST /api/auth/signup으로 users 저장)
 → pm_session 쿠키 설정 → 프론트 메인으로 이동
 → 이후 모든 /api 요청에 쿠키 자동 포함 → CurrentUser로 사용자 확인
 ```

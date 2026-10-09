@@ -1,4 +1,4 @@
-"""닉네임은 대소문자 구분 없이 하나뿐 — 위시맵 닉네임 검색·선물 상대를 헷갈리지 않게"""
+"""닉네임은 대소문자 구분 없이 하나뿐 — 겹치면 자동으로 바꾸지 않고, 사용자가 고를 추천안을 준다"""
 
 import secrets
 
@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import User
 
 MAX_LENGTH = 30
+TAKEN_MESSAGE = "이미 사용 중인 닉네임입니다."
 
 
 async def is_taken(db: AsyncSession, nickname: str, except_user_id: int | None = None) -> bool:
@@ -17,13 +18,25 @@ async def is_taken(db: AsyncSession, nickname: str, except_user_id: int | None =
     return await db.scalar(query.limit(1)) is not None
 
 
-async def unique_nickname(db: AsyncSession, base: str) -> str:
-    """새 계정용 — 이미 있으면 '#4자리 숫자'를 붙인다 (구글 이름이 겹쳐도 가입은 막지 않음)"""
+def _fit(base: str, suffix: str) -> str:
+    return base[: MAX_LENGTH - len(suffix)] + suffix
+
+
+async def suggest_nicknames(db: AsyncSession, base: str, count: int = 3) -> list[str]:
+    """겹친 닉네임의 대체안 — 예: 슬라임킹0421, 슬라임킹_1, 슬라임킹_2 (모두 지금 사용 가능)"""
     base = base.strip()[:MAX_LENGTH] or "PLAYER"
-    if not await is_taken(db, base):
-        return base
-    while True:
-        suffix = f"#{secrets.randbelow(10_000):04d}"
-        candidate = base[: MAX_LENGTH - len(suffix)] + suffix
-        if not await is_taken(db, candidate):
-            return candidate
+    candidates = [_fit(base, f"{secrets.randbelow(10_000):04d}")]
+    candidates += [_fit(base, f"_{n}") for n in range(1, 10)]
+    candidates += [_fit(base, f"{secrets.randbelow(10_000):04d}") for _ in range(5)]
+    taken = set(
+        await db.scalars(
+            select(func.lower(User.nickname)).where(func.lower(User.nickname).in_([c.lower() for c in candidates]))
+        )
+    )
+    picked: list[str] = []
+    for candidate in candidates:
+        if candidate.lower() not in taken and candidate not in picked:
+            picked.append(candidate)
+        if len(picked) == count:
+            break
+    return picked

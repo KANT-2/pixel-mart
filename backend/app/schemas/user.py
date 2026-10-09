@@ -28,9 +28,26 @@ class UserUpdateIn(CamelModel):
     )
 
 
+Nickname = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=30)]
+
+
 class NicknameCheckOut(CamelModel):
     nickname: str
     available: bool
+    suggestions: list[str] = Field(
+        default_factory=list, description="겹칠 때만 — 지금 사용 가능한 대체 닉네임 최대 3개"
+    )
+
+
+class SignupPendingOut(CamelModel):
+    """구글 확인은 끝났고 닉네임만 고르면 되는 상태"""
+
+    email: str
+    google_name: str
+
+
+class SignupIn(CamelModel):
+    nickname: Nickname = Field(examples=["슬라임킹"])
 
 
 class AvatarIn(CamelModel):

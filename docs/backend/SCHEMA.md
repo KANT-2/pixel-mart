@@ -35,7 +35,7 @@ erDiagram
 ## 공통 (BE-A)
 | 테이블 | 주요 컬럼 | 비고 |
 | --- | --- | --- |
-| **users** ✅ | id, email (unique), google_sub (unique), nickname (lower() unique — 가입 시 겹치면 #4자리 숫자), avatar_url, created_at | + BE-A가 추가: region_code FK, local_public bool |
+| **users** ✅ | id, email (unique), google_sub (unique), nickname (lower() unique — 겹치면 가입 409, 사용자가 추천안 중 고름), avatar_url, created_at | + BE-A가 추가: region_code FK, local_public bool |
 | **categories** ✅ | slug PK, name (unique), description, sort_order | |
 | **products** ✅ | id, name, price, category_slug FK, image_url, description, is_new, created_at | |
 | cart_items | user_id FK, product_id FK, quantity, added_at · **PK(user_id, product_id)** | 수량 1~99 |
