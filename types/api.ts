@@ -51,3 +51,51 @@ export interface ApiFaq {
   question: string;
   answer: string;
 }
+
+export interface ApiOrderItem {
+  product: ApiProduct;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export interface ApiOrder {
+  id: number;
+  status: string;
+  totalPrice: number;
+  recipientName: string;
+  address: string;
+  createdAt: string;
+  items: ApiOrderItem[];
+}
+
+export interface ApiOrderTimelineEntry {
+  status: string;
+  label: string;
+  changedAt: string;
+}
+
+export interface ApiOrderDetail extends ApiOrder {
+  statusLabel: string;
+  timeline: ApiOrderTimelineEntry[];
+}
+
+export interface ApiOrderSummary {
+  id: number;
+  status: string;
+  statusLabel: string;
+  totalPrice: number;
+  createdAt: string;
+  title: string;
+  imageUrl: string;
+  itemCount: number;
+}
+
+export interface ApiCancelRequest {
+  id: number;
+  orderId: number;
+  reason: string;
+  status: string;
+  statusLabel: string;
+  createdAt: string;
+}
