@@ -1,37 +1,188 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { useLocalSelection } from "@/components/local/useLocalSelection";
+import { useCallback, useMemo, useState } from "react";
+import PixelAvatar from "@/components/avatar/PixelAvatar";
+import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
+import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import { useLocalResource } from "@/components/local/useLocalResource";
-import CompactRegionSelect from "@/components/local/CompactRegionSelect";
-import { LocalError, LocalSkeleton, localButton } from "@/components/local/LocalStates";
-import ProductCard from "@/components/ProductCard";
+import { LocalError, LocalSkeleton, localButton, localInput } from "@/components/local/LocalStates";
 import { localApi } from "@/lib/local";
-import { parseTradeQuery } from "@/utils/localTrades";
-import type { ApiRegion } from "@/types/api";
+import { MAP_VIEWS } from "@/lib/localMapData";
+import { formatPrice } from "@/utils/formatPrice";
+import { rarityOf } from "@/utils/gameItem";
+import { giftHref } from "@/utils/gift";
+import { containsContact } from "@/utils/localTrades";
+import { viewCodeFor, viewTrail } from "@/utils/localMap";
+import type { ApiRegion, ApiTradePost } from "@/types/api";
 
+const HEART = "/images/hero-heart.svg";
+
+function wishHref(region: string | null, nickname: string | null) {
+  const params = new URLSearchParams();
+  if (region !== null) params.set("region", region);
+  if (nickname) params.set("q", nickname);
+  const query = params.toString();
+  return `/local/wish-map${query ? `?${query}` : ""}`;
+}
+
+/** 위시맵 — 픽셀 지도 위에 동네별 WANT(구해요) 하트, 고른 동네의 WANT 글에서 바로 선물 */
 export default function WishMap() {
-  const params = useSearchParams(), query = parseTradeQuery(params);
-  const { catalog, profile, selected, loading, invalid } = useLocalSelection(query);
-  const choose = (region: string | null) => window.history.pushState(null, "", `/local/wish-map?${new URLSearchParams({ region: region ?? "" })}`);
-  if (catalog.error) return <LocalError message={catalog.error} onRetry={() => void catalog.refresh()} />;
-  if (loading || !catalog.data) return <LocalSkeleton />;
-  return <div className="space-y-8">
-    {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택해 주세요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
-    <section aria-label="Wish Map 지역" className="space-y-2"><div className="pixel-panel p-2"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} ownRegion={profile.data?.region?.code ?? null} onChange={choose} /></div>{invalid && <p role="status" className="text-sm text-pink">없는 지역이에요. 지역을 다시 선택해 주세요.</p>}<p className="text-xs leading-relaxed text-dim">집계 참여자의 익명 찜 인원만 표시해요. 5명 미만 상품은 순위에 나타나지 않아요. 하위 지역을 합산하며 개인 찜 목록은 공개하지 않아요.</p></section>
-    {selected ? <WishMapResults key={selected.code} region={selected} onParent={() => choose(selected.parentCode)} /> : <div className="pixel-panel p-10 text-center"><h2 className="text-xl font-bold">궁금한 동네를 먼저 골라 보세요</h2><p className="mt-3 text-sm text-sub">우리 동네에서 관심을 모으는 아이템을 살펴보세요.</p></div>}
+  const params = useSearchParams();
+  const regions = useRegions();
+  const profile = useLocalProfile();
+  const catalog = useMemo(() => regions.data ?? [], [regions.data]);
+  const byCode = useMemo(() => new Map(catalog.map((region) => [region.code, region])), [catalog]);
+  const nickname = params.get("q")?.trim().slice(0, 30) || null;
+  // URL에 지역이 없으면 내 동네부터 (빈 값은 "전체"를 고른 상태)
+  const focus = params.has("region") ? params.get("region") || null : profile.data?.region?.code ?? null;
+  const viewCode = viewCodeFor(focus, catalog, MAP_VIEWS);
+  const view = MAP_VIEWS[viewCode];
+  const selected = focus && focus !== viewCode && view.legend.includes(focus) ? focus : null;
+  const go = useCallback((region: string | null, q: string | null = null) => window.history.pushState(null, "", wishHref(region ?? "", q)), []);
+
+  const loadCounts = useCallback((signal: AbortSignal) => localApi.wishWants(view.legend, signal), [view.legend]);
+  const counts = useLocalResource(loadCounts);
+  const blocks: MapBlock[] = view.legend.map((code) => {
+    const row = counts.data?.find((item) => item.regionCode === code);
+    const count = row?.count ?? 0;
+    return { code, name: byCode.get(code)?.name ?? code, count: count || null, pins: Array(Math.min(count, 4)).fill(HEART), sample: row?.sample ?? false, hint: "WANT", unit: "개" };
+  });
+  const choose = (code: string) => {
+    if (MAP_VIEWS[code]) go(code); // 시·구는 지도 안으로
+    else go(selected === code ? viewCode : code);
+  };
+  const trail = viewTrail(viewCode, catalog);
+  const place = selected ?? (viewCode || null);
+
+  if (regions.error) return <LocalError message={regions.error} onRetry={() => void regions.refresh()} />;
+  return <div className="space-y-3">
+    <div className="flex flex-wrap items-center gap-2">
+      <nav aria-label="지도 위치" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 font-pixel text-sm">
+        <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
+        {trail.map((code) => <span key={code} className="flex items-center gap-1">
+          <span aria-hidden="true" className="text-dim">›</span>
+          <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
+            className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
+        </span>)}
+      </nav>
+      <WishSearch key={nickname ?? ""} regions={catalog} nickname={nickname} onRegion={(code) => go(code)} onNickname={(q) => go(focus, q)} />
+    </div>
+
+    <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="mx-auto w-full" style={{ maxWidth: `calc((100dvh - 15rem) * ${view.cols / view.rows})` }}>
+        {counts.error ? <LocalError message={counts.error} onRetry={() => void counts.refresh()} busy={counts.loading} /> : (
+          <PixelMap view={view} blocks={blocks} selected={selected} seedKey="wish" onSelect={choose}
+            label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
+        )}
+        <p className="mt-2 text-xs leading-relaxed text-dim">
+          💗 하트는 그 동네에서 진행 중인 WANT(구해요) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;위시맵에 닉네임 공개&rsquo;를 켠 이웃만 보여요.
+          {blocks.some((block) => block.sample) && <> <span className="text-violet">*</span> 샘플 데이터</>}
+        </p>
+      </div>
+      {nickname
+        ? <WantPanel key={`q:${nickname}`} title={`👤 '${nickname}' 검색`} kicker="PLAYER SEARCH" region={null} nickname={nickname} onClear={() => go(focus)} />
+        : <WantPanel key={`r:${place ?? ""}`} title={place ? byCode.get(place)?.fullName ?? place : "서비스 지역 전체"} kicker={selected ? "NEIGHBORHOOD" : "AREA"} region={place} nickname={null} />}
+    </div>
   </div>;
 }
-interface WishMapResultsProps { region: ApiRegion; onParent: () => void; }
-function WishMapResults({ region, onParent }: WishMapResultsProps) {
-  const load = useCallback((signal: AbortSignal) => localApi.wishMap(region.code, signal), [region.code]);
-  const result = useLocalResource(load);
-  if (result.loading) return <LocalSkeleton label="인기 찜 상품 불러오는 중" />;
-  if (result.error) return <LocalError message={result.error} onRetry={() => void result.refresh()} />;
-  if (!result.data) return null;
-  const rows = result.data.filter((row) => row.count >= 5);
-  return rows.length ? <ol aria-label="동네 인기 찜 상품" className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">{rows.map((row) => <li key={row.product.id} className="min-w-0"><div className="mb-2 flex flex-wrap items-center justify-between gap-x-2 sm:mb-3"><span className="font-pixel text-base text-violet sm:text-lg">#{row.rank}</span><span className="text-xs font-bold text-mint sm:text-sm">{row.count}명이 찜했어요{row.isSample && <span className="ml-1.5 rounded border border-violet/40 px-1 font-normal text-violet">샘플</span>}</span></div><ProductCard product={row.product} /></li>)}</ol>
-    : <div className="pixel-panel p-8 text-center"><p className="mb-3 font-pixel text-violet">NEXT WISH</p><h2 className="text-xl font-bold">아직 순위를 보여 줄 만큼 모이지 않았어요</h2><p className="mt-3 text-sm text-sub">5명 이상이 찜한 상품부터 보여드려요. 더 넓은 지역이나 다른 아이템을 살펴보세요.</p><div className="mt-5 flex flex-wrap justify-center gap-3"><button type="button" onClick={onParent} className={localButton}>{region.parentCode ? "상위 지역에서 보기" : "다른 시에서 보기"}</button><Link href="/products" className={localButton}>상품 둘러보기</Link><Link href="/local/settings" className={localButton}>내 취향 등록</Link></div></div>;
+
+interface WishSearchProps { regions: ApiRegion[]; nickname: string | null; onRegion: (code: string) => void; onNickname: (q: string) => void; }
+
+/** 동네 이름 또는 닉네임으로 찾기 — 전국으로 늘어나도 긴 목록 없이 */
+function WishSearch({ regions, nickname, onRegion, onNickname }: WishSearchProps) {
+  const [mode, setMode] = useState<"region" | "nickname">(nickname ? "nickname" : "region");
+  const [text, setText] = useState(nickname ?? "");
+  const keyword = text.trim();
+  const matches = mode === "region" && keyword ? regions.filter((region) => region.fullName.includes(keyword)).slice(0, 6) : [];
+  const pick = (code: string) => { onRegion(code); setText(""); };
+  const tab = "h-11 px-3 text-xs font-bold aria-pressed:bg-lime aria-pressed:text-lime-ink";
+  return <form role="search" aria-label="위시맵 찾기" className="flex w-full gap-1.5 sm:w-auto" onSubmit={(event) => {
+    event.preventDefault();
+    if (mode === "nickname" && keyword) onNickname(keyword);
+    else if (matches[0]) pick(matches[0].code);
+  }}>
+    <div className="flex shrink-0 overflow-hidden rounded-md border-2 border-frame bg-panel">
+      <button type="button" aria-pressed={mode === "region"} onClick={() => { setMode("region"); setText(""); }} className={tab}>📍 동네</button>
+      <button type="button" aria-pressed={mode === "nickname"} onClick={() => { setMode("nickname"); setText(""); }} className={tab}>👤 닉네임</button>
+    </div>
+    <div className="relative min-w-0 flex-1 sm:w-52 sm:flex-none">
+      <label htmlFor="wish-search" className="sr-only">{mode === "region" ? "동네 이름" : "닉네임"}</label>
+      <input id="wish-search" value={text} onChange={(event) => setText(event.target.value.slice(0, mode === "region" ? 20 : 30))}
+        placeholder={mode === "region" ? "동네 검색 (예: 판교)" : "닉네임으로 찾기"} autoComplete="off" enterKeyHint="search"
+        onKeyDown={(event) => { if (event.key === "Escape") setText(""); }} className={localInput} />
+      {matches.length > 0 && <ul aria-label="동네 검색 결과" className="pixel-panel absolute inset-x-0 top-full z-20 mt-1 overflow-hidden">
+        {matches.map((region) => <li key={region.code}>
+          <button type="button" onClick={() => pick(region.code)} className="block w-full px-3 py-2 text-left text-sm hover:bg-panel-2">{region.fullName}</button>
+        </li>)}
+      </ul>}
+    </div>
+    {mode === "nickname" && <button type="submit" disabled={!keyword} className="btn-lime h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>}
+  </form>;
+}
+
+interface WantPanelProps { title: string; kicker: string; region: string | null; nickname: string | null; onClear?: () => void; }
+
+function WantPanel({ title, kicker, region, nickname, onClear }: WantPanelProps) {
+  const loadWants = useCallback((signal: AbortSignal) => localApi.wants(region, nickname, signal), [region, nickname]);
+  const wants = useLocalResource(loadWants);
+  const loadTop = useCallback((signal: AbortSignal) => region ? localApi.wishMap(region, signal) : Promise.resolve([]), [region]);
+  const top = useLocalResource(loadTop);
+  const rows = wants.data?.items ?? [];
+  const popular = (top.data ?? []).filter((row) => row.count >= 5).slice(0, 3);
+  return <aside aria-label={`${title} WANT 글`} className="pixel-panel overflow-hidden">
+    <header className="border-b-2 border-frame bg-panel-2 px-4 py-3">
+      <p className="font-pixel text-[10px] tracking-widest text-lime">▶ {kicker}</p>
+      <div className="mt-1 flex items-center justify-between gap-2">
+        <h2 className="min-w-0 break-keep text-lg font-extrabold">{title}</h2>
+        {onClear && <button type="button" onClick={onClear} className="btn-pixel h-8 shrink-0 px-2.5 text-xs font-bold">지우기</button>}
+      </div>
+      {wants.data && <p className="mt-1 text-sm text-sub"><span aria-hidden="true">💗 </span>WANT <strong className="text-pink">{wants.data.total}</strong>개</p>}
+    </header>
+    <div className="max-h-[min(60dvh,32rem)] overflow-y-auto p-3">
+      {wants.error ? <LocalError message={wants.error} onRetry={() => void wants.refresh()} />
+        : wants.loading ? <LocalSkeleton label="WANT 글 불러오는 중" />
+          : rows.length ? <ul className="space-y-2">{rows.map((post) => <li key={post.id}><WantRow post={post} /></li>)}</ul>
+            : <div className="p-4 text-center text-sm text-sub">
+              <p className="font-pixel text-xs tracking-widest text-dim">EMPTY</p>
+              <p className="mt-2">{nickname ? "닉네임을 공개한 이웃 중에 찾지 못했어요." : "아직 이 동네에 WANT 글이 없어요."}</p>
+            </div>}
+    </div>
+    <footer className="space-y-3 border-t-2 border-frame p-3">
+      {popular.length > 0 && <div>
+        <p className="mb-1.5 font-pixel text-[10px] tracking-widest text-dim">♥ 이 동네 인기 찜</p>
+        <ol className="space-y-1">{popular.map((row) => <li key={row.product.id} className="flex items-center justify-between gap-2 text-xs">
+          <Link href={`/products/${row.product.id}`} className="min-w-0 truncate hover:text-mint"><span className="mr-1.5 font-pixel text-violet">{row.rank}</span>{row.product.name}</Link>
+          <span className="shrink-0 text-dim">{row.count}명{row.isSample ? " · 샘플" : ""}</span>
+        </li>)}</ol>
+      </div>}
+      <Link href="/local/trades/new?kind=want" className={`${localButton} w-full`}>💗 내 WANT 올리기</Link>
+    </footer>
+  </aside>;
+}
+
+function WantRow({ post }: { post: ApiTradePost }) {
+  const rarity = rarityOf(post.price ?? post.product?.price);
+  const name = containsContact(post.itemName) ? "물건명 비공개" : post.itemName;
+  const giftable = !post.isMine && !post.isSample && post.status === "open";
+  return <article className="flex gap-2.5 rounded-md border-2 border-frame bg-night/60 p-2">
+    <div className="relative grid size-12 shrink-0 place-items-end justify-center overflow-hidden rounded bg-[linear-gradient(#17123a,#2a1f5c)]">
+      {post.author?.avatarUrl ? <PixelAvatar src={post.author.avatarUrl} alt="" className="size-10 object-bottom" /> : (
+        // eslint-disable-next-line @next/next/no-img-element -- 픽셀 슬라임
+        <img src="/images/hero-slime.svg" alt="" className={`size-10 object-contain object-bottom [image-rendering:pixelated] ${post.author ? "" : "brightness-75 grayscale-[40%]"}`} />
+      )}
+    </div>
+    <div className="min-w-0 flex-1">
+      <p className="truncate text-xs text-dim">
+        <span className={post.author ? "font-bold text-ink" : ""}>{post.isMine ? "나" : post.author?.nickname ?? "이웃 플레이어"}</span> · {post.regionName.split(" ").at(-1)}
+        {post.isSample && <span className="ml-1 text-violet">· 샘플 데이터</span>}
+      </p>
+      <p className="truncate font-bold" style={{ color: rarity.color }}><span aria-hidden="true">💗 </span>{name}</p>
+      <p className="truncate text-[11px] text-dim">{post.price !== null ? `희망가 ${formatPrice(post.price)}` : post.product ? `연결 상품 ${post.product.name}` : "가격 제안"}</p>
+    </div>
+    {giftable
+      ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold">🎁 선물</Link>
+      : <span title={post.isMine ? "내 글" : "샘플 글에는 선물할 수 없어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">🎁 선물</span>}
+  </article>;
 }

@@ -6,7 +6,6 @@ import { interestLabel } from "@/utils/local";
 import { formatDate } from "@/utils/formatDate";
 import { formatPrice } from "@/utils/formatPrice";
 import { durabilityOf, rarityOf, TRADE_KIND_GAME, TRADE_METHOD_ICON } from "@/utils/gameItem";
-import { giftHref } from "@/utils/gift";
 
 interface TradeCardProps { post: ApiTradePost; proximity?: TradeProximity | null; actions?: ReactNode; }
 
@@ -56,8 +55,6 @@ export default function TradeCard({ post, proximity = null, actions }: TradeCard
     </Link>}
     <div className="mt-auto flex items-end justify-between gap-2 pt-3">
       <time dateTime={post.createdAt} className="text-[11px] text-dim">{formatDate(post.createdAt)}</time>
-      {/* 이웃의 진행 중인 글에만 — 내 글·샘플 글은 선물 받을 사람이 없다 */}
-      {!post.isMine && !post.isSample && post.status === "open" && <Link href={giftHref(post)} className="btn-pixel inline-flex h-8 items-center px-2.5 text-xs font-bold text-pink hover:text-ink">🎁 선물하기</Link>}
     </div>
     {actions}
   </article>;

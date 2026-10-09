@@ -1,6 +1,4 @@
-/** 거래 카드·교환 창에서 선물 화면으로 — 거래글 하나를 받는 사람으로 정한다 */
-export function giftHref(post: { id: number; itemName: string; product: { id: number } | null }): string {
-  const params = new URLSearchParams({ post: String(post.id), item: post.itemName.slice(0, 60) });
-  if (post.product) params.set("product", String(post.product.id));
-  return `/local/gift?${params}`;
+/** 위시맵 WANT 글에서 선물 화면으로 — 받는 사람·물건은 선물 화면이 글 id로 다시 불러온다 */
+export function giftHref(post: { id: number }): string {
+  return `/local/gift?post=${post.id}`;
 }
