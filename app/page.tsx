@@ -27,7 +27,7 @@ async function RecommendedProducts() {
 function SectionTitle({ quest, title, href }: { quest: string; title: string; href?: string }) {
   return <div className="mb-5 flex items-end justify-between gap-3">
     <div>
-      <p className="mb-1 font-pixel text-xs tracking-widest text-violet motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">▶ {quest}</p>
+      <p className="mb-1 font-pixel text-xs tracking-widest text-lime motion-safe:animate-[pulse_1.2s_steps(2)_infinite]">▶ {quest}</p>
       <h2 className="text-2xl font-extrabold">{title}</h2>
     </div>
     {href && <Link href={href} className="shrink-0 text-sm font-semibold text-sub transition-colors hover:text-ink">전체 보기 →</Link>}

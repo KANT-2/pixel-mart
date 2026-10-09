@@ -5,13 +5,14 @@ import { useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocalSelection } from "@/components/local/useLocalSelection";
 import { useLocalResource } from "@/components/local/useLocalResource";
-import RegionSelector from "@/components/local/RegionSelector";
+import CompactRegionSelect from "@/components/local/CompactRegionSelect";
 import TradeCard from "@/components/local/TradeCard";
 import Pagination from "@/components/Pagination";
-import { LocalError, LocalSkeleton, localButton, localInput } from "@/components/local/LocalStates";
+import { LocalError, LocalSkeleton, localButton } from "@/components/local/LocalStates";
 import { localApi } from "@/lib/local";
 import { changeTradeQuery, parseTradeQuery, tradeHref, tradeProximity, tradeQueryParams, TRADE_KINDS, type TradeQuery } from "@/utils/localTrades";
 import type { ApiRegion, TradeKind } from "@/types/api";
+import { TRADE_KIND_GAME } from "@/utils/gameItem";
 
 export default function TradesBoard() {
   const params = useSearchParams(), router = useRouter();
@@ -24,11 +25,18 @@ export default function TradesBoard() {
   function change(patch: Partial<TradeQuery>) { router.push(tradeHref(changeTradeQuery(effective, patch)), { scroll: false }); }
   return <div className="space-y-6">
     {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택할 수 있어요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
-    <section aria-label="게시판 필터" className="space-y-4 pixel-panel p-5">
-      <RegionSelector regions={catalog.data} value={selected?.code ?? null} onChange={(region) => change({ region })} />
+    {/* 거래소 도구 막대 — 지역 · 종류를 한 줄에 */}
+    <section aria-label="게시판 필터" className="space-y-2">
+      <div className="pixel-panel flex min-w-0 flex-wrap items-center gap-2 p-2">
+        <div className="min-w-0 flex-[1_1_14rem]"><CompactRegionSelect regions={catalog.data} value={selected?.code ?? null} onChange={(region) => change({ region })} /></div>
+        <div role="group" aria-label="글 종류 필터" className="flex flex-wrap gap-1.5">
+          {[{ value: undefined, label: "전체" }, ...TRADE_KINDS.map((item) => ({ value: item.value, label: `${TRADE_KIND_GAME[item.value].icon} ${TRADE_KIND_GAME[item.value].tag}` }))].map((item) =>
+            <button key={item.label} type="button" aria-pressed={query.kind === item.value} onClick={() => change({ kind: item.value as TradeKind | undefined })}
+              className="h-10 btn-pixel px-3 font-pixel text-xs text-sub hover:text-ink aria-pressed:border-lime aria-pressed:text-lime">{item.label}</button>)}
+        </div>
+      </div>
       {invalid && <p role="status" className="text-sm text-pink">없는 지역 조건은 제외했어요. 지역을 다시 선택해 주세요.</p>}
-      <label className="block max-w-xs text-sm font-semibold">글 종류<select aria-label="글 종류 필터" value={query.kind ?? ""} onChange={(event) => change({ kind: event.target.value as TradeKind || undefined })} className={`${localInput} mt-2`}><option value="">전체</option>{TRADE_KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></label>
-      {(query.productId || query.interestId) && <div className="flex flex-wrap gap-2">{query.productId && <button type="button" onClick={() => change({ productId: undefined })} className={localButton}>연결 상품 조건 해제 ×</button>}{query.interestId && <button type="button" onClick={() => change({ interestId: undefined })} className={localButton}>취향 조건 해제 ×</button>}</div>}
+      {(query.productId || query.interestId) && <div className="flex flex-wrap gap-2">{query.productId && <button type="button" onClick={() => change({ productId: undefined })} className="btn-pixel min-h-8 px-2.5 py-1 text-xs text-sub">연결 상품 조건 ×</button>}{query.interestId && <button type="button" onClick={() => change({ interestId: undefined })} className="btn-pixel min-h-8 px-2.5 py-1 text-xs text-sub">취향 조건 ×</button>}</div>}
       <p className="text-xs text-dim">{selected ? "선택한 지역의 하위 지역까지 둘러봐요." : "전체 지역의 진행 중인 글을 둘러봐요."} 글은 저장된 내 동네로 작성돼요.</p>
     </section>
     <TradesResults key={tradeHref(effective)} query={effective} regions={catalog.data} ownRegion={profile.data?.region?.code ?? null} />

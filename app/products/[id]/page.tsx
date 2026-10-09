@@ -6,6 +6,7 @@ import AddToCartButton from "@/components/AddToCartButton";
 import WishButton from "@/components/WishButton";
 import ProductCard from "@/components/ProductCard";
 import { formatPrice } from "@/utils/formatPrice";
+import { rarityOf } from "@/utils/gameItem";
 import { getProduct, getProducts, getProductParams } from "@/lib/products";
 import { ProductFallbackNotice } from "@/components/products/ProductStates";
 import ProductDetailTabs from "@/components/products/ProductDetailTabs";
@@ -41,6 +42,7 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
 
   // 없는 id(/products/999, /products/abc) → 같은 폴더의 not-found.tsx 표시
   if (!product) notFound();
+  const rarity = rarityOf(product.price);
 
   const category = { slug: product.categorySlug, name: product.category };
   const relatedResult = await getProducts({ category: product.categorySlug, size: 5 });
@@ -62,25 +64,30 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
 
       {/* 상품 정보 */}
       <section className="grid gap-8 md:grid-cols-2 md:gap-12">
-        <div className="relative">
+        {/* 게임 아이템 칸 — 가격대 등급 색으로 테두리가 빛남 */}
+        <div className="item-slot relative self-start overflow-hidden p-1.5" style={{ ["--rarity" as string]: rarity.color }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- 과제 권장: 설정 없이 쓰는 일반 img */}
           <img
             src={product.imageUrl}
             alt={product.name}
-            className="aspect-square w-full pixel-panel object-cover"
+            className="aspect-square w-full rounded object-cover"
           />
           {product.isNew && (
             <span className="absolute left-4 top-4 rounded bg-violet px-2.5 py-1 font-pixel text-sm text-night">NEW</span>
           )}
+          <span className="absolute bottom-4 right-4 rounded border-2 px-2 py-0.5 font-pixel text-xs" style={{ color: rarity.color, borderColor: rarity.color, background: "rgb(13 11 26 / 0.85)" }}>★ {rarity.label}</span>
         </div>
 
         <div className="flex flex-col">
-          <p className="mb-2 text-sm font-semibold text-mint">{product.category}</p>
+          <p className="mb-2 font-pixel text-xs tracking-widest text-dim">TYPE <span className="text-mint">{product.category}</span> · RARITY <span style={{ color: rarity.color }}>{rarity.label}</span></p>
           <div className="mb-4 flex items-start justify-between gap-4">
-            <h1 className="text-3xl font-extrabold leading-snug md:text-4xl">{product.name}</h1>
+            <h1 className="text-3xl font-extrabold leading-snug md:text-4xl" style={{ color: rarity.key === "common" ? undefined : rarity.color }}>{product.name}</h1>
             <WishButton productId={product.id} productName={product.name} />
           </div>
-          <p className="mb-6 text-3xl font-extrabold text-lime">{formatPrice(product.price)}</p>
+          <p className="mb-6 flex items-center gap-2 text-3xl font-extrabold text-lime">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 픽셀 코인 */}
+            <img src="/images/hero-coin.svg" alt="" className="size-7 [image-rendering:pixelated]" />{formatPrice(product.price)}
+          </p>
           <p className="mb-8 leading-relaxed text-sub">{product.description}</p>
 
           <p className="mb-2 font-pixel text-xs tracking-widest text-violet">▶ ITEM STATS</p>
