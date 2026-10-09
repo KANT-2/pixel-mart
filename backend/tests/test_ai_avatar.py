@@ -166,11 +166,12 @@ async def test_cloudflare_retries_false_positive_safety_flag(client, upstream):
     assert len(seeds) == 2 and seeds[0] != seeds[1]
 
 
-async def test_cloudflare_gives_up_after_three_flags(client, upstream):
+async def test_cloudflare_gives_up_after_five_flags(client, upstream):
     await login(client)
     upstream(lambda request: httpx.Response(400, json={"errors": [{"code": 3030}], "success": False}))
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
-    assert res.status_code == 422 and len(upstream.calls) == 3
+    assert res.status_code == 422 and len(upstream.calls) == 5
+    assert "바로 픽셀로" in res.json()["detail"]  # 브라우저 픽셀 변환으로 이어지게
 
 
 def test_image_mime():

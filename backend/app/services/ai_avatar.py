@@ -9,6 +9,7 @@
 
 import base64
 import binascii
+import logging
 import secrets
 import time
 from collections import defaultdict, deque
@@ -103,6 +104,7 @@ def image_mime(data: str) -> str:
 NOT_CONFIGURED = "AI 아바타가 아직 설정되지 않았어요. 픽셀 캔버스로 직접 만들어 보세요."
 CANNOT_DRAW = "이 사진으로는 아바타를 만들 수 없어요. 사람·동물·캐릭터가 잘 보이는 다른 사진을 골라 주세요."
 FAILED = "AI 아바타를 만들지 못했어요. 잠시 후 다시 시도해 주세요."
+FLAGGED_MESSAGE = "AI가 이 사진으로 그리지 못했어요. 다시 시도하거나, 사진을 바로 픽셀로 바꿔 보세요."
 
 
 async def _post(client: httpx.AsyncClient | None, url: str, **kwargs) -> httpx.Response:
@@ -118,7 +120,9 @@ async def _post(client: httpx.AsyncClient | None, url: str, **kwargs) -> httpx.R
 
 
 FLAGGED = 3030  # Cloudflare 출력 안전 필터 — 같은 입력도 시드에 따라 오탐이 나서 다른 시드로 다시 시도
-CLOUDFLARE_ATTEMPTS = 3
+# 실측: 같은 그림도 시드에 따라 20~70%가 걸린다 — 사람 사진은 더 자주 걸려 5번까지
+CLOUDFLARE_ATTEMPTS = 5
+logger = logging.getLogger(__name__)
 
 
 def _error_codes(response: httpx.Response) -> set[int]:
@@ -146,8 +150,14 @@ async def _cloudflare(mime: str, encoded: str, client: httpx.AsyncClient | None)
             },
             files={"input_image_0": (f"photo.{extension}", photo, mime)},
         )
-        if response.status_code != 400 or FLAGGED not in _error_codes(response):
+        codes = _error_codes(response) if response.status_code >= 400 else set()
+        if response.status_code >= 400:
+            # 원인 파악용 — 상태·오류 코드만 남긴다 (사진·키·응답 본문은 남기지 않음)
+            logger.warning("cloudflare ai avatar failed: status=%s codes=%s", response.status_code, sorted(codes))
+        if response.status_code != 400 or FLAGGED not in codes:
             break
+    if response.status_code == 400 and FLAGGED in _error_codes(response):
+        raise AiAvatarError(422, FLAGGED_MESSAGE)
     if response.status_code == 429:
         raise AiAvatarError(429, "오늘 AI 무료 사용량을 다 썼어요. 내일 다시 시도하거나 픽셀 캔버스로 만들어 보세요.")
     if response.status_code in (400, 413):
