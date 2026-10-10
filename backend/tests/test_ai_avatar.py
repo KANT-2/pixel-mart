@@ -138,8 +138,24 @@ async def test_cloudflare_sends_photo_as_reference_image(client, upstream):
     assert request.headers["content-type"].startswith("multipart/form-data")
     body = request.content
     assert b'name="input_image_0"' in body and b"\xff\xd8\xff fake jpeg" in body  # 사진 원본 바이트
-    assert b'name="prompt"' in body and b"magenta" in body
+    assert b'name="prompt"' in body and b"magenta" in body and b"chibi" in body
+    assert b'name="input_image_1"' in body  # 사람: 머리:몸 1:2 윤곽선 가이드
     assert b'name="width"\r\n\r\n512' in body and b'name="height"\r\n\r\n512' in body
+
+
+async def test_other_subject_keeps_proportions_without_guide(client, upstream):
+    await login(client)
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True, "subject": "other"})
+    assert res.status_code == 200
+    [request] = upstream.calls
+    assert b'name="input_image_1"' not in request.content and b"head : body" not in request.content
+    assert b"do not change its proportions" in request.content
+
+
+async def test_rejects_unknown_subject(client, upstream):
+    await login(client)
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True, "subject": "robot"})
+    assert res.status_code == 422 and upstream.calls == []
 
 
 @pytest.mark.parametrize(
