@@ -63,6 +63,8 @@ class RateLimiter:
         self.calls: dict[int, deque[float]] = defaultdict(deque)
 
     def check(self, user_id: int, now: float | None = None) -> None:
+        if self.per_hour <= 0:  # 0이면 제한 없음
+            return
         now = time.monotonic() if now is None else now
         calls = self.calls[user_id]
         while calls and now - calls[0] >= self.window:
@@ -104,7 +106,7 @@ def image_mime(data: str) -> str:
 NOT_CONFIGURED = "AI 아바타가 아직 설정되지 않았어요. 픽셀 캔버스로 직접 만들어 보세요."
 CANNOT_DRAW = "이 사진으로는 아바타를 만들 수 없어요. 사람·동물·캐릭터가 잘 보이는 다른 사진을 골라 주세요."
 FAILED = "AI 아바타를 만들지 못했어요. 잠시 후 다시 시도해 주세요."
-FLAGGED_MESSAGE = "AI가 이 사진으로 그리지 못했어요. 다시 시도하거나, 사진을 바로 픽셀로 바꿔 보세요."
+FLAGGED_MESSAGE = "AI가 이 사진으로 그리지 못했어요. 유명 캐릭터의 공식 그림은 막힐 수 있어요 — 내 사진·직접 그린 그림으로 하거나, 사진을 바로 픽셀로 바꿔 보세요."
 
 
 async def _post(client: httpx.AsyncClient | None, url: str, **kwargs) -> httpx.Response:

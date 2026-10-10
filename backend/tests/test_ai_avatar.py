@@ -30,6 +30,12 @@ def test_decode_photo_rejects_large_photo():
         decode_photo(big)
 
 
+def test_rate_limiter_zero_means_unlimited():
+    limiter = RateLimiter(per_hour=0)
+    for i in range(50):
+        limiter.check(1, now=i)
+
+
 def test_rate_limiter_window():
     limiter = RateLimiter(per_hour=2, window=3600)
     limiter.check(1, now=0)
