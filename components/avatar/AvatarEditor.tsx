@@ -22,7 +22,7 @@ function gridToPng(grid: PixelGridData, large: boolean): { dataUrl: string; byte
   small.height = grid.rows;
   small.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(grid.pixels), grid.cols, grid.rows), 0, 0);
   const size = large ? getOutputSize(1024, 1024, { cols: grid.cols, rows: grid.rows }) : getOutputSize(grid.cols, grid.rows, { cols: grid.cols, rows: grid.rows });
-  // 큰 격자(최대 128칸)는 키운 PNG가 50KB를 넘을 수 있어, 넘으면 배율을 한 단계씩 낮춘다 (마지막은 1배)
+  // 큰 격자(최대 256칸)는 키운 PNG가 200KB를 넘을 수 있어, 넘으면 배율을 한 단계씩 낮춘다 (마지막은 1배)
   for (let scale = size.scale; ; scale--) {
     const output = document.createElement("canvas");
     output.width = grid.cols * scale;
