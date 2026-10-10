@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     cloudflare_account_id: str = ""
     cloudflare_api_token: str = ""
     cloudflare_image_model: str = "@cf/black-forest-labs/flux-2-klein-4b"
-    ai_avatar_per_hour: int = 10
+    ai_avatar_per_hour: int = 0  # 사용자별 1시간 횟수 제한, 0이면 제한 없음 (무료 일일 할당 약 300장)
 
     @property
     def is_local(self) -> bool:
