@@ -103,8 +103,9 @@ function AvatarForm({ user }: AvatarFormProps) {
       <aside className={`space-y-3 ${mode === "canvas" ? "md:mt-[112px]" : "md:mt-[60px]"}`}>
         <div className="pixel-panel p-4">
           <h2 className="mb-3 text-sm font-bold">지금 내 아바타</h2>
-          <MotionBoundary className="grid aspect-square place-items-center rounded-md bg-night">
-            <div className={`${heroStyles.bob} grid h-3/5 w-3/5 place-items-center`}>
+          {/* 큰 아바타(최대 256칸)도 칸 안에 비율 그대로 — 퍼센트 크기가 먹도록 절대 위치로 */}
+          <MotionBoundary className="relative aspect-square overflow-hidden rounded-md bg-night">
+            <div className={`${heroStyles.bob} absolute inset-[12%] grid place-items-center`}>
               {user.avatarUrl ? <PixelAvatar src={user.avatarUrl} alt="현재 픽셀 아바타" className="h-full w-full" /> : (
                 // eslint-disable-next-line @next/next/no-img-element -- 무대와 같은 기존 픽셀 스프라이트
                 <img src="/images/hero-slime.svg" alt="기본 슬라임" className="w-full [image-rendering:pixelated]" />
@@ -200,9 +201,9 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
       </figure>
       <figure className="pixel-panel p-4">
         <figcaption className="mb-3 text-sm font-bold">AI 픽셀 아바타</figcaption>
-        <div className="grid aspect-square place-items-center overflow-hidden rounded-md bg-night">
+        <div className="relative grid aspect-square place-items-center overflow-hidden rounded-md bg-night">
           {working ? <p role="status" className="font-pixel text-sm text-lime motion-safe:animate-[pulse_1s_steps(2)_infinite]">LOADING…</p>
-            : result ? <PixelAvatar src={result.preview} alt="AI가 만든 픽셀 아바타" className="h-4/5 w-4/5" />
+            : result ? <PixelAvatar src={result.preview} alt="AI가 만든 픽셀 아바타" className="absolute inset-[8%] h-[84%] w-[84%]" />
               : <p className="px-4 text-center text-sm text-dim">결과가 여기에 보여요.</p>}
         </div>
         {result && <div className="mt-3 flex flex-wrap gap-2">
