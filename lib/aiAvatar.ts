@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import { keyOutBackground, opaqueBounds, snapToGrid, type PixelGridData } from "@/utils/pixelCanvas";
 import { despeckle, quantizeColors } from "@/utils/pixelate";
+import { photoSkinTone, snapSkinTones } from "@/utils/skinTone";
 import type { ApiAiAvatarStatus } from "@/types/api";
 
 export const MAX_PHOTO_SOURCE_BYTES = 10 * 1024 * 1024;
@@ -41,16 +42,33 @@ export async function preparePhoto(file: File, maxSide = DEFAULT_PHOTO_SIDE): Pr
   }
 }
 
-export async function requestAiAvatar(photo: string, signal?: AbortSignal): Promise<string> {
-  const result = await api.post<{ image: string }>("/avatars/ai", { photo, consent: true }, { signal });
+/** person: 머리:몸 1:2 미니미 형식 / other: 동물·캐릭터·사물을 원래 비율 그대로 */
+export type AiSubject = "person" | "other";
+
+export async function requestAiAvatar(photo: string, subject: AiSubject = "person", signal?: AbortSignal): Promise<string> {
+  const result = await api.post<{ image: string }>("/avatars/ai", { photo, subject, consent: true }, { signal });
   return result.image;
 }
 
-/** AI가 그린 큰 이미지 → 테두리에서 이어진 단색 배경 제거(투명) → 캐릭터만 잘라 픽셀 격자로 → 색 16개로 정리 */
 /** 아바타 격자 최대 크기 — 긴 쪽 256칸 */
 export const MAX_AVATAR_CELLS = 256;
 
-export async function aiImageToGrid(image: string, longCells = MAX_AVATAR_CELLS): Promise<PixelGridData> {
+/** 원본 사진을 작게 그려 피부 톤(밝은·어두운)을 고른다 — AI가 피부색을 바꿔 그려도 사진 기준으로 맞추려고 */
+async function skinToneFromPhoto(photo: string) {
+  const element = await loadImage(photo);
+  const scale = Math.min(1, 96 / Math.max(element.naturalWidth, element.naturalHeight));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(element.naturalWidth * scale));
+  canvas.height = Math.max(1, Math.round(element.naturalHeight * scale));
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return null;
+  context.drawImage(element, 0, 0, canvas.width, canvas.height);
+  return photoSkinTone(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
+}
+
+/** AI가 그린 큰 이미지 → 테두리에서 이어진 단색 배경 제거(투명) → 캐릭터만 잘라 픽셀 격자로 → 색 16개로 정리.
+ * 사람이면 피부색을 정해 둔 두 톤(사진 기준) 중 하나로 맞춘다 */
+export async function aiImageToGrid(image: string, subject: AiSubject = "person", photo?: string, longCells = MAX_AVATAR_CELLS): Promise<PixelGridData> {
   const element = await loadImage(image);
   const canvas = document.createElement("canvas");
   canvas.width = element.naturalWidth;
@@ -64,7 +82,9 @@ export async function aiImageToGrid(image: string, longCells = MAX_AVATAR_CELLS)
   if (!bounds) throw new Error("캐릭터를 찾지 못했어요. 다른 사진으로 다시 만들어 보세요.");
   const grid = snapToGrid(keyed, canvas.width, bounds, longCells);
   const cleaned = despeckle(quantizeColors(grid.pixels, 16), grid.cols, grid.rows);
-  return { ...grid, pixels: cleaned };
+  if (subject !== "person") return { ...grid, pixels: cleaned };
+  const tone = photo ? await skinToneFromPhoto(photo).catch(() => null) : null;
+  return { ...grid, pixels: snapSkinTones(cleaned, grid.cols, grid.rows, tone) };
 }
 
 /** AI 없이 사진을 그대로 픽셀 격자로 — 브라우저 안에서만 처리하고 아무 데도 보내지 않는다 (AI가 못 그렸을 때 대안) */

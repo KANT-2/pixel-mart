@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { api, ApiError } from "@/lib/api";
-import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
+import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar, type AiSubject } from "@/lib/aiAvatar";
 import { assertAvatarSize, getOutputSize, getPngByteSize, MAX_AVATAR_BYTES } from "@/utils/pixelate";
 import { isEmpty, type PixelGridData } from "@/utils/pixelCanvas";
 import type { ApiAiAvatarStatus, ApiUser } from "@/types/api";
@@ -133,6 +133,7 @@ interface AiPanelProps {
 function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  const [subject, setSubject] = useState<AiSubject>("person");
   const [working, setWorking] = useState(false);
   const [result, setResult] = useState<{ grid: PixelGridData; preview: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -160,7 +161,7 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
     const id = ++request.current;
     setWorking(true); setError(null); setResult(null);
     try {
-      const grid = kind === "ai" ? await aiImageToGrid(await requestAiAvatar(photo)) : await photoToGrid(photo);
+      const grid = kind === "ai" ? await aiImageToGrid(await requestAiAvatar(photo, subject), subject, photo) : await photoToGrid(photo);
       if (id !== request.current) return;
       const small = document.createElement("canvas");
       small.width = grid.cols; small.height = grid.rows;
@@ -173,7 +174,13 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
 
   return <div className="space-y-4">
     <div className="pixel-panel space-y-4 p-5">
-      <p className="text-sm leading-relaxed text-sub">사진 속 <strong className="text-ink">사람·동물·캐릭터</strong>를 AI가 알아보고, 자세·옷차림·비율을 살린 <strong className="text-lime">픽셀아트 캐릭터</strong>로 다시 그려 줘요. 결과는 픽셀 캔버스에서 다듬을 수 있어요.</p>
+      <p className="text-sm leading-relaxed text-sub">사람 사진은 옷차림·머리·소품을 살린 <strong className="text-lime">머리:몸 1:2 미니미</strong>로, 동물·캐릭터·사물은 <strong className="text-ink">원래 모양 그대로</strong> 픽셀아트로 그려 줘요. 결과는 픽셀 캔버스에서 다듬을 수 있어요.</p>
+      <div role="group" aria-label="사진 속 대상" className="segmented h-10 text-sm font-bold">
+        {([["person", "사람"], ["other", "동물·캐릭터·사물"]] as const).map(([value, label]) => (
+          <button key={value} type="button" aria-pressed={subject === value} disabled={disabled || working}
+            onClick={() => { setSubject(value); setResult(null); }}>{label}</button>
+        ))}
+      </div>
       <label htmlFor="ai-photo" className="block text-sm font-bold">사진 고르기 <span className="font-normal text-dim">(JPEG·PNG·WebP, 10MB 이하)</span></label>
       <input id="ai-photo" type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled || working} onChange={(event) => void choose(event.target.files?.[0])}
         className="block w-full min-w-0 text-sm text-sub file:mr-3 file:rounded-md file:border-2 file:border-frame file:bg-panel-2 file:px-4 file:py-2 file:font-semibold file:text-ink" />
