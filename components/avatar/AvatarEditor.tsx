@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { api, ApiError } from "@/lib/api";
 import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
-import { assertAvatarSize, getOutputSize, getPngByteSize } from "@/utils/pixelate";
+import { assertAvatarSize, getOutputSize, getPngByteSize, MAX_AVATAR_BYTES } from "@/utils/pixelate";
 import { isEmpty, type PixelGridData } from "@/utils/pixelCanvas";
 import type { ApiAiAvatarStatus, ApiUser } from "@/types/api";
 import PixelAvatar from "./PixelAvatar";
@@ -22,14 +22,18 @@ function gridToPng(grid: PixelGridData, large: boolean): { dataUrl: string; byte
   small.height = grid.rows;
   small.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(grid.pixels), grid.cols, grid.rows), 0, 0);
   const size = large ? getOutputSize(1024, 1024, { cols: grid.cols, rows: grid.rows }) : getOutputSize(grid.cols, grid.rows, { cols: grid.cols, rows: grid.rows });
-  const output = document.createElement("canvas");
-  output.width = size.width;
-  output.height = size.height;
-  const context = output.getContext("2d")!;
-  context.imageSmoothingEnabled = false;
-  context.drawImage(small, 0, 0, size.width, size.height);
-  const dataUrl = output.toDataURL("image/png");
-  return { dataUrl, bytes: getPngByteSize(dataUrl), width: size.width, height: size.height };
+  // 큰 격자(최대 128칸)는 키운 PNG가 50KB를 넘을 수 있어, 넘으면 배율을 한 단계씩 낮춘다 (마지막은 1배)
+  for (let scale = size.scale; ; scale--) {
+    const output = document.createElement("canvas");
+    output.width = grid.cols * scale;
+    output.height = grid.rows * scale;
+    const context = output.getContext("2d")!;
+    context.imageSmoothingEnabled = false;
+    context.drawImage(small, 0, 0, output.width, output.height);
+    const dataUrl = output.toDataURL("image/png");
+    const bytes = getPngByteSize(dataUrl);
+    if (bytes <= MAX_AVATAR_BYTES || scale <= 1) return { dataUrl, bytes, width: output.width, height: output.height };
+  }
 }
 
 function ModerationNotice() {

@@ -14,6 +14,8 @@ const SIZES = [
   { label: "32 × 32", cols: 32, rows: 32 },
   { label: "24 × 32 (세로)", cols: 24, rows: 32 },
   { label: "32 × 48 (전신)", cols: 32, rows: 48 },
+  { label: "64 × 64", cols: 64, rows: 64 },
+  { label: "128 × 128 (최대)", cols: 128, rows: 128 },
 ] as const;
 
 // 템플릿 — 메인 무대 슬라임과 같은 색·비율
@@ -42,7 +44,8 @@ export default function PixelCanvasEditor({ initial = null, disabled = false, on
   const [mirror, setMirror] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
   const drawing = useRef<{ last: [number, number] | null; grid: PixelGridData } | null>(null);
-  const cell = Math.max(6, Math.floor(384 / Math.max(grid.cols, grid.rows)));
+  // 큰 격자(최대 128칸)도 캔버스가 384px 안팎에 들어오게 한 칸 최소 3px
+  const cell = Math.max(3, Math.floor(384 / Math.max(grid.cols, grid.rows)));
 
   useEffect(() => { onChange(grid); }, [grid, onChange]);
 
