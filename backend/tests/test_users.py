@@ -31,7 +31,7 @@ def test_avatar_accepts_small_png():
         ("data:image/jpeg;base64," + base64.b64encode(PNG_SIGNATURE).decode(), "data:image/png"),
         (PREFIX + "!!!not-base64!!!", "base64"),
         (PREFIX + base64.b64encode(b"GIF89a....").decode(), "PNG"),
-        (png_data_url(MAX_AVATAR_BYTES + 1), "50KB"),
+        (png_data_url(MAX_AVATAR_BYTES + 1), "200KB"),
     ],
     # 값이 길어 테스트 이름이 환경 변수 길이 제한(Windows 32767자)을 넘지 않게 짧은 id 사용
     ids=["not-data-url", "jpeg", "bad-base64", "not-png", "too-large"],
@@ -97,5 +97,5 @@ async def test_too_large_avatar_is_422_and_not_saved(client, db_ready):
 
     res = await client.put("/api/users/me/avatar", json={"avatarUrl": png_data_url(MAX_AVATAR_BYTES + 1)})
     assert res.status_code == 422
-    assert "50KB" in res.text
+    assert "200KB" in res.text
     assert (await client.get("/api/auth/me")).json()["avatarUrl"] is None
