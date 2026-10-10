@@ -132,7 +132,7 @@ async def test_cloudflare_sends_photo_as_reference_image(client, upstream):
     assert res.status_code == 200
     assert res.json() == {"image": f"data:image/png;base64,{PIXEL}"}
 
-    [request] = upstream.calls
+    request = upstream.calls[0]  # 동시에 여러 번 보낼 수 있어 첫 요청만 본다
     assert str(request.url).endswith("/accounts/acct-123/ai/run/@cf/black-forest-labs/flux-2-klein-4b")
     assert request.headers["authorization"] == "Bearer cf-token"
     assert request.headers["content-type"].startswith("multipart/form-data")
@@ -164,12 +164,13 @@ async def test_cloudflare_retries_false_positive_safety_flag(client, upstream):
     """출력 안전 필터(3030)는 시드에 따라 오탐 — 다른 시드로 다시 시도한다"""
     await login(client)
     flagged = httpx.Response(400, json={"errors": [{"code": 3030, "message": "flagged"}], "success": False})
-    answers = iter([flagged, httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})])
-    upstream(lambda request: next(answers))
+    ok = httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})
+    # 첫 묶음(3개 동시)은 모두 오탐, 두 번째 묶음에서 성공
+    upstream(lambda request: flagged if len(upstream.calls) <= 3 else ok)
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == 200
     seeds = [r.content.split(b'name="seed"\r\n\r\n')[1].split(b"\r\n")[0] for r in upstream.calls]
-    assert len(seeds) == 2 and seeds[0] != seeds[1]
+    assert len(seeds) >= 4 and len(set(seeds)) == len(seeds)  # 매번 다른 시드
 
 
 async def test_cloudflare_gives_up_after_five_flags(client, upstream):
