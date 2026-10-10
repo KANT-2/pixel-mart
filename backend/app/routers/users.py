@@ -36,7 +36,7 @@ async def update_me(body: UserUpdateIn, user: CurrentUser, db: DbSession):
     return user
 
 
-@router.put("/me/avatar", response_model=UserOut, summary="픽셀 아바타 저장 (PNG data URL, 50KB 이하)")
+@router.put("/me/avatar", response_model=UserOut, summary="픽셀 아바타 저장 (PNG data URL, 200KB 이하)")
 async def put_avatar(body: AvatarIn, user: CurrentUser, db: DbSession):
     user.avatar_url = body.avatar_url
     await db.commit()

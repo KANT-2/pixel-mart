@@ -51,7 +51,7 @@ class SignupIn(CamelModel):
 
 
 class AvatarIn(CamelModel):
-    """브라우저에서 픽셀 변환한 PNG (data URL, 디코딩 50KB 이하). 얼굴 원본 사진은 받지 않는다"""
+    """브라우저에서 픽셀 변환한 PNG (data URL, 디코딩 200KB 이하). 얼굴 원본 사진은 받지 않는다"""
 
     avatar_url: Annotated[str, AfterValidator(validate_avatar_data_url)] = Field(
         examples=["data:image/png;base64,iVBORw0KGgo..."]
