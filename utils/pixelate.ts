@@ -1,4 +1,4 @@
-export const MAX_AVATAR_BYTES = 50 * 1024;
+export const MAX_AVATAR_BYTES = 200 * 1024; // 최대 256×256 격자 (서버와 같은 한도)
 export const MAX_SOURCE_BYTES = 10 * 1024 * 1024;
 
 export interface PixelateOptions {
@@ -203,7 +203,7 @@ export function getPngByteSize(dataUrl: string): number {
 export function assertAvatarSize(dataUrl: string): number {
   const bytes = getPngByteSize(dataUrl);
   if (bytes > MAX_AVATAR_BYTES) {
-    throw new Error("아바타는 50KB 이하여야 합니다. 해상도를 낮춰 다시 만들어 주세요.");
+    throw new Error("아바타는 200KB 이하여야 합니다. 해상도를 낮춰 다시 만들어 주세요.");
   }
   return bytes;
 }

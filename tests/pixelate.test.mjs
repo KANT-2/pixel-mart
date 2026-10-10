@@ -93,7 +93,7 @@ test("PNG는 base64 문자열 길이가 아닌 디코딩 바이트를 계산한�
     assert.equal(assertAvatarSize(dataUrl), bytes);
   }
   const oversized = `data:image/png;base64,${Buffer.alloc(MAX_AVATAR_BYTES + 1).toString("base64")}`;
-  assert.equal(MAX_AVATAR_BYTES, 51200);
+  assert.equal(MAX_AVATAR_BYTES, 204800); // 200KB — 최대 256×256 격자
   assert.throws(() => assertAvatarSize(oversized), /해상도를 낮춰/);
   for (const invalid of ["", "data:image/jpeg;base64,YQ==", "data:image/png;base64,", "data:image/png;base64,YQ=", "data:image/png;base64,Y===", "data:image/png;base64,!!!!"]) {
     assert.throws(() => getPngByteSize(invalid));
