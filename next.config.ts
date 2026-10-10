@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  experimental: {
+    // AI 아바타는 안전 필터 오탐 재시도로 30초를 넘길 수 있어 /api 프록시 대기 시간을 늘림 (기본 30초)
+    proxyTimeout: 90_000,
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {
