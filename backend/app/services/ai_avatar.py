@@ -7,7 +7,6 @@
 사용자가 고르면 기존 아바타 API로 저장한다.
 """
 
-import asyncio
 import base64
 import binascii
 import logging
@@ -126,8 +125,8 @@ async def _post(client: httpx.AsyncClient | None, url: str, **kwargs) -> httpx.R
 
 
 FLAGGED = 3030  # Cloudflare 출력 안전 필터 — 같은 입력도 시드에 따라 오탐이 나서 다른 시드로 다시 시도
-# 실측: 같은 그림도 시드에 따라 20~70%가 걸린다 — 기다림을 줄이려 3개를 동시에, 다 걸리면 2개 더 (최대 5번)
-CLOUDFLARE_ROUNDS = (3, 2)
+# 실측: 같은 그림도 시드에 따라 20~70%가 걸린다 — 하나씩 차례로 최대 5번 (프론트 프록시 대기 90초)
+CLOUDFLARE_ATTEMPTS = 5
 logger = logging.getLogger(__name__)
 
 
@@ -159,26 +158,14 @@ async def _cloudflare(mime: str, encoded: str, client: httpx.AsyncClient | None)
         )
 
     response: httpx.Response | None = None
-    for count in CLOUDFLARE_ROUNDS:
-        tasks = [asyncio.create_task(attempt()) for _ in range(count)]
-        try:
-            # 먼저 끝난 것부터 — 성공하거나 오탐이 아닌 오류(사용량 초과 등)면 바로 그 결과로
-            for finished in asyncio.as_completed(tasks):
-                response = await finished
-                codes = _error_codes(response) if response.status_code >= 400 else set()
-                if response.status_code >= 400:
-                    # 원인 파악용 — 상태·오류 코드만 남긴다 (사진·키·응답 본문은 남기지 않음)
-                    logger.warning(
-                        "cloudflare ai avatar failed: status=%s codes=%s", response.status_code, sorted(codes)
-                    )
-                if response.status_code != 400 or FLAGGED not in codes:
-                    break
-            else:
-                continue  # 이번 묶음은 모두 오탐 — 다음 묶음
+    for _ in range(CLOUDFLARE_ATTEMPTS):
+        response = await attempt()
+        codes = _error_codes(response) if response.status_code >= 400 else set()
+        if response.status_code >= 400:
+            # 원인 파악용 — 상태·오류 코드만 남긴다 (사진·키·응답 본문은 남기지 않음)
+            logger.warning("cloudflare ai avatar failed: status=%s codes=%s", response.status_code, sorted(codes))
+        if response.status_code != 400 or FLAGGED not in codes:
             break
-        finally:
-            for task in tasks:
-                task.cancel()
     assert response is not None
     if response.status_code == 400 and FLAGGED in _error_codes(response):
         raise AiAvatarError(422, FLAGGED_MESSAGE)
