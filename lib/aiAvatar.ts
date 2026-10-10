@@ -47,7 +47,10 @@ export async function requestAiAvatar(photo: string, signal?: AbortSignal): Prom
 }
 
 /** AI가 그린 큰 이미지 → 테두리에서 이어진 단색 배경 제거(투명) → 캐릭터만 잘라 픽셀 격자로 → 색 16개로 정리 */
-export async function aiImageToGrid(image: string, longCells = 48): Promise<PixelGridData> {
+/** 아바타 격자 최대 크기 — 긴 쪽 128칸 */
+export const MAX_AVATAR_CELLS = 128;
+
+export async function aiImageToGrid(image: string, longCells = MAX_AVATAR_CELLS): Promise<PixelGridData> {
   const element = await loadImage(image);
   const canvas = document.createElement("canvas");
   canvas.width = element.naturalWidth;
@@ -65,7 +68,7 @@ export async function aiImageToGrid(image: string, longCells = 48): Promise<Pixe
 }
 
 /** AI 없이 사진을 그대로 픽셀 격자로 — 브라우저 안에서만 처리하고 아무 데도 보내지 않는다 (AI가 못 그렸을 때 대안) */
-export async function photoToGrid(photo: string, longCells = 48): Promise<PixelGridData> {
+export async function photoToGrid(photo: string, longCells = 64): Promise<PixelGridData> {
   const element = await loadImage(photo);
   const canvas = document.createElement("canvas");
   canvas.width = element.naturalWidth;
