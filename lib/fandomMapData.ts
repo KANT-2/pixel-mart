@@ -1,6 +1,6 @@
 import { localApi } from "@/lib/local";
 import { pinCount } from "@/utils/localMap";
-import type { ApiFandom, ApiFandomRank, ApiMapAvatars } from "@/types/api";
+import type { ApiFandom, ApiFandomRank, ApiMapAvatars, ApiMapCard } from "@/types/api";
 
 export interface MapBlockData {
   code: string;
@@ -8,6 +8,8 @@ export interface MapBlockData {
   count: number | null;
   /** 아바타 PNG data URL / null(기본 슬라임) */
   pins: (string | null)[];
+  /** pins와 같은 순서의 이웃 카드 (카드 비공개·집계 슬라임이면 null) */
+  cards: (ApiMapCard | null)[];
   sample: boolean;
   /** true면 핀이 '지도에 내 아바타 표시'에 동의한 실제 이웃 (샘플 캐릭터면 false) */
   real: boolean;
@@ -73,9 +75,9 @@ export async function loadMapBlocks(viewCode: string, legend: string[], interest
     const real = avatarBy.get(code);
     const fallback = counts.get(code);
     if (real && !real.belowThreshold && real.avatars.length) {
-      return { code, count: real.count, pins: real.avatars, sample: real.isSample, real: !real.isSample, ranked: true, topInterest: fallback?.top ?? null };
+      return { code, count: real.count, pins: real.avatars, cards: real.cards ?? [], sample: real.isSample, real: !real.isSample, ranked: true, topInterest: fallback?.top ?? null };
     }
     const count = fallback?.count ?? null;
-    return { code, count: count && count >= 5 ? count : null, pins: Array(pinCount(count)).fill(null), sample: fallback?.sample ?? false, real: false, ranked: false, topInterest: fallback?.top ?? null };
+    return { code, count: count && count >= 5 ? count : null, pins: Array(pinCount(count)).fill(null), cards: [], sample: fallback?.sample ?? false, real: false, ranked: false, topInterest: fallback?.top ?? null };
   });
 }
