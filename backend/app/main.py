@@ -8,6 +8,7 @@ from app.routers import (
     auth,
     cancel_requests,
     cart,
+    compat,
     faqs,
     gifts,
     health,
@@ -67,5 +68,6 @@ for router in (
     reviews.router,
     questions.router,
     questions.dev_router,
+    compat.router,
 ):
     app.include_router(router, prefix="/api")
