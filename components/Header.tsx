@@ -7,7 +7,7 @@ import HeaderNav, { HeaderNavFallback } from "@/components/HeaderNav";
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-night/70 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line bg-night/70 backdrop-blur-md phone-landscape:static">
       <div className="relative mx-auto flex min-h-16 max-w-6xl flex-wrap items-center gap-x-2 gap-y-2 px-4 py-3 md:px-8 lg:flex-nowrap lg:gap-4">
         <Link href="/" className="flex shrink-0 items-center gap-2 whitespace-nowrap font-pixel text-base font-bold tracking-wide sm:text-lg">
           {/* eslint-disable-next-line @next/next/no-img-element -- 과제 권장: 설정 없이 쓰는 일반 img */}

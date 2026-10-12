@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
@@ -45,6 +45,28 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const [over, setOver] = useState<string | null>(null);
   const [message, setMessage] = useState(current ? `${withObject(current.name)} 끼워 봤어요. 다른 키캡도 끌어다 놓아 보세요.` : "키캡을 끌어다 빈 키 위에 놓아 보세요.");
   const [cartState, setCartState] = useState<"idle" | "adding" | "done" | "error">("idle");
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [rotateNote, setRotateNote] = useState(false);
+  useEffect(() => {
+    const sync = () => setFullscreen(document.fullscreenElement === rootRef.current);
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+  // 안드로이드: 전체화면 + 가로 고정. 아이폰 사파리는 화면 방향 잠금을 지원하지 않아 돌려 달라는 안내로
+  async function openLandscape() {
+    const root = rootRef.current;
+    if (!root) return;
+    try {
+      await root.requestFullscreen();
+      const orientation = screen.orientation as ScreenOrientation & { lock?: (direction: "landscape") => Promise<void> };
+      if (!orientation.lock) throw new Error("no lock");
+      await orientation.lock("landscape");
+    } catch {
+      if (document.fullscreenElement) await document.exitFullscreen().catch(() => undefined);
+      setRotateNote(true);
+    }
+  }
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
   const B = BASES[base];
@@ -98,7 +120,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       }}
       onClick={() => pick(item)}
       className={`relative flex min-w-0 cursor-grab flex-col items-center gap-1.5 rounded-md border-2 bg-night px-1.5 py-2 text-center ${picked === item.id ? "border-lime/60" : item.id === current?.id ? "border-sub" : "border-frame/70"}`}>
-      {item.id === current?.id && !compact && <span className="absolute left-1 top-1 rounded bg-sub px-1.5 text-[10px] font-black text-night">지금 보는 키캡</span>}
+      {item.id === current?.id && !compact && <span className="absolute left-1 top-1 rounded bg-sub px-1.5 text-[10px] font-black text-night phone-landscape:px-1 phone-landscape:text-[8px]">지금 보는 키캡</span>}
       <span className={`flex items-center justify-center ${compact ? "h-10" : "h-12"}`}>
         {/* eslint-disable-next-line @next/next/no-img-element -- 키캡 그림 */}
         <img src={keycapImage(item)} alt="" draggable={false} className="h-full max-w-full object-contain" />
@@ -108,10 +130,18 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
     </button>
   );
 
-  return <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-    <div className="min-w-0 space-y-5">
+  return <div ref={rootRef} className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] [&:fullscreen]:overflow-y-auto [&:fullscreen]:bg-night [&:fullscreen]:p-3">
+    {/* 휴대폰 세로 — 가로로 보면 키가 커지고 키캡 목록이 옆에 나란히 */}
+    <div className="hidden items-center gap-3 rounded-md border-2 border-mint/40 bg-panel p-3 phone-portrait:flex">
+      <span aria-hidden="true" className="font-pixel text-xl text-mint">⟲</span>
+      <p role="status" className="min-w-0 flex-1 text-sm text-sub">{rotateNote ? <>이 휴대폰은 자동으로 돌릴 수 없어요. <strong className="text-ink">휴대폰을 가로로 돌려 주세요.</strong></> : <>휴대폰을 <strong className="text-ink">가로로 돌리면</strong> 키보드가 크게 보이고 키캡 목록이 옆에 나와요.</>}</p>
+      <button type="button" onClick={() => void openLandscape()} className="btn-pixel h-10 shrink-0 px-3 text-xs font-bold text-mint">가로로 크게 보기</button>
+    </div>
+    {fullscreen && <button type="button" onClick={() => void document.exitFullscreen()} className="btn-pixel fixed right-3 top-3 z-30 h-9 px-3 text-xs font-bold">✕ 나가기</button>}
+    {/* 휴대폰 가로 — 왼쪽 키보드, 오른쪽 키캡 목록(따로 스크롤)의 분할 화면 */}
+    <div className="min-w-0 space-y-5 phone-landscape:grid phone-landscape:grid-cols-[minmax(0,1fr)_36%] phone-landscape:gap-3 phone-landscape:space-y-0">
       {/* 1. 내 키보드 — 지금 키캡 색·케이스·조명 */}
-      <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4">
+      <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4 phone-landscape:col-span-2 phone-landscape:gap-y-2 phone-landscape:p-2.5">
         <span className="font-pixel text-xs text-mint">STEP 1 · MY KEYBOARD</span>
         <label className="flex items-center gap-2 text-sm font-bold">모델
           <select className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={() => undefined}><option value={BOARD.id}>{BOARD.name}</option></select>
@@ -126,7 +156,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       </section>
 
       {/* 2. 키보드 — 키캡을 끌어다 놓거나, 고른 뒤 키를 눌러 끼우기 */}
-      <section aria-label="키보드 미리보기" className="pixel-panel p-4">
+      <section aria-label="키보드 미리보기" className="pixel-panel p-4 phone-landscape:sticky phone-landscape:top-2 phone-landscape:self-start phone-landscape:p-2.5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <span className="font-pixel text-xs text-mint">STEP 2 · 키캡을 끌어다 키 위에 놓기</span>
           <div className="flex items-center gap-2">
@@ -139,7 +169,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         </div>
         {/* 모바일에서는 상자 안에서 가로로 밀어 보기 */}
         <div className="overflow-x-auto pb-2">
-          <div className="relative min-w-[640px]" style={{ aspectRatio: `${BOARD.width} / ${BOARD.height}` }}>
+          <div className="relative min-w-[640px] phone-landscape:min-w-0" style={{ aspectRatio: `${BOARD.width} / ${BOARD.height}` }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- 키캡을 뺀 RGB 스위치 사진 */}
             <img src={board.image} alt={`${BOARD.name} ${board.label} — 키캡을 뺀 모습`} className="absolute inset-0 h-full w-full select-none" draggable={false} />
             {BOARD.keys.map((key) => {
@@ -169,18 +199,18 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
 
 
       {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
-      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4">
+      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4 phone-landscape:max-h-[calc(100svh-16px)] phone-landscape:overflow-y-auto phone-landscape:p-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</span></p>
-          <div className="flex flex-wrap items-center gap-2">
+          <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim phone-landscape:hidden">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</span></p>
+          <div className="flex flex-wrap items-center gap-2 phone-landscape:w-full">
             <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
-            <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm" />
-            <div role="group" aria-label="키캡 종류" className="segmented h-9 text-xs font-bold">
+            <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm phone-landscape:w-full" />
+            <div role="group" aria-label="키캡 종류" className="segmented h-9 text-xs font-bold phone-landscape:flex phone-landscape:w-full phone-landscape:[&>button]:flex-1 phone-landscape:[&>button]:px-1">
               {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
             </div>
           </div>
         </div>
-        {tray.length ? <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6">{tray.map((item) => capButton(item))}</div>
+        {tray.length ? <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6 phone-landscape:grid-cols-3 phone-landscape:gap-1.5">{tray.map((item) => capButton(item))}</div>
           : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
       </section>
     </div>
