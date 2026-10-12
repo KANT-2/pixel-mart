@@ -50,9 +50,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const { user } = useAuth();
   const { add } = useCart();
   const [base, setBaseKey] = useState<BaseKey>("none");
-  // 기본 키캡을 하나씩 뺀 자리 — 색을 새로 고르면 다시 모두 채운다
-  const [baseOff, setBaseOff] = useState<ReadonlySet<string>>(() => new Set());
-  const setBase = (key: BaseKey) => { setBaseKey(key); setBaseOff(new Set()); };
+  // 기본 키캡을 하나씩 바꾼 자리 — 나머지 키를 채웠으면 '뺀 자리', 비워 뒀으면 '끼운 자리'. 색을 새로 고르면 초기화
+  const [toggled, setToggled] = useState<ReadonlySet<string>>(() => new Set());
+  // 비우기 상태에서 하나씩 끼울 때 쓰는 색 — 마지막으로 고른 색 (처음엔 블랙)
+  const [lastBase, setLastBase] = useState<Exclude<BaseKey, "none">>("black");
+  const setBase = (key: BaseKey) => { setBaseKey(key); setToggled(new Set()); if (key !== "none") setLastBase(key); };
   const [customColor, setCustomColor] = useState("#6ef2d6");
   const [modelId, setModelId] = useState(KEYBOARDS[0].id);
   const [switchId, setSwitchId] = useState(KEYBOARDS[0].switches[0].id);
@@ -99,7 +101,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   }
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
-  const baseColor = base === "custom" ? customColor : BASES[base].color;
+  const fillKey = base === "none" ? lastBase : base;
+  const baseColor = fillKey === "custom" ? customColor : BASES[fillKey].color;
   // 각인 색 — 칠한 색(질감과 곱해 조금 어두워짐)이 밝으면 어두운 글자, 어두우면 밝은 글자
   const legendColor = (() => {
     const [r, g, b] = [1, 3, 5].map((i) => parseInt(baseColor.slice(i, i + 2), 16));
@@ -133,13 +136,14 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
     const item = placed[keyId] ? byId(placed[keyId]) : undefined;
     if (item) { setPlaced(removeKeycap(placed, keyId, item.kind)); setMessage(`${withObject(item.name)} 뺐어요.`); setCartState("idle"); }
     else if (picked) place(picked, keyId);
-    // 고른 키캡 없이 누르면 그 자리 기본 키캡만 빼기 / 다시 끼우기
-    else if (base !== "none") {
+    // 고른 키캡 없이 누르면 그 자리 기본 키캡만 끼우기 / 빼기
+    else {
       const label = BOARD.keys.find((key) => key.id === keyId)?.label || "스페이스바";
-      const next = new Set(baseOff);
-      if (next.has(keyId)) { next.delete(keyId); setMessage(`${label} 자리에 기본 키캡을 다시 끼웠어요.`); }
-      else { next.add(keyId); setMessage(`${label} 자리의 기본 키캡을 뺐어요. 다시 누르면 끼워져요.`); }
-      setBaseOff(next);
+      const next = new Set(toggled);
+      if (next.has(keyId)) next.delete(keyId); else next.add(keyId);
+      const filled = base === "none" ? next.has(keyId) : !next.has(keyId);
+      setMessage(filled ? `${label} 자리에 기본 키캡을 끼웠어요. 다시 누르면 빠져요.` : `${label} 자리의 기본 키캡을 뺐어요. 다시 누르면 끼워져요.`);
+      setToggled(next);
     }
   }
   function pick(item: KeycapItem) {
@@ -245,7 +249,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
             {BOARD.keys.map((key) => {
               const item = placed[key.id] ? byId(placed[key.id]) : undefined;
               const show = item && view === "after";
-              const fill = !show && base !== "none" && !baseOff.has(key.id);
+              const fill = !show && (base === "none" ? toggled.has(key.id) : !toggled.has(key.id));
               const [rx, ry, rw, rh] = key.rect;
               return <button key={key.id} type="button" aria-label={`${key.label || "스페이스바"}${item ? ` — ${item.name} 끼움, 눌러서 빼기` : " 자리"}`}
                 onClick={() => clickKey(key.id)}
