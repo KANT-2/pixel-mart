@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
 import { KEYCAPS, KEYCAP_KIND_LABEL, KEYCAP_TONES, type KeycapItem, type KeycapKind, type KeycapTone } from "@/data/keycaps";
-import { ARROW_KEYS, WOOTING_80HE as BOARD } from "@/data/keyboards";
+import { ARROW_KEYS, KEYBOARDS } from "@/data/keyboards";
 import { keycapImage, placeKeycap, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
@@ -51,7 +51,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const { add } = useCart();
   const [base, setBase] = useState<BaseKey>("none");
   const [customColor, setCustomColor] = useState("#6ef2d6");
-  const [switchId, setSwitchId] = useState(BOARD.switches[0].id);
+  const [modelId, setModelId] = useState(KEYBOARDS[0].id);
+  const [switchId, setSwitchId] = useState(KEYBOARDS[0].switches[0].id);
   const [placed, setPlaced] = useState<Placement>(() => current ? placeKeycap({}, current, current.kind === "space" ? { id: "Space", label: "", w: 6.25 } : { id: "Escape", label: "Esc", w: 1 }).placed : {});
   const [view, setView] = useState<"before" | "after">("after");
   const [kind, setKind] = useState<KeycapKind | "all">("all");
@@ -96,11 +97,21 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
   const baseColor = base === "custom" ? customColor : BASES[base].color;
+  const BOARD = KEYBOARDS.find((item) => item.id === modelId) ?? KEYBOARDS[0];
   const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
   const used = usedIds.map(byId).filter((item): item is KeycapItem => Boolean(item));
   const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query, tone);
 
+  function changeModel(id: string) {
+    const model = KEYBOARDS.find((item) => item.id === id);
+    if (!model) return;
+    const ids = new Set(model.keys.map((key) => key.id));
+    setModelId(model.id);
+    setSwitchId(model.switches[0].id);
+    setPlaced((current) => Object.fromEntries(Object.entries(current).filter(([keyId]) => ids.has(keyId))));
+    setMessage(`${model.name} 키보드로 바꿨어요. 같은 자리에 끼운 키캡은 그대로 옮겨요.`);
+  }
   function place(itemId: string | null, keyId: string) {
     const item = itemId ? byId(itemId) : undefined;
     const key = BOARD.keys.find((k) => k.id === keyId);
@@ -178,11 +189,14 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4 phone-landscape:col-span-2 phone-landscape:gap-y-2 phone-landscape:p-2.5">
         <span className="font-pixel text-xs text-mint">STEP 1 · MY KEYBOARD</span>
         <label className="flex items-center gap-2 text-sm font-bold">모델
-          <select id="keycap-board" name="board" className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={() => undefined}><option value={BOARD.id}>{BOARD.name}</option></select>
+          <select id="keycap-board" name="board" className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={(event) => changeModel(event.target.value)}>
+            {KEYBOARDS.map((model) => <option key={model.id} value={model.id}>{model.name} · {model.variant}</option>)}
+          </select>
         </label>
-        <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold">
-          {BOARD.switches.map((item) => <button key={item.id} type="button" aria-pressed={switchId === item.id} onClick={() => setSwitchId(item.id)}>{item.label}</button>)}
-        </div>
+        {/* 스위치 사진이 여러 장인 모델만 */}
+        {BOARD.switches.length > 1 && <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold">
+          {BOARD.switches.map((item) => <button key={item.id} type="button" aria-pressed={board.id === item.id} onClick={() => setSwitchId(item.id)}>{item.label}</button>)}
+        </div>}
         <div role="group" aria-label="나머지 키" className="flex items-center gap-2"><span className="text-sm font-bold">나머지 키</span>
           {(Object.keys(BASES) as BaseKey[]).filter((key) => key !== "custom").map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={key === "none" ? "나머지 키 비우기 (스위치 보기)" : `나머지 키를 ${BASES[key].label} 키캡으로`} title={BASES[key].label}
             onClick={() => setBase(key)} className={`size-8 rounded-md border-2 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].color }} />)}
@@ -216,7 +230,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
               const item = placed[key.id] ? byId(placed[key.id]) : undefined;
               const show = item && view === "after";
               const fill = !show && base !== "none";
-              const inset = BOARD.insetPx;
+              const [rx, ry, rw, rh] = key.rect;
               return <button key={key.id} type="button" aria-label={`${key.label || "스페이스바"}${item ? ` — ${item.name} 끼움, 눌러서 빼기` : " 자리"}`}
                 onClick={() => clickKey(key.id)}
                 onDragOver={(event) => { event.preventDefault(); if (over !== key.id) setOver(key.id); }}
@@ -224,8 +238,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
                 onDrop={(event) => { event.preventDefault(); place(event.dataTransfer.getData("text/plain") || picked, key.id); }}
                 className={`absolute cursor-pointer rounded-[6px] ${over === key.id ? "outline-3 outline-dashed outline-lime" : picked && !item ? "outline-2 outline-mint/70" : "hover:outline-2 hover:outline-white/40"}`}
                 style={{
-                  left: pct(key.x + inset, BOARD.width), top: pct(key.y + inset, BOARD.height),
-                  width: pct(key.w * BOARD.unitPx - 2 * inset, BOARD.width), height: pct(BOARD.unitPx - 2 * inset, BOARD.height),
+                  left: pct(rx, BOARD.width), top: pct(ry, BOARD.height), width: pct(rw, BOARD.width), height: pct(rh, BOARD.height),
                 }}>
                 {/* 기본 키캡 — 밝은 무각 키캡 질감에 색을 곱해 칠하고, 긴 키는 경사면을 그대로 둔 채 가운데만 늘림 */}
                 {fill && <span className="absolute inset-0 isolate [container-type:size]">
