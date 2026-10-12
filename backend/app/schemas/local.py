@@ -51,7 +51,27 @@ class MapAvatarsOut(CamelModel):
     region_name: str
     count: int | None = Field(description="아바타 표시에 동의한 인원, 5명 미만이면 null")
     below_threshold: bool
-    avatars: list[str | None] = Field(description="무작위 최대 6개 — PNG data URL, null이면 기본 슬라임")
+    avatars: list[str | None] = Field(
+        description="최대 10개, 구매 금액이 큰 순(같으면 무작위) — 0번이 1위 — PNG data URL, null이면 기본 슬라임"
+    )
+    is_sample: bool = Field(default=False, description="동의자가 적은 지역을 샘플 캐릭터로 채운 블록")
+
+
+class BuyerRankOut(CamelModel):
+    """구매 순위 한 줄 — 금액·사용자 id는 포함하지 않는다"""
+
+    rank: int
+    avatar_url: str | None = Field(description="PNG data URL, null이면 기본 슬라임")
+    nickname: str | None = Field(description="닉네임 공개 동의자만, 아니면 null")
+
+
+class BuyerRankingOut(CamelModel):
+    """지역 구매 순위 TOP 10 (아바타 표시 동의자 기준, 5명 미만이면 비움)"""
+
+    region_code: str
+    below_threshold: bool
+    is_sample: bool
+    items: list[BuyerRankOut]
 
 
 class FandomOut(CamelModel):

@@ -3,7 +3,7 @@
     "regionCode": "41135-01",
     "kind": "have",
     "itemName": "카카시 키링",
-    "interestId": 13,
+    "interestId": 1,
     "condition": "like_new",
     "tradeMethod": "direct",
     "content": "랜덤 굿즈 중복이라 교환 원해요."
@@ -12,7 +12,7 @@
     "regionCode": "41135-01",
     "kind": "want",
     "itemName": "오로치마루 키링",
-    "interestId": 12,
+    "interestId": 1,
     "tradeMethod": "direct",
     "content": "오로치마루 키링 구해요."
   },
@@ -30,7 +30,7 @@
     "regionCode": "41135-03",
     "kind": "have",
     "itemName": "오로치마루 키링",
-    "interestId": 12,
+    "interestId": 1,
     "condition": "used",
     "tradeMethod": "direct",
     "content": "카카시 키링이랑 바꾸고 싶어요."
@@ -39,7 +39,7 @@
     "regionCode": "41135-03",
     "kind": "want",
     "itemName": "카카시 키링",
-    "interestId": 13,
+    "interestId": 1,
     "tradeMethod": "direct",
     "content": ""
   },
@@ -57,7 +57,7 @@
     "regionCode": "11440-01",
     "kind": "want",
     "itemName": "슬라임 무드등",
-    "interestId": 14,
+    "interestId": 3,
     "tradeMethod": "both",
     "content": "슬라임 관련 굿즈 모아요."
   }

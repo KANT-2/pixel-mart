@@ -24,7 +24,7 @@ TEST_REGIONS = [
     ("TRD1-02", "zone", "TRD1", "나동"),
     ("TRD2-01", "zone", "TRD2", "다동"),
 ]
-OROCHIMARU, KAKASHI = 12, 13
+NARUTO, PIXEL_GAME = 1, 3  # 작품 취향
 
 
 # --- 규칙 (DB 없이) ---
@@ -56,7 +56,7 @@ def item(product_id=None, interest_id=None, name="x"):
 
 def test_same_item():
     assert same_item(item(product_id=1, name="a"), item(product_id=1, name="b"))
-    assert same_item(item(interest_id=OROCHIMARU, name="키링"), item(interest_id=OROCHIMARU, name="피규어"))
+    assert same_item(item(interest_id=NARUTO, name="키링"), item(interest_id=NARUTO, name="피규어"))
     assert same_item(item(name="오로치마루 키링"), item(name=" 오로치마루키링 "))
     assert not same_item(item(product_id=1, name="a"), item(product_id=2, name="b"))
 
@@ -186,14 +186,12 @@ async def test_matches_same_district_mutual_and_zone_first(users):
     seller = await users("trade-seller@pixelmart.test", region=ZONE_A)
     far = await users("trade-far@pixelmart.test", region=OTHER_DISTRICT)
 
-    await me.post("/api/local/trades", json=post("want", "오로치마루 키링", interestId=OROCHIMARU))
-    await me.post("/api/local/trades", json=post("have", "카카시 키링", interestId=KAKASHI))
-    swap = (
-        await swapper.post("/api/local/trades", json=post("have", "오로치마루 아크릴", interestId=OROCHIMARU))
-    ).json()
-    await swapper.post("/api/local/trades", json=post("want", "카카시 굿즈", interestId=KAKASHI))  # 맞교환 후보
+    await me.post("/api/local/trades", json=post("want", "오로치마루 키링", interestId=NARUTO))
+    await me.post("/api/local/trades", json=post("have", "카카시 키링", interestId=PIXEL_GAME))
+    swap = (await swapper.post("/api/local/trades", json=post("have", "오로치마루 아크릴", interestId=NARUTO))).json()
+    await swapper.post("/api/local/trades", json=post("want", "카카시 굿즈", interestId=PIXEL_GAME))  # 맞교환 후보
     sell = (await seller.post("/api/local/trades", json=post("sell", "오로치마루 키링", price=5000))).json()
-    await far.post("/api/local/trades", json=post("have", "오로치마루 키링", interestId=OROCHIMARU))  # 다른 구
+    await far.post("/api/local/trades", json=post("have", "오로치마루 키링", interestId=NARUTO))  # 다른 구
 
     matches = (await me.get("/api/local/trades/matches")).json()
     assert [(m["offer"]["id"], m["proximity"], m["mutual"]) for m in matches] == [
