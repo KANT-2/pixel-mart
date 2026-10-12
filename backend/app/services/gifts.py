@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Gift, Order, OrderItem, OrderStatusHistory, Product, TradePost, User
 from app.schemas.order import OrderCreate
+from app.services import activity
 from app.services.trade_rules import contains_private_info
 
 
@@ -93,6 +94,8 @@ async def accept_gift(db: AsyncSession, user: User, gift_id: int, body: OrderCre
     gift.order_id = order.id
     gift.status = "accepted"
     gift.responded_at = datetime.now(UTC)
+    # 선물 보내기 완료 — 받는 사람이 받았을 때 보낸 사람에게 (거절된 선물은 적립 안 함)
+    await activity.award(db, gift.sender_id, "gift_sent", gift.id)
     await db.commit()
     return await get_gift(db, gift.id)
 

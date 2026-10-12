@@ -23,6 +23,8 @@ class User(Base):
     map_avatar_opt_in: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
     # 위시맵 WANT 글에 내 닉네임·아바타 표시 + 닉네임 검색 허용 (opt-in). 선물 주소·받는 이름은 계속 비공개
     nickname_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
+    # 덕력지도에서 내 캐릭터를 누르면 이웃 카드(하트·코인 구간·공개 취향) 표시 (opt-in, 정확한 점수·금액은 비공개)
+    map_card_public: Mapped[bool] = mapped_column(Boolean, default=False, server_default=false())
 
 
 # 닉네임은 대소문자 구분 없이 하나뿐 (app/services/nickname.py)

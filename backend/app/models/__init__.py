@@ -1,4 +1,5 @@
 # 새 모델을 만들면 여기에 import 해야 Alembic이 테이블을 인식합니다.
+from app.models.activity import ActivityPoint
 from app.models.cancel_request import CancelRequest
 from app.models.cart import CartItem
 from app.models.faq import Faq
@@ -12,6 +13,7 @@ from app.models.user import User
 from app.models.wishlist import Wishlist
 
 __all__ = [
+    "ActivityPoint",
     "CancelRequest",
     "CartItem",
     "Category",

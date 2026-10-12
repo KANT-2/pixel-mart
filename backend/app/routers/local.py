@@ -7,9 +7,10 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import delete, func, select
 
-from app.deps import CurrentUser, DbSession
-from app.models import FandomSample, Interest, Order, Region, User, UserInterest
+from app.deps import CurrentUser, DbSession, OptionalUser
+from app.models import ActivityPoint, FandomSample, Interest, Order, Region, TradePost, User, UserInterest
 from app.schemas.local import (
+    ActivityLogOut,
     BuyerRankingOut,
     BuyerRankOut,
     FandomOut,
@@ -19,9 +20,11 @@ from app.schemas.local import (
     LocalProfileIn,
     LocalProfileOut,
     MapAvatarsOut,
+    MapCardOut,
+    MyActivityOut,
     RegionOut,
 )
-from app.services import local_stats
+from app.services import activity, local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, Period, period_start, present, rollup
 from app.services.regions import RegionTree, load_tree
 from app.services.sample_avatars import sample_avatars, sample_nicknames
@@ -68,6 +71,7 @@ async def _profile_out(db: DbSession, user: User) -> LocalProfileOut:
         profile_public=user.profile_public,
         map_avatar_opt_in=user.map_avatar_opt_in,
         nickname_public=user.nickname_public,
+        map_card_public=user.map_card_public,
     )
 
 
@@ -93,6 +97,7 @@ async def put_my_local(body: LocalProfileIn, user: CurrentUser, db: DbSession):
     user.profile_public = body.profile_public
     user.map_avatar_opt_in = body.map_avatar_opt_in
     user.nickname_public = body.nickname_public
+    user.map_card_public = body.map_card_public
     # 계속 고른 취향은 그대로 두어 고른 시각(집계 기간 기준)을 유지
     current = set(await db.scalars(select(UserInterest.interest_id).where(UserInterest.user_id == user.id)))
     if removed := current - wanted:
@@ -100,6 +105,8 @@ async def put_my_local(body: LocalProfileIn, user: CurrentUser, db: DbSession):
             delete(UserInterest).where(UserInterest.user_id == user.id, UserInterest.interest_id.in_(removed))
         )
     db.add_all(UserInterest(user_id=user.id, interest_id=i) for i in wanted - current)
+    if body.region_code and wanted:
+        await activity.award(db, user.id, "profile")  # 지역·취향 프로필 처음 완성 (한 번만)
     await db.commit()
     return await _profile_out(db, user)
 
@@ -214,15 +221,90 @@ BUYER_RANK_SIZE = 10
 
 
 @dataclass
+class Person:
+    """핀 하나 — 화면에 내보내는 값만 (사용자 id는 카드 계산에만 쓰고 응답에는 넣지 않는다)"""
+
+    avatar: str | None
+    nickname: str | None
+    card: MapCardOut | None
+
+
+@dataclass
 class Crowd:
-    """지역 블록 하나의 핀 — 구매 금액 순으로 정렬된 (아바타, 공개 닉네임)"""
+    """지역 블록 하나의 핀 — 구매 금액 순으로 정렬"""
 
     count: int
     is_sample: bool
-    people: list[tuple[str | None, str | None]]
+    people: list[Person]
 
 
-async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: int | None) -> dict[str, Crowd]:
+async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dict[int, MapCardOut]:
+    """카드 공개 동의자의 이웃 카드 — 하트·코인은 구간으로만"""
+    users = [u for u in users if u.map_card_public]
+    if not users:
+        return {}
+    ids = [u.id for u in users]
+    points = await activity.totals(db, ids)
+    picked: dict[int, list[str]] = {}
+    public_ids = [u.id for u in users if u.profile_public]
+    if public_ids:
+        rows = await db.execute(
+            select(UserInterest.user_id, Interest.name)
+            .join(Interest, Interest.id == UserInterest.interest_id)
+            .where(UserInterest.user_id.in_(public_ids))
+            .order_by(Interest.id)
+        )
+        for user_id, name in rows:
+            picked.setdefault(user_id, []).append(name)
+    wants = dict(
+        (
+            await db.execute(
+                select(TradePost.user_id, func.count())
+                .where(TradePost.user_id.in_(ids), TradePost.kind == "want", TradePost.status == "open")
+                .group_by(TradePost.user_id)
+            )
+        ).all()
+    )
+    cards = {}
+    for u in users:
+        score, coins = points.get(u.id, (0, 0))
+        hearts = activity.hearts_for(score)
+        cards[u.id] = MapCardOut(
+            nickname=u.nickname if u.nickname_public else None,
+            hearts=hearts,
+            level=activity.level_title(hearts),
+            coin_band=activity.coin_band(coins),
+            interests=picked.get(u.id, [])[:3],
+            # WANT 보기·선물은 닉네임으로 찾아가므로 닉네임 공개일 때만
+            want_count=wants.get(u.id, 0) if u.nickname_public else 0,
+            is_me=u.id == viewer_id,
+        )
+    return cards
+
+
+def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[MapCardOut]:
+    """샘플 캐릭터의 카드 (지역·필터마다 고정) — 시연용, 응답 블록에 isSample"""
+    rng = random.Random(f"card:{key}")
+    cards = []
+    for nickname in nicknames:
+        hearts = rng.choice((0, 1, 1, 2, 2, 2, 3, 3))
+        cards.append(
+            MapCardOut(
+                nickname=nickname,
+                hearts=hearts,
+                level=activity.level_title(hearts),
+                coin_band=activity.coin_band(rng.choice((0, 1, 2, 5, 7, 12))),
+                interests=rng.sample(interests, min(len(interests), rng.randint(1, 2))) if interests else [],
+                want_count=0,
+                is_me=False,
+            )
+        )
+    return cards
+
+
+async def _crowds(
+    db: DbSession, tree: RegionTree, blocks: list[str], interest: int | None, viewer_id: int | None = None
+) -> dict[str, Crowd]:
     """동의자가 5명 미만인 블록은 덕력지도 샘플 인원만큼 샘플 캐릭터로 채운다 (isSample)"""
     # 취소되지 않은 주문 금액 합계 — 많이 산 이웃부터 (주문이 없으면 0)
     spent = (
@@ -232,13 +314,7 @@ async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: 
         .subquery()
     )
     stmt = (
-        select(
-            User.region_code,
-            User.avatar_url,
-            User.nickname,
-            User.nickname_public,
-            func.coalesce(spent.c.total, 0),
-        )
+        select(User, func.coalesce(spent.c.total, 0))
         .outerjoin(spent, spent.c.user_id == User.id)
         .where(
             User.map_avatar_opt_in.is_(True),
@@ -248,44 +324,59 @@ async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: 
     )
     if interest is not None:
         stmt = stmt.join(UserInterest, UserInterest.user_id == User.id).where(UserInterest.interest_id == interest)
-    by_block: dict[str, list[tuple[int, float, str | None, str | None]]] = {code: [] for code in blocks}
-    for region_code, avatar_url, nickname, nickname_public, total in await db.execute(stmt):
+    by_block: dict[str, list[tuple[int, float, User]]] = {code: [] for code in blocks}
+    for user, total in await db.execute(stmt):
         tie = random.random()  # 같은 금액끼리는 매번 무작위 순서
-        shown = nickname if nickname_public else None  # 닉네임 공개 동의자만 (정책 15-1)
-        for code in tree.ancestors(region_code):  # 하위 지역 사람도 상위 블록에 포함
+        for code in tree.ancestors(user.region_code):  # 하위 지역 사람도 상위 블록에 포함
             if code in by_block:
-                by_block[code].append((-total, tie, avatar_url, shown))
+                by_block[code].append((-total, tie, user))
 
+    top = {
+        code: [u for _, _, u in sorted(people, key=lambda p: p[:2])[:MAX_MAP_AVATARS]]
+        for code, people in by_block.items()
+    }
+    cards = await _cards(db, list({u.id: u for users in top.values() for u in users}.values()), viewer_id)
     samples = await _sample_counts(db, tree, interest)
+    interest_names: list[str] | None = None
     crowds = {}
     for code in blocks:
-        people = sorted(by_block[code], key=lambda p: p[:2])
-        if len(people) < MIN_GROUP_SIZE and samples.get(code, 0) >= MIN_GROUP_SIZE:
+        if len(by_block[code]) < MIN_GROUP_SIZE and samples.get(code, 0) >= MIN_GROUP_SIZE:
+            if interest_names is None:
+                interest_names = list(await db.scalars(select(Interest.name).order_by(Interest.id)))
             n = samples[code]
             key = f"{code}:{interest}"
             shown = min(n, MAX_MAP_AVATARS)
-            crowds[code] = Crowd(
-                n, True, list(zip(sample_avatars(key, shown), sample_nicknames(key, shown), strict=True))
-            )
+            nicknames = sample_nicknames(key, shown)
+            people = [
+                Person(avatar, nickname, card)
+                for avatar, nickname, card in zip(
+                    sample_avatars(key, shown), nicknames, _sample_cards(key, nicknames, interest_names), strict=True
+                )
+            ]
+            crowds[code] = Crowd(n, True, people)
         else:
-            crowds[code] = Crowd(len(people), False, [(a, nick) for _, _, a, nick in people[:MAX_MAP_AVATARS]])
+            people = [
+                Person(u.avatar_url, u.nickname if u.nickname_public else None, cards.get(u.id)) for u in top[code]
+            ]
+            crowds[code] = Crowd(len(by_block[code]), False, people)
     return crowds
 
 
 @router.get(
     "/local/map-avatars",
     response_model=list[MapAvatarsOut],
-    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (5명 미만 비공개, 구매 금액 상위 10명)",
+    summary="덕력지도 아바타 핀·이웃 카드: 하위 지역별 동의자 (5명 미만 비공개, 구매 금액 상위 10명)",
 )
 async def map_avatars(
     db: DbSession,
+    viewer: OptionalUser,
     region: Annotated[str | None, Query(max_length=12, description="보고 있는 지역 — 없으면 시 단계")] = None,
     interest: Annotated[int | None, Query(description="이 취향을 고른 사람만")] = None,
 ):
     tree = await load_tree(db)
     await _check_filters(db, tree, region, interest)
     blocks = [r.code for r in tree.by_code.values() if r.parent_code == region] or ([region] if region else [])
-    crowds = await _crowds(db, tree, blocks, interest)
+    crowds = await _crowds(db, tree, blocks, interest, viewer.id if viewer else None)
     out = []
     for code in sorted(blocks):
         crowd = crowds[code]
@@ -296,8 +387,9 @@ async def map_avatars(
                 region_name=tree.full_name(code),
                 count=crowd.count if enough else None,
                 below_threshold=not enough,
-                avatars=[avatar for avatar, _ in crowd.people] if enough else [],
+                avatars=[p.avatar for p in crowd.people] if enough else [],
                 is_sample=crowd.is_sample and enough,
+                cards=[p.card for p in crowd.people] if enough else [],
             )
         )
     return out
@@ -319,14 +411,37 @@ async def buyer_ranking(
     crowd = (await _crowds(db, tree, [region], interest))[region]
     enough = crowd.count >= MIN_GROUP_SIZE
     items = [
-        BuyerRankOut(rank=rank, avatar_url=avatar, nickname=nickname)
-        for rank, (avatar, nickname) in enumerate(crowd.people[:BUYER_RANK_SIZE], 1)
+        BuyerRankOut(rank=rank, avatar_url=p.avatar, nickname=p.nickname)
+        for rank, p in enumerate(crowd.people[:BUYER_RANK_SIZE], 1)
     ]
     return BuyerRankingOut(
         region_code=region,
         below_threshold=not enough,
         is_sample=crowd.is_sample and enough,
         items=items if enough else [],
+    )
+
+
+@router.get("/users/me/activity", response_model=MyActivityOut, summary="내 활동 점수 — 하트·코인 (나에게만 정확한 값)")
+async def my_activity(user: CurrentUser, db: DbSession):
+    score, coins = (await activity.totals(db, [user.id])).get(user.id, (0, 0))
+    hearts = activity.hearts_for(score)
+    recent = await db.scalars(
+        select(ActivityPoint)
+        .where(ActivityPoint.user_id == user.id)
+        .order_by(ActivityPoint.created_at.desc(), ActivityPoint.id.desc())
+        .limit(5)
+    )
+    return MyActivityOut(
+        score=score,
+        hearts=hearts,
+        level=activity.level_title(hearts),
+        next_heart_at=activity.next_heart_at(score),
+        coins=coins,
+        coin_band=activity.coin_band(coins),
+        recent=[
+            ActivityLogOut(label=activity.RULES[r.kind].label, points=r.points, created_at=r.created_at) for r in recent
+        ],
     )
 
 
