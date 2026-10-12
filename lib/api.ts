@@ -59,7 +59,7 @@ export const api = {
 
 export function serverFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (typeof window !== "undefined") throw new Error("serverFetch는 서버에서만 사용할 수 있습니다");
-  const base = (process.env.BACKEND_URL ?? "http://localhost:8000").replace(/\/$/, "");
+  const base = (process.env.BACKEND_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
   const timeout = AbortSignal.timeout(3000);
   return request<T>(`${base}${apiPath(path)}`, {
     ...init,
