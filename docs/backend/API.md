@@ -45,8 +45,8 @@
 | POST | /api/products/{id}/questions 🔒 | 문의 작성 | ✅ |
 | POST | /api/dev/questions/{id}/answer 🔒 | [로컬 전용] 문의에 답변 달기 (비밀글 내용은 작성자 외에는 응답에서도 가림) | ✅ |
 | GET | /api/faqs?category= | FAQ | ✅ |
-| GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) |  |
-| GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) |  |
+| GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) | ✅ |
+| GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) | ✅ |
 
 ## 데스크테리어 · 토너먼트 · 뱃지 — BE-C
 | 메서드 | 경로 | 설명 |

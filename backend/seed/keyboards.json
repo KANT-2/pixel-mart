@@ -1,0 +1,91 @@
+[
+  {
+    "id": 1,
+    "maker": "Keychron",
+    "model": "K8",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["cherry", "oem", "metal"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": true,
+    "note": "팀 기획서(PRODUCT_STRATEGY)의 예시 키보드"
+  },
+  {
+    "id": 2,
+    "maker": "Keychron",
+    "model": "K2",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["cherry", "oem"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": true
+  },
+  {
+    "id": 3,
+    "maker": "Pixel",
+    "model": "Board 60",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["cherry"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": false
+  },
+  {
+    "id": 4,
+    "maker": "Pixel",
+    "model": "Board 65",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["cherry", "oem", "metal"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": true
+  },
+  {
+    "id": 5,
+    "maker": "Pixel",
+    "model": "Board TKL ISO",
+    "layout": "ISO",
+    "stem": "MX",
+    "profileSupport": ["cherry"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": true
+  },
+  {
+    "id": 6,
+    "maker": "Arcade",
+    "model": "Slim 75",
+    "layout": "ANSI",
+    "stem": "LOW",
+    "profileSupport": ["low"],
+    "escSize": "1u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": true
+  },
+  {
+    "id": 7,
+    "maker": "Arcade",
+    "model": "Wide 7U",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["cherry"],
+    "escSize": "1u",
+    "spacebarSize": "7u",
+    "hasArrowCluster": true
+  },
+  {
+    "id": 8,
+    "maker": "Retro",
+    "model": "Mini 40",
+    "layout": "ANSI",
+    "stem": "MX",
+    "profileSupport": ["oem"],
+    "escSize": "1.5u",
+    "spacebarSize": "6.25u",
+    "hasArrowCluster": false
+  }
+]
