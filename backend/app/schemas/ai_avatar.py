@@ -9,6 +9,9 @@ class AiAvatarIn(CamelModel):
     """AI 픽셀 아바타 요청 — 사진은 저장하지 않고 설정된 AI 제공자로 한 번만 보낸다 (동의 필수)"""
 
     photo: str = Field(max_length=6_000_000, examples=["data:image/jpeg;base64,/9j/4AAQ..."])
+    subject: Literal["person", "other"] = Field(
+        default="person", description="person: 머리:몸 1:2 미니미 형식 / other: 동물·캐릭터·사물을 원래 비율 그대로"
+    )
     consent: Literal[True] = Field(description="사진이 안내된 AI 제공자로 전송되는 데 동의")
 
 

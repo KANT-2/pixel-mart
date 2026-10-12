@@ -22,7 +22,7 @@ async def ai_avatar_status():
 async def create_ai_avatar(body: AiAvatarIn, user: CurrentUser):
     try:
         ai_avatar.limiter.check(user.id)
-        image = await ai_avatar.generate_pixel_avatar(body.photo)
+        image = await ai_avatar.generate_pixel_avatar(body.photo, body.subject)
     except ai_avatar.AiAvatarError as error:
         raise HTTPException(error.status, error.message) from None
     return AiAvatarOut(image=image)

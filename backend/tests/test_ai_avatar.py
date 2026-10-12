@@ -30,6 +30,12 @@ def test_decode_photo_rejects_large_photo():
         decode_photo(big)
 
 
+def test_rate_limiter_zero_means_unlimited():
+    limiter = RateLimiter(per_hour=0)
+    for i in range(50):
+        limiter.check(1, now=i)
+
+
 def test_rate_limiter_window():
     limiter = RateLimiter(per_hour=2, window=3600)
     limiter.check(1, now=0)
@@ -132,8 +138,24 @@ async def test_cloudflare_sends_photo_as_reference_image(client, upstream):
     assert request.headers["content-type"].startswith("multipart/form-data")
     body = request.content
     assert b'name="input_image_0"' in body and b"\xff\xd8\xff fake jpeg" in body  # 사진 원본 바이트
-    assert b'name="prompt"' in body and b"magenta" in body
+    assert b'name="prompt"' in body and b"magenta" in body and b"chibi" in body
+    assert b'name="input_image_1"' in body  # 사람: 머리:몸 1:2 윤곽선 가이드
     assert b'name="width"\r\n\r\n512' in body and b'name="height"\r\n\r\n512' in body
+
+
+async def test_other_subject_keeps_proportions_without_guide(client, upstream):
+    await login(client)
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True, "subject": "other"})
+    assert res.status_code == 200
+    [request] = upstream.calls
+    assert b'name="input_image_1"' not in request.content and b"head : body" not in request.content
+    assert b"do not change its proportions" in request.content
+
+
+async def test_rejects_unknown_subject(client, upstream):
+    await login(client)
+    res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True, "subject": "robot"})
+    assert res.status_code == 422 and upstream.calls == []
 
 
 @pytest.mark.parametrize(
@@ -158,12 +180,13 @@ async def test_cloudflare_retries_false_positive_safety_flag(client, upstream):
     """출력 안전 필터(3030)는 시드에 따라 오탐 — 다른 시드로 다시 시도한다"""
     await login(client)
     flagged = httpx.Response(400, json={"errors": [{"code": 3030, "message": "flagged"}], "success": False})
-    answers = iter([flagged, httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})])
-    upstream(lambda request: next(answers))
+    ok = httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})
+    # 처음 두 번은 오탐, 세 번째에 성공 — 하나씩 차례로
+    upstream(lambda request: flagged if len(upstream.calls) <= 2 else ok)
     res = await client.post("/api/avatars/ai", json={"photo": PHOTO, "consent": True})
     assert res.status_code == 200
     seeds = [r.content.split(b'name="seed"\r\n\r\n')[1].split(b"\r\n")[0] for r in upstream.calls]
-    assert len(seeds) == 2 and seeds[0] != seeds[1]
+    assert len(seeds) == 3 and len(set(seeds)) == 3  # 성공하면 멈추고, 매번 다른 시드
 
 
 async def test_cloudflare_gives_up_after_five_flags(client, upstream):
