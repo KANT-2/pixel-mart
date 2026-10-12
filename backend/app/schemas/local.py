@@ -29,7 +29,7 @@ class LocalProfileIn(CamelModel):
     interest_ids: Annotated[list[int], Field(max_length=20)] = Field(default_factory=list, examples=[[12, 51, 71]])
     fandom_opt_in: bool = Field(default=False, description="덕력지도 등 지역 익명 집계에 참여")
     profile_public: bool = Field(default=False, description="선택한 취향을 다른 사용자에게 공개")
-    map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시 (5명 이상 지역에서만)")
+    map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시")
     nickname_public: bool = Field(default=False, description="내 거래·위시 글에 닉네임·아바타 표시, 닉네임 검색 허용")
 
 
@@ -49,7 +49,7 @@ class MapAvatarsOut(CamelModel):
 
     region_code: str
     region_name: str
-    count: int | None = Field(description="아바타 표시에 동의한 인원, 5명 미만이면 null")
+    count: int | None = Field(description="아바타 표시에 동의한 인원, 없으면 null")
     below_threshold: bool
     avatars: list[str | None] = Field(
         description="최대 10개, 구매 금액이 큰 순(같으면 무작위) — 0번이 1위 — PNG data URL, null이면 기본 슬라임"
@@ -66,7 +66,7 @@ class BuyerRankOut(CamelModel):
 
 
 class BuyerRankingOut(CamelModel):
-    """지역 구매 순위 TOP 10 (아바타 표시 동의자 기준, 5명 미만이면 비움)"""
+    """지역 구매 순위 TOP 10 (아바타 표시 동의자 기준, 없으면 비움)"""
 
     region_code: str
     below_threshold: bool
@@ -82,8 +82,8 @@ class FandomOut(CamelModel):
     interest_id: int
     interest: str
     interest_type: str
-    count: int | None = Field(description="5명 미만이면 null")
-    below_threshold: bool = Field(description="true면 화면에 '5명 미만'으로 표시")
+    count: int | None = Field(description="0명이면 null")
+    below_threshold: bool = Field(description="true면 화면에 '아직 없음'으로 표시")
     is_sample: bool = Field(description="true면 Cold Start용 샘플 데이터 — 화면에 '샘플' 표시")
 
 

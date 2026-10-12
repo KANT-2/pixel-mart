@@ -151,7 +151,7 @@ export interface LocalProfileInput {
   nicknamePublic?: boolean;
 }
 
-/** 덕력지도 아바타 핀 — 동의한 이웃의 아바타만, 5명 미만은 비공개 (id·닉네임 없음) */
+/** 덕력지도 아바타 핀 — 동의한 이웃의 아바타만 (id·닉네임 없음) */
 export interface ApiMapAvatars {
   regionCode: string;
   regionName: string;

@@ -6,8 +6,8 @@ from typing import Literal
 
 from app.services.regions import RegionTree
 
-# 5명 미만은 정확한 숫자를 보여 주지 않는다 (순위도 이 기준을 넘은 항목만)
-MIN_GROUP_SIZE = 5
+# 최소 인원 제한 없음 — 1명부터 숫자를 보여 준다 (0명만 "없음")
+MIN_GROUP_SIZE = 1
 # 테스트 계정(예약 도메인 .test — dev-login 기본 이메일)은 집계에서 뺀다
 EXCLUDED_EMAIL_SUFFIX = ".test"
 

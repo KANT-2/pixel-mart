@@ -241,7 +241,7 @@ async def trade_matches(user: CurrentUser, db: DbSession):
     return [m for m, _ in matches]
 
 
-@router.get("/wish-map", response_model=list[WishMapOut], summary="지역 인기 찜 상품 (5명 이상만, 하위 지역 합산)")
+@router.get("/wish-map", response_model=list[WishMapOut], summary="지역 인기 찜 상품 (1명 이상, 하위 지역 합산)")
 async def wish_map(
     db: DbSession,
     region: Annotated[str, Query(max_length=12, description="지역 코드")],

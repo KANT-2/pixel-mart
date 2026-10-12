@@ -135,7 +135,7 @@ async def _check_filters(db: DbSession, tree: RegionTree, region: str | None, in
 
 
 @router.get(
-    "/local/fandom", response_model=list[FandomOut], summary="덕력지도: 지역 × 취향 인원 (5명 미만 숫자 비공개)"
+    "/local/fandom", response_model=list[FandomOut], summary="덕력지도: 지역 × 취향 인원 (0명은 숫자 없음)"
 )
 async def fandom_map(
     db: DbSession,
@@ -173,7 +173,7 @@ async def fandom_map(
     return rows[:limit]
 
 
-@router.get("/local/fandom/ranking", response_model=list[FandomRankOut], summary="지역 인기 취향 순위 (5명 이상만)")
+@router.get("/local/fandom/ranking", response_model=list[FandomRankOut], summary="지역 인기 취향 순위 (1명 이상)")
 async def fandom_ranking(
     db: DbSession,
     region: Annotated[str, Query(max_length=12, description="지역 코드 — 하위 지역 합산")],
@@ -223,7 +223,7 @@ class Crowd:
 
 
 async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: int | None) -> dict[str, Crowd]:
-    """동의자가 5명 미만인 블록은 덕력지도 샘플 인원만큼 샘플 캐릭터로 채운다 (isSample)"""
+    """동의자가 없는 블록은 덕력지도 샘플 인원만큼 샘플 캐릭터로 채운다 (isSample)"""
     # 취소되지 않은 주문 금액 합계 — 많이 산 이웃부터 (주문이 없으면 0)
     spent = (
         select(Order.user_id, func.sum(Order.total_price).label("total"))
@@ -275,7 +275,7 @@ async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: 
 @router.get(
     "/local/map-avatars",
     response_model=list[MapAvatarsOut],
-    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (5명 미만 비공개, 구매 금액 상위 10명)",
+    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (구매 금액 상위 10명)",
 )
 async def map_avatars(
     db: DbSession,
@@ -306,7 +306,7 @@ async def map_avatars(
 @router.get(
     "/local/buyer-ranking",
     response_model=BuyerRankingOut,
-    summary="지역 구매 순위 TOP 10: 아바타 표시 동의자를 구매 금액 순으로 (금액 비공개, 5명 미만 비공개)",
+    summary="지역 구매 순위 TOP 10: 아바타 표시 동의자를 구매 금액 순으로 (금액 비공개)",
 )
 async def buyer_ranking(
     db: DbSession,

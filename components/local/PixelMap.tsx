@@ -9,7 +9,7 @@ import { HEAT_COLORS, HEAT_NONE, LANDMARKS, SPRITES, coversCell, heatTier, place
 export interface MapBlock {
   code: string;
   name: string;
-  /** 이름표에 붙일 인원 (5명 미만이면 null) */
+  /** 이름표에 붙일 인원 (없으면 null) */
   count: number | null;
   /** 핀 — 아바타 PNG data URL, null이면 기본 슬라임. ranked면 0번부터 구매 순위 */
   pins: (string | null)[];
@@ -316,11 +316,11 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
           if (!cell || !block) return null;
           // 이름표는 확대해도 같은 크기로 (배율만큼 되돌림)
           return <button key={code} type="button" className={styles.label} data-label={code} aria-pressed={selected === code} onClick={() => onSelect(code)}
-            aria-label={namesOnly ? `${block.name} 지도로 이동` : block.tag ? `${block.name} · ${block.tag} ${block.count ? `${block.count}명` : "소수의 이웃"}` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 소수의 이웃"}`}
+            aria-label={namesOnly ? `${block.name} 지도로 이동` : block.tag ? `${block.name} · ${block.tag} ${block.count ? `${block.count}명` : "아직 없음"}` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 아직 없음"}`}
             style={{ left: percent(cell[0] + 0.5, view.cols), top: percent(cell[1] + 0.5, view.rows), transform: `translate(-50%, -50%) scale(${1 / zoom.z})` }}>
             <span className={`${styles.labelName} font-pixel`}>{block.name}{!namesOnly && block.tag && (block.count ? ` · ${block.tag}` : "")}</span>
             {!namesOnly && (block.count ? <span className={styles.labelCount}>{block.count}{block.tag ? "명" : ""}</span>
-              : <span className={styles.labelFew}>{block.tag ? "· 소수의 이웃" : "·"}</span>)}
+              : <span className={styles.labelFew}>{block.tag ? "· 아직 없음" : "·"}</span>)}
           </button>;
         })}
       </div>

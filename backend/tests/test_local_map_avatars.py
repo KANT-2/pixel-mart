@@ -1,4 +1,4 @@
-"""덕력지도 아바타 핀 — 동의자만, 5명 미만 비공개, 개인 식별 정보 없음 (로컬 DB 필요, 없으면 건너뜀)
+"""덕력지도 아바타 핀 — 동의자만, 1명부터 공개(0명만 숨김), 개인 식별 정보 없음 (로컬 DB 필요, 없으면 건너뜀)
 
 다른 테스트·샘플과 섞이지 않게 테스트 전용 지역(AVT › AVT1·AVT2 › 생활권)을 만들고 끝나면 정리한다.
 """
@@ -95,7 +95,7 @@ async def test_opt_in_is_off_by_default_and_saved(users):
     assert (await c.put("/api/users/me/local", json=body)).json()["mapAvatarOptIn"] is True
 
 
-async def test_below_five_hides_count_and_avatars(users):
+async def test_small_group_shows_count_and_avatars(users):
     for n in range(4):
         await users(f"avatar-few{n}@pixelmart.test", avatar=True)
     rows = blocks(
@@ -108,11 +108,13 @@ async def test_below_five_hides_count_and_avatars(users):
     assert rows[ZONE_A] == {
         "regionCode": ZONE_A,
         "regionName": "아바타시 일구 가동",
-        "count": None,
-        "belowThreshold": True,
-        "avatars": [],
+        "count": 4,
+        "belowThreshold": False,
+        "avatars": [PNG] * 4,
         "isSample": False,
     }
+    assert rows[ZONE_B]["count"] is None and rows[ZONE_B]["belowThreshold"] is True  # 0명만 숨김
+    assert rows[ZONE_B]["avatars"] == []
 
 
 async def test_five_opted_in_show_avatars_without_identity(users):
@@ -240,12 +242,15 @@ async def test_buyer_ranking_hides_amounts_and_private_nicknames(users):
             )
 
 
-async def test_buyer_ranking_below_five_is_empty(users):
+async def test_buyer_ranking_lists_small_group_and_hides_empty(users):
     for n in range(4):
         await users(f"avatar-few{n}@pixelmart.test")
     viewer = await users("avatar-viewer@pixelmart.test", region=OTHER, opt_in=False)
     body = (await viewer.get("/api/local/buyer-ranking", params={"region": ZONE_A})).json()
-    assert body == {"regionCode": ZONE_A, "belowThreshold": True, "isSample": False, "items": []}
+    items = [{"rank": n, "avatarUrl": None, "nickname": None} for n in range(1, 5)]  # 아바타·닉네임 공개 없음
+    assert body == {"regionCode": ZONE_A, "belowThreshold": False, "isSample": False, "items": items}
+    empty = (await viewer.get("/api/local/buyer-ranking", params={"region": ZONE_B})).json()
+    assert empty == {"regionCode": ZONE_B, "belowThreshold": True, "isSample": False, "items": []}
 
 
 async def test_buyer_ranking_sample_top_ten(client):

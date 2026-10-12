@@ -165,7 +165,7 @@ export function seaSpots(rows: string[], sprite: Sprite, n: number, seed: number
   return picked;
 }
 
-/** 지역 색 단계 — 보고 있는 지도에서 가장 많은 곳 대비 적음(0)·보통(1)·많음(2), 5명 미만은 null */
+/** 지역 색 단계 — 보고 있는 지도에서 가장 많은 곳 대비 적음(0)·보통(1)·많음(2), 없으면 null */
 export function heatTier(count: number | null, max: number): 0 | 1 | 2 | null {
   if (!count || max <= 0) return null;
   const ratio = count / max;
