@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
-import HeroStage from "@/components/hero/HeroStage";
+import HomeCarousel from "@/components/home/HomeCarousel";
 import WorldMapTeaser from "@/components/home/WorldMapTeaser";
 import { getProducts } from "@/lib/products";
 import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
@@ -38,34 +38,7 @@ export default function Home() {
   return (
     <>
       {/* 히어로 배너 */}
-      <section className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-8 pt-10 md:grid-cols-2 md:px-8 md:pb-12 md:pt-14">
-        <div>
-          <p className="mb-4 flex items-center gap-2 font-pixel text-sm tracking-widest text-mint">
-            <span className="size-2 bg-mint" />
-            GOOD ITEMS, BETTER DAYS
-          </p>
-          <h1 className="mb-5 bg-linear-to-b from-white via-[#dccfff] to-mint bg-clip-text font-pixel text-4xl leading-tight font-bold text-transparent drop-shadow-[4px_4px_0_#3a2a80] md:text-6xl">
-            일상에 아이템을
-            <br />
-            장착하세요.
-          </h1>
-          <p className="mb-8 text-sub md:text-lg">
-            좋아하는 게임이 있는 하루는,
-            <br />
-            언제나 조금 더 특별하니까.
-          </p>
-          <div className="flex flex-wrap items-center gap-4">
-            <Link href="/products" className="btn-lime px-7 py-4 font-extrabold text-lime-ink">
-              ▶ 아이템 둘러보기
-            </Link>
-            <Link href="/local" className="btn-pixel px-6 py-4 font-bold">
-              월드맵 열기
-            </Link>
-          </div>
-        </div>
-
-        <HeroStage />
-      </section>
+      <HomeCarousel />
 
       {/* 추천 상품 */}
       <section className="mx-auto max-w-6xl px-4 pb-14 md:px-8">
