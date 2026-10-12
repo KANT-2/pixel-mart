@@ -237,8 +237,11 @@ class Crowd:
 
 
 async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dict[int, MapCardOut]:
-    """카드 공개 동의자의 이웃 카드 — 하트·코인은 구간으로만"""
-    users = [u for u in users if u.map_card_public]
+    """카드 공개 동의자의 이웃 카드 — 하트·코인은 구간으로만.
+
+    내 캐릭터는 공개를 안 켰어도 나에게만 내 카드를 보여 준다.
+    """
+    users = [u for u in users if u.map_card_public or u.id == viewer_id]
     if not users:
         return {}
     ids = [u.id for u in users]
@@ -276,6 +279,7 @@ async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dic
             # WANT 보기·선물은 닉네임으로 찾아가므로 닉네임 공개일 때만
             want_count=wants.get(u.id, 0) if u.nickname_public else 0,
             is_me=u.id == viewer_id,
+            is_public=u.map_card_public,
         )
     return cards
 
@@ -295,6 +299,7 @@ def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[
                 interests=rng.sample(interests, min(len(interests), rng.randint(1, 2))) if interests else [],
                 want_count=0,
                 is_me=False,
+                is_sample=True,
             )
         )
     return cards
@@ -338,25 +343,24 @@ async def _crowds(
     interest_names: list[str] | None = None
     crowds = {}
     for code in blocks:
-        if len(by_block[code]) < MIN_GROUP_SIZE and samples.get(code, 0) >= MIN_GROUP_SIZE:
-            if interest_names is None:
-                interest_names = list(await db.scalars(select(Interest.name).order_by(Interest.id)))
-            n = samples[code]
-            key = f"{code}:{interest}"
-            shown = min(n, MAX_MAP_AVATARS)
-            nicknames = sample_nicknames(key, shown)
-            people = [
-                Person(avatar, nickname, card)
-                for avatar, nickname, card in zip(
-                    sample_avatars(key, shown), nicknames, _sample_cards(key, nicknames, interest_names), strict=True
-                )
-            ]
-            crowds[code] = Crowd(n, True, people)
-        else:
-            people = [
-                Person(u.avatar_url, u.nickname if u.nickname_public else None, cards.get(u.id)) for u in top[code]
-            ]
-            crowds[code] = Crowd(len(by_block[code]), False, people)
+        real = [Person(u.avatar_url, u.nickname if u.nickname_public else None, cards.get(u.id)) for u in top[code]]
+        n = samples.get(code, 0)
+        if len(by_block[code]) >= n:
+            crowds[code] = Crowd(len(by_block[code]), False, real)
+            continue
+        # 실제 이웃이 샘플 인원보다 적으면 실제 이웃을 앞에, 남는 자리는 샘플 캐릭터로 (1명만 있어도 지도가 비지 않게)
+        if interest_names is None:
+            interest_names = list(await db.scalars(select(Interest.name).order_by(Interest.id)))
+        key = f"{code}:{interest}"
+        fill = max(0, min(n, MAX_MAP_AVATARS) - len(real))
+        nicknames = sample_nicknames(key, fill)
+        fake = [
+            Person(avatar, nickname, card)
+            for avatar, nickname, card in zip(
+                sample_avatars(key, fill), nicknames, _sample_cards(key, nicknames, interest_names), strict=True
+            )
+        ]
+        crowds[code] = Crowd(n, bool(fake), real + fake)
     return crowds
 
 

@@ -48,7 +48,12 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
         <Tile icon={<PixelIcon name="coin" className="size-4" />} label="교환·거래" value={card.coinBand ?? "아직 없음"} />
         <Tile icon={<PixelIcon name="heart" className="size-4" />} label="취향" value={card.interests.length ? card.interests.join("·") : "비공개"} />
       </ul>
-      {card.isMe ? <MyProgress /> : sample ? <p className="mt-3 text-xs text-dim">시연용 샘플 캐릭터예요. 실제 이웃은 카드 공개에 동의한 경우에만 보여요.</p>
+      {card.isMe ? <>
+        <MyProgress />
+        {card.isPublic === false && <p className="mt-2 text-xs leading-relaxed text-sub">
+          내 카드는 지금 나에게만 보여요. <Link href="/local/settings" className="text-mint underline">내 동네·취향 설정</Link>에서 &lsquo;지도에서 내 이웃 카드 보여 주기&rsquo;를 켜면 이웃에게도 보여요.
+        </p>}
+      </> : sample ? <p className="mt-3 text-xs text-dim">시연용 샘플 캐릭터예요. 실제 이웃은 카드 공개에 동의한 경우에만 보여요.</p>
         : card.wantCount > 0 && card.nickname && <Link href={`/local/wish-map?nickname=${encodeURIComponent(card.nickname)}`}
           className="btn-pixel mt-3 flex min-h-10 w-full items-center justify-center text-sm font-bold">
           WANT {card.wantCount}개 보기 · 선물하기

@@ -70,7 +70,9 @@ export default function FandomMapScreen() {
   const pickPin = (code: string, index: number) => {
     const block = mapBlocks.find((item) => item.code === code);
     const data = blocks.data?.find((item) => item.code === code);
-    const neighbor = { avatar: block?.pins[index] ?? null, card: data?.cards[index] ?? null, sample: block?.sample ?? false };
+    const card = data?.cards[index] ?? null;
+    // 한 지역에 실제 이웃과 샘플 캐릭터가 섞일 수 있어 샘플 여부는 캐릭터마다 (카드가 없으면 실제 이웃)
+    const neighbor = { avatar: block?.pins[index] ?? null, card, sample: Boolean(card?.isSample) };
     setPinned({ view: viewCode, code, rank: block?.ranked ? index + 1 : null, neighbor });
     setSheet(true);
   };
