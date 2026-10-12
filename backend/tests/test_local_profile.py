@@ -111,6 +111,7 @@ async def test_clear_local_profile(client, db_ready):
     assert cleared == {
         "region": None,
         "interests": [],
+        "mapCardPublic": False,
         "fandomOptIn": False,
         "profilePublic": False,
         "mapAvatarOptIn": False,

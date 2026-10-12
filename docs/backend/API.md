@@ -68,7 +68,7 @@
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |
-| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`)·닉네임 공개(`nicknamePublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
+| GET · PUT | /api/users/me/local 🔒 | 내 지역·취향·집계 참여(`fandomOptIn`)·취향 공개(`profilePublic`)·지도 아바타 표시(`mapAvatarOptIn`)·닉네임 공개(`nicknamePublic`)·이웃 카드 공개(`mapCardPublic`) 조회·설정 (PUT은 전체 교체, 없는 지역·취향 422) | ✅ |
 | GET | /api/interests?type=&q= | 취향 태그 검색 — 지금은 **작품(`work`)만** 운영 (나루토·레트로 RPG·픽셀 게임·던전 크롤러). type 값 `character/style/product_type`도 받지만 결과는 비어 있음 | ✅ |
 | GET | /api/local/fandom?region=&interest=&type=&period=&limit= | 덕력지도 집계 — 집계 참여자 수(중복 제거, 테스트 계정 제외), 하위 지역 합산, 0명만 `count: null, belowThreshold: true`, 사용자 목록 없음, 샘플은 `isSample: true`, period `30d/90d/all` | ✅ |
 | GET | /api/local/fandom/ranking?region=&type=&period=&limit= | 지역 인기 취향 순위 (1명 이상, `rank`·`isSample`) | ✅ |
@@ -78,8 +78,9 @@
 | GET | /api/local/wish-wants?codes=a,b | 위시맵 지역 블록별 진행 중 WANT 수·핀 이미지(최대 4, 하위 지역 포함), 없는 지역 404, 최대 40개 | ✅ |
 | PATCH | /api/local/trades/{id} 🔒 | 내 글 상태 `done`/`hidden` (남의 글 404) | ✅ |
 | GET | /api/local/trades/matches 🔒 | 내 WANT ↔ 같은 구 이웃의 HAVE·SELL (같은 상품·취향·물건 이름), `proximity: same_zone/same_district`, 맞교환 `mutual` 우선 | ✅ |
-| GET | /api/local/map-avatars?region=&interest= | 덕력지도 아바타 핀 — 보고 있는 지역의 하위 지역(생활권이면 자기 자신)별 `mapAvatarOptIn` 동의자 수와 구매 금액 상위 최대 10개 아바타(PNG data URL, null=기본 슬라임, 같은 금액은 무작위, 0번이 1위). 동의자가 없으면 덕력지도 샘플 인원만큼 샘플 캐릭터로 채우고 `isSample: true`, 샘플도 없으면 `count: null, belowThreshold: true, avatars: []`, id·닉네임 없음, 테스트 계정 제외 | ✅ |
+| GET | /api/local/map-avatars?region=&interest= | 덕력지도 아바타 핀 — 보고 있는 지역의 하위 지역(생활권이면 자기 자신)별 `mapAvatarOptIn` 동의자 수와 구매 금액 상위 최대 10개 아바타(PNG data URL, null=기본 슬라임, 같은 금액은 무작위, 0번이 1위). 동의자가 없으면 덕력지도 샘플 인원만큼 샘플 캐릭터로 채우고 `isSample: true`, 샘플도 없으면 `count: null, belowThreshold: true, avatars: []`, id·닉네임 없음, 테스트 계정 제외 · `cards`: avatars와 같은 순서의 이웃 카드 `{nickname, hearts 0~3, level, coinBand, interests, wantCount, isMe}` — 카드 공개 동의자만(아니면 null), 닉네임·취향·WANT 수는 각 공개 동의 시에만, 점수·금액·id 없음 | ✅ |
 | GET | /api/local/buyer-ranking?region=&interest= | 지역 구매 순위 TOP 10 — 아바타 표시 동의자를 구매 금액(취소 제외) 순으로 `{regionCode, belowThreshold, isSample, items: [{rank, avatarUrl, nickname}]}`. **금액은 내보내지 않음**, `nickname`은 닉네임 공개 동의자만(아니면 null), 동의자가 없으면 `items: []`, 동의자가 적으면 지도와 같은 샘플 캐릭터(`isSample`). 없는 지역·취향 404, region 없음 422 | ✅ |
+| GET | /api/users/me/activity 🔒 | 내 활동 점수 `{score, hearts, level, nextHeartAt, coins, coinBand, recent}` — 하트(지역 커뮤니티 참여도: 프로필 완성 +5·첫 WANT +10 한 번, 거래·교환 완료 +20·선물 완료(받았을 때) +10 하루 3건까지, 같은 글·선물은 한 번), 코인 = 완료한 교환·거래 수. 하트 1·2·3개 = 15·35·70점 (시범 기준) | ✅ |
 | GET | /api/local/wish-map?region=&limit= | 지역 인기 찜 상품 순위 (집계 참여자만, 하위 지역 합산, 1명 이상). 실제 찜이 없는 칸은 샘플로 채우고 `isSample: true` | ✅ |
 | POST | /api/gifts 🔒 | WANT 글 이웃에게 선물(데모 결제) `{tradePostId, productId, quantity 1~9, message ≤100}` → 201. **글에 연결된 상품만**(`productId`가 글의 상품과 다르거나 상품 없는 글이면 400), HAVE·SELL·내 글·샘플 400, 없음·숨김 404, 연락처 메시지 422. 상대는 항상 "이웃 플레이어" | ✅ |
 | GET | /api/gifts?box=received\|sent 🔒 | 받은/보낸 선물함 (최신순, 닉네임·주소 없음, `orderId`는 받은 사람만) | ✅ |

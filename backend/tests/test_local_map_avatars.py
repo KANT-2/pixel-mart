@@ -112,6 +112,7 @@ async def test_small_group_shows_count_and_avatars(users):
         "belowThreshold": False,
         "avatars": [PNG] * 4,
         "isSample": False,
+        "cards": [None] * 4,  # 카드 공개 동의 안 함
     }
     assert rows[ZONE_B]["count"] is None and rows[ZONE_B]["belowThreshold"] is True  # 0명만 숨김
     assert rows[ZONE_B]["avatars"] == []
@@ -131,8 +132,9 @@ async def test_five_opted_in_show_avatars_without_identity(users):
     assert sorted(zone["avatars"], key=str) == sorted([PNG] * 3 + [None] * 2, key=str)
     raw = json.dumps(res.json())
     assert "pixelmart.test" not in raw and "avatar-a0" not in raw  # 이메일·닉네임 없음
-    assert set(zone) == {"regionCode", "regionName", "count", "belowThreshold", "avatars", "isSample"}
+    assert set(zone) == {"regionCode", "regionName", "count", "belowThreshold", "avatars", "isSample", "cards"}
     assert zone["isSample"] is False
+    assert zone["cards"] == [None] * 5  # 카드 공개에 동의하지 않으면 카드 없음
 
 
 async def test_parent_block_sums_children(users):

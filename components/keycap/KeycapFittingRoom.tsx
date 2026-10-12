@@ -205,25 +205,25 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       <button type="button" onClick={() => setTipClosed(true)} aria-label="사용법 알림 닫기" className="btn-pixel size-9 shrink-0 text-sm">✕</button>
     </div>}
     {fullscreen && <button type="button" onClick={() => void document.exitFullscreen()} className="btn-pixel fixed right-3 top-3 z-30 h-9 px-3 text-xs font-bold">✕ 나가기</button>}
-    {/* 휴대폰 가로 — 왼쪽 키보드, 오른쪽 키캡 목록(따로 스크롤)의 분할 화면 */}
-    <div className="min-w-0 space-y-5 phone-landscape:grid phone-landscape:grid-cols-[minmax(0,1fr)_36%] phone-landscape:gap-3 phone-landscape:space-y-0">
+    {/* 휴대폰 가로 — 왼쪽에 STEP 1·키보드, 오른쪽 키캡 목록(따로 스크롤). 두 칸의 위·아래 끝을 맞춘다 */}
+    <div className="min-w-0 space-y-5 phone-landscape:grid phone-landscape:grid-cols-[minmax(0,1fr)_36%] phone-landscape:gap-x-3 phone-landscape:gap-y-2 phone-landscape:space-y-0">
       {/* 1. 내 키보드 — 지금 키캡 색·케이스·조명 */}
-      <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4 phone-landscape:col-span-2 phone-landscape:gap-y-2 phone-landscape:p-2.5">
-        <span className="font-pixel text-xs text-mint">STEP 1 · MY KEYBOARD</span>
-        <label className="flex items-center gap-2 text-sm font-bold">모델
-          <select id="keycap-board" name="board" className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={(event) => changeModel(event.target.value)}>
+      <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4 phone-landscape:col-start-1 phone-landscape:row-start-1 phone-landscape:gap-x-3 phone-landscape:gap-y-1.5 phone-landscape:p-2">
+        <span className="font-pixel text-xs text-mint phone-landscape:hidden">STEP 1 · MY KEYBOARD</span>
+        <label className="flex items-center gap-2 text-sm font-bold phone-landscape:text-xs">모델
+          <select id="keycap-board" name="board" className="pixel-input h-9 py-0 text-sm phone-landscape:h-8 phone-landscape:max-w-[13rem] phone-landscape:text-xs" value={BOARD.id} onChange={(event) => changeModel(event.target.value)}>
             {KEYBOARDS.map((model) => <option key={model.id} value={model.id}>{model.name} · {model.variant}</option>)}
           </select>
         </label>
         {/* 스위치 사진이 여러 장인 모델만 */}
-        {BOARD.switches.length > 1 && <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold">
+        {BOARD.switches.length > 1 && <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold phone-landscape:h-8">
           {BOARD.switches.map((item) => <button key={item.id} type="button" aria-pressed={board.id === item.id} onClick={() => setSwitchId(item.id)}>{item.label}</button>)}
         </div>}
-        <div role="group" aria-label="나머지 키" className="flex items-center gap-2"><span className="text-sm font-bold">나머지 키</span>
+        <div role="group" aria-label="나머지 키" className="flex flex-wrap items-center gap-2 phone-landscape:gap-1.5"><span className="text-sm font-bold phone-landscape:text-xs">나머지 키</span>
           {(Object.keys(BASES) as BaseKey[]).filter((key) => key !== "custom").map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={key === "none" ? "나머지 키 비우기 (스위치 보기)" : `나머지 키를 ${BASES[key].label} 키캡으로`} title={BASES[key].label}
-            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].color }} />)}
+            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 phone-landscape:size-6 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].color }} />)}
           {/* 원하는 색 직접 고르기 */}
-          <label title="직접 고르기" className={`relative size-8 cursor-pointer overflow-hidden rounded-md border-2 border-frame ${base === "custom" ? "outline-3 outline-offset-2 outline-mint" : ""}`}
+          <label title="직접 고르기" className={`relative size-8 cursor-pointer overflow-hidden rounded-md border-2 border-frame phone-landscape:size-6 ${base === "custom" ? "outline-3 outline-offset-2 outline-mint" : ""}`}
             style={{ background: base === "custom" ? customColor : "conic-gradient(#ff7ab6, #ffd166, #b6ff5c, #6ef2d6, #a78bff, #ff7ab6)" }}>
             <span className="sr-only">나머지 키 색 직접 고르기</span>
             <input id="keycap-base-color" name="baseColor" type="color" value={customColor} onChange={(event) => { setCustomColor(event.target.value); setBase("custom"); }} className="absolute inset-0 cursor-pointer opacity-0" />
@@ -232,7 +232,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       </section>
 
       {/* 2. 키보드 — 키캡을 끌어다 놓거나, 고른 뒤 키를 눌러 끼우기 */}
-      <section aria-label="키보드 미리보기" className="pixel-panel p-4 phone-landscape:sticky phone-landscape:top-2 phone-landscape:self-start phone-landscape:p-2.5">
+      <section aria-label="키보드 미리보기" className="pixel-panel p-4 phone-landscape:col-start-1 phone-landscape:row-start-2 phone-landscape:p-2.5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <span className="font-pixel text-xs text-mint">STEP 2 · {touch ? "키캡을 누르고 키 자리를 눌러 끼우기" : "키캡을 끌어다 키 위에 놓기"}</span>
           <div className="flex items-center gap-2">
@@ -279,8 +279,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       </section>
 
 
-      {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
-      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4 phone-landscape:max-h-[calc(100svh-16px)] phone-landscape:overflow-y-auto phone-landscape:p-2.5">
+      {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 (가로 화면에서는 왼쪽 두 칸 높이에 맞추고 안에서 스크롤) */}
+      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4 phone-landscape:col-start-2 phone-landscape:row-span-2 phone-landscape:row-start-1 phone-landscape:overflow-y-auto phone-landscape:[contain:size] phone-landscape:p-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim phone-landscape:hidden">{touch ? "키캡을 누른 뒤, 끼울 키 자리를 눌러 주세요" : "끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요"}</span></p>
           <div className="flex flex-wrap items-center gap-2 phone-landscape:w-full">

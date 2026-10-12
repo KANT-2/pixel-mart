@@ -31,6 +31,9 @@ class LocalProfileIn(CamelModel):
     profile_public: bool = Field(default=False, description="선택한 취향을 다른 사용자에게 공개")
     map_avatar_opt_in: bool = Field(default=False, description="덕력지도 핀에 내 아바타 표시")
     nickname_public: bool = Field(default=False, description="내 거래·위시 글에 닉네임·아바타 표시, 닉네임 검색 허용")
+    map_card_public: bool = Field(
+        default=False, description="덕력지도에서 내 캐릭터를 누르면 이웃 카드(하트·코인 구간·공개 취향) 표시"
+    )
 
 
 class LocalProfileOut(CamelModel):
@@ -42,10 +45,23 @@ class LocalProfileOut(CamelModel):
     profile_public: bool
     map_avatar_opt_in: bool
     nickname_public: bool
+    map_card_public: bool
+
+
+class MapCardOut(CamelModel):
+    """지도에서 캐릭터를 눌렀을 때의 이웃 카드 — 카드 공개 동의자만. 사용자 id·정확한 점수·금액·위치는 없다"""
+
+    nickname: str | None = Field(description="닉네임 공개 동의자만, 아니면 null(화면에서 '이웃 플레이어')")
+    hearts: int = Field(ge=0, le=3, description="지역 커뮤니티 참여도 0~3")
+    level: str = Field(examples=["단골 이웃"])
+    coin_band: str | None = Field(description="완료한 교환·거래 구간 (예: '교환 5회+'), 없으면 null")
+    interests: list[str] = Field(description="취향 공개 동의자의 취향 이름 (최대 3개)")
+    want_count: int = Field(description="진행 중인 WANT 글 수 (닉네임 공개일 때만, 아니면 0)")
+    is_me: bool = Field(description="보고 있는 내 캐릭터")
 
 
 class MapAvatarsOut(CamelModel):
-    """덕력지도 지역 블록 하나의 아바타 핀 — 사용자 id·닉네임·위치는 절대 포함하지 않는다"""
+    """덕력지도 지역 블록 하나의 아바타 핀 — 사용자 id·위치는 절대 포함하지 않는다 (카드는 카드 공개 동의자만)"""
 
     region_code: str
     region_name: str
@@ -55,6 +71,27 @@ class MapAvatarsOut(CamelModel):
         description="최대 10개, 구매 금액이 큰 순(같으면 무작위) — 0번이 1위 — PNG data URL, null이면 기본 슬라임"
     )
     is_sample: bool = Field(default=False, description="동의자가 적은 지역을 샘플 캐릭터로 채운 블록")
+    cards: list[MapCardOut | None] = Field(
+        default_factory=list, description="avatars와 같은 순서의 이웃 카드 — 카드를 공개하지 않은 이웃은 null"
+    )
+
+
+class ActivityLogOut(CamelModel):
+    label: str
+    points: int
+    created_at: datetime
+
+
+class MyActivityOut(CamelModel):
+    """내 활동 점수 — 나에게만 정확한 점수·코인 수를 보여 준다"""
+
+    score: int
+    hearts: int
+    level: str
+    next_heart_at: int | None = Field(description="다음 하트가 되는 점수, 하트가 꽉 찼으면 null")
+    coins: int = Field(description="완료한 교환·거래 수")
+    coin_band: str | None
+    recent: list[ActivityLogOut] = Field(description="최근 적립 5개")
 
 
 class BuyerRankOut(CamelModel):
