@@ -10,21 +10,18 @@ import { ARROW_KEYS, WOOTING_80HE as BOARD } from "@/data/keyboards";
 import { keycapImage, matchKeycaps, placeKeycap, recommendKeycaps, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
-// 지금 키캡(기본 키캡)·케이스·조명 — 내 키보드와 비슷하게 맞춰 보는 용도
+// 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 그 색 키캡으로 채워 내 키보드와 비슷하게 맞춘다
 const BASES = {
+  none: { label: "비우기", bg: "#1e1c26", side: "#1e1c26", fg: "transparent" },
   black: { label: "블랙", bg: "#2a2733", side: "#16141d", fg: "#8f8aa8" },
   white: { label: "화이트", bg: "#ecebf3", side: "#b6b3c6", fg: "#5a5672" },
   lavender: { label: "라벤더", bg: "#c9b8f0", side: "#9a86cf", fg: "#3c2e66" },
   cream: { label: "크림", bg: "#efe4cb", side: "#c7b693", fg: "#5c4b2d" },
 } as const;
-const CASES = { black: { label: "블랙", color: "#1c1a24", plate: "#0d0b14" }, white: { label: "화이트", color: "#e4e2ec", plate: "#c9c6d6" } } as const;
-const LIGHTS = { off: { label: "끔", color: null }, mint: { label: "민트", color: "#6ef2d6" }, violet: { label: "보라", color: "#a78bff" }, pink: { label: "분홍", color: "#ff7ab6" }, white: { label: "흰빛", color: "#f4f2ff" } } as const;
 const KINDS: [KeycapKind | "all", string][] = [["all", "전체"], ["one", "1u"], ["set", "방향키 세트"], ["space", "스페이스바"]];
 const TONE = { good: "var(--color-lime)", ok: "var(--color-mint)", warn: "#ffd166", info: "var(--color-dim)" } as const;
 
 type BaseKey = keyof typeof BASES;
-type CaseKey = keyof typeof CASES;
-type LightKey = keyof typeof LIGHTS;
 
 interface KeycapFittingRoomProps {
   /** 들어온 상세 페이지의 키캡 (서랍 맨 앞, 처음엔 ESC에 끼워 둠) */
@@ -39,9 +36,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const router = useRouter();
   const { user } = useAuth();
   const { add } = useCart();
-  const [base, setBase] = useState<BaseKey>("black");
-  const [caseKey, setCaseKey] = useState<CaseKey>("black");
-  const [light, setLight] = useState<LightKey>("violet");
+  const [base, setBase] = useState<BaseKey>("none");
+  const [switchId, setSwitchId] = useState(BOARD.switches[0].id);
   const [placed, setPlaced] = useState<Placement>(() => current ? placeKeycap({}, current, current.kind === "space" ? { id: "Space", label: "", w: 6.25 } : { id: "Escape", label: "Esc", w: 1 }).placed : {});
   const [view, setView] = useState<"before" | "after">("after");
   const [kind, setKind] = useState<KeycapKind | "all">("all");
@@ -52,11 +48,13 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const [cartState, setCartState] = useState<"idle" | "adding" | "done" | "error">("idle");
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
-  const B = BASES[base], C = CASES[caseKey], L = LIGHTS[light];
+  const B = BASES[base];
+  const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
   const used = usedIds.map(byId).filter((item): item is KeycapItem => Boolean(item));
-  const match = matchKeycaps(used, { baseColor: B.bg, baseLabel: B.label, lightColor: L.color, lightLabel: L.label });
-  const recs = recommendKeycaps(KEYCAPS, usedIds, B.bg, used[0]?.color ?? L.color ?? "#a78bff");
+  // 비워 두면 검은 몸체와 비교, 사진의 RGB 조명 기준
+  const match = matchKeycaps(used, { baseColor: B.bg, baseLabel: base === "none" ? "검은 몸체" : `${B.label} 키캡`, lightColor: "rgb", lightLabel: "RGB" });
+  const recs = recommendKeycaps(KEYCAPS, usedIds, B.bg, used[0]?.color ?? "#a78bff");
   const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query);
 
   function place(itemId: string | null, keyId: string) {
@@ -121,17 +119,12 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         <label className="flex items-center gap-2 text-sm font-bold">모델
           <select className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={() => undefined}><option value={BOARD.id}>{BOARD.name}</option></select>
         </label>
-        <div role="group" aria-label="지금 키캡 색" className="flex items-center gap-2"><span className="text-sm font-bold">지금 키캡</span>
-          {(Object.keys(BASES) as BaseKey[]).map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={`${BASES[key].label} 키캡`} title={BASES[key].label}
-            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 border-frame ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: BASES[key].bg }} />)}
+        <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold">
+          {BOARD.switches.map((item) => <button key={item.id} type="button" aria-pressed={switchId === item.id} onClick={() => setSwitchId(item.id)}>{item.label}</button>)}
         </div>
-        <div role="group" aria-label="케이스 색" className="flex items-center gap-2"><span className="text-sm font-bold">케이스</span>
-          {(Object.keys(CASES) as CaseKey[]).map((key) => <button key={key} type="button" aria-pressed={caseKey === key} aria-label={`${CASES[key].label} 케이스`} title={CASES[key].label}
-            onClick={() => setCaseKey(key)} className={`size-8 rounded-md border-2 border-frame ${caseKey === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: CASES[key].color }} />)}
-        </div>
-        <div role="group" aria-label="조명" className="segmented h-9 text-xs font-bold">
-          {(Object.keys(LIGHTS) as LightKey[]).map((key) => <button key={key} type="button" aria-pressed={light === key} onClick={() => setLight(key)}>
-            <span className="mr-1.5 size-2.5 rounded-sm" style={{ background: LIGHTS[key].color ?? "var(--color-frame)" }} />{LIGHTS[key].label}</button>)}
+        <div role="group" aria-label="나머지 키" className="flex items-center gap-2"><span className="text-sm font-bold">나머지 키</span>
+          {(Object.keys(BASES) as BaseKey[]).map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={key === "none" ? "나머지 키 비우기 (스위치 보기)" : `나머지 키를 ${BASES[key].label} 키캡으로`} title={BASES[key].label}
+            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].bg }} />)}
         </div>
       </section>
 
@@ -149,26 +142,27 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         </div>
         {/* 모바일에서는 상자 안에서 가로로 밀어 보기 */}
         <div className="overflow-x-auto pb-2">
-          <div className="relative min-w-[640px] rounded-[18px] border-[3px] border-shadow shadow-[6px_8px_0_var(--color-shadow)]" style={{ aspectRatio: `${BOARD.width} / ${BOARD.height}`, background: C.color }}>
-            <div className="absolute inset-x-[1.7%] bottom-[7.3%] top-[5.4%] rounded-lg" style={{ background: C.plate, boxShadow: L.color ? `inset 0 0 40px ${L.color}55, 0 0 30px ${L.color}33` : "none" }} />
+          <div className="relative min-w-[640px]" style={{ aspectRatio: `${BOARD.width} / ${BOARD.height}` }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- 키캡을 뺀 RGB 스위치 사진 */}
+            <img src={board.image} alt={`${BOARD.name} ${board.label} — 키캡을 뺀 모습`} className="absolute inset-0 h-full w-full select-none" draggable={false} />
             {BOARD.keys.map((key) => {
               const item = placed[key.id] ? byId(placed[key.id]) : undefined;
               const show = item && view === "after";
-              return <button key={key.id} type="button" aria-label={`${key.label || "스페이스바"}${item ? ` — ${item.name} 끼움, 눌러서 빼기` : " 키"}`}
+              const fill = !show && base !== "none";
+              const inset = BOARD.insetPx;
+              return <button key={key.id} type="button" aria-label={`${key.label || "스페이스바"}${item ? ` — ${item.name} 끼움, 눌러서 빼기` : " 자리"}`}
                 onClick={() => clickKey(key.id)}
                 onDragOver={(event) => { event.preventDefault(); if (over !== key.id) setOver(key.id); }}
                 onDragLeave={() => { if (over === key.id) setOver(null); }}
                 onDrop={(event) => { event.preventDefault(); place(event.dataTransfer.getData("text/plain") || picked, key.id); }}
-                className="absolute cursor-pointer rounded-[5px]"
+                className={`absolute cursor-pointer rounded-[6px] ${over === key.id ? "outline-3 outline-dashed outline-lime" : picked && !item ? "outline-2 outline-mint/70" : "hover:outline-2 hover:outline-white/40"}`}
                 style={{
-                  left: pct(BOARD.originX + key.x * BOARD.unitPx + BOARD.insetPx, BOARD.width), top: pct(BOARD.originY + key.y * BOARD.unitPx + BOARD.insetPx, BOARD.height),
-                  width: pct(key.w * BOARD.unitPx - 2 * BOARD.insetPx, BOARD.width), height: pct(BOARD.unitPx - 2 * BOARD.insetPx, BOARD.height),
-                  boxShadow: L.color ? `0 0 10px 1px ${L.color}66` : "none",
+                  left: pct(key.x + inset, BOARD.width), top: pct(key.y + inset, BOARD.height),
+                  width: pct(key.w * BOARD.unitPx - 2 * inset, BOARD.width), height: pct(BOARD.unitPx - 2 * inset, BOARD.height),
                 }}>
-                <span className={`absolute inset-0 flex items-start rounded-[5px] px-1.5 py-1 font-pixel text-[10px] ${over === key.id ? "outline-3 outline-dashed outline-lime" : picked && !item ? "outline-2 outline-mint/60" : ""}`}
-                  style={{ background: B.bg, color: B.fg, boxShadow: `inset 0 -4px 0 ${B.side}` }}>{show ? "" : key.label}</span>
+                {fill && <span className="absolute inset-0 flex items-start rounded-[6px] px-1.5 py-1 font-pixel text-[10px]" style={{ background: B.bg, color: B.fg, boxShadow: `inset 0 -5px 0 ${B.side}` }}>{key.label}</span>}
                 {/* eslint-disable-next-line @next/next/no-img-element -- 끼운 키캡 그림 */}
-                {show && <img src={keycapImage(item, key.id)} alt="" draggable={false} className="absolute -inset-[3%] h-[106%] w-[106%] object-fill drop-shadow-[0_2px_0_rgb(0_0_0/0.35)]" />}
+                {show && <img src={keycapImage(item, key.id)} alt="" draggable={false} className="absolute inset-0 h-full w-full object-fill drop-shadow-[0_3px_2px_rgb(0_0_0/0.45)]" />}
               </button>;
             })}
           </div>

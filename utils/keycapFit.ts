@@ -8,11 +8,11 @@ export interface KeyInfo { id: string; label: string; w: number; }
 
 const ARROWS = ["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight"];
 
+const hasBatchim = (word: string) => { const code = word.charCodeAt(word.length - 1) - 0xac00; return code >= 0 && code <= 11171 && code % 28 > 0; };
 /** "HP 하트 키캡을" / "방향키 세트를" — 마지막 글자 받침으로 을/를 */
-export function withObject(word: string): string {
-  const code = word.charCodeAt(word.length - 1) - 0xac00;
-  return word + (code >= 0 && code <= 11171 && code % 28 ? "을" : "를");
-}
+export function withObject(word: string): string { return word + (hasBatchim(word) ? "을" : "를"); }
+/** "블랙 키캡과" / "검은 몸체와" */
+export function withAnd(word: string): string { return word + (hasBatchim(word) ? "과" : "와"); }
 
 export interface PlaceResult { placed: Placement; ok: boolean; message: string; }
 
@@ -82,10 +82,10 @@ export interface MatchResult {
 }
 
 export interface MatchContext {
-  /** 지금 키캡(기본 키캡) 색과 이름 */
+  /** 나머지 키(기본 키캡 또는 몸체) 색과 이름 — 예: "블랙 키캡", "검은 몸체" */
   baseColor: string;
   baseLabel: string;
-  /** 조명 색, 꺼져 있으면 null */
+  /** 조명 색, 꺼져 있으면 null. "rgb"는 키마다 색이 다른 RGB 조명 */
   lightColor: string | null;
   lightLabel: string;
 }
@@ -99,21 +99,24 @@ export function matchKeycaps(items: KeycapItem[], context: MatchContext): MatchR
   const contrast = items.reduce((sum, item) => sum + colorDistance(item.color, context.baseColor), 0) / items.length;
   const groups = new Set(items.map((item) => Math.round(hue(item.color) / 60) % 6)).size;
   const resin = items.some((item) => item.material === "resin");
-  const lightFit = context.lightColor
-    ? Math.round(100 - Math.min(...items.map((item) => hueGap(hue(item.color), hue(context.lightColor!)))) / 180 * 60)
-    : resin ? 45 : 70;
+  const rgbLight = context.lightColor === "rgb";
+  const lightFit = rgbLight ? (resin ? 85 : 65)
+    : context.lightColor
+      ? Math.round(100 - Math.min(...items.map((item) => hueGap(hue(item.color), hue(context.lightColor!)))) / 180 * 60)
+      : resin ? 45 : 70;
   const point = Math.min(100, Math.round(contrast * 200));
   const unity = Math.max(10, 100 - (groups - 1) * 30);
   const score = Math.round(point * 0.4 + unity * 0.35 + lightFit * 0.25);
   const tone = score >= 75 ? "good" : score >= 55 ? "ok" : "warn";
   const hints: MatchHint[] = [
-    point >= 60 ? { tone: "good", text: `${context.baseLabel} 키캡 사이에서 포인트가 또렷하게 보여요.` }
-      : point >= 30 ? { tone: "ok", text: `${context.baseLabel} 키캡과 톤이 비슷해 은은하게 어울려요.` }
-        : { tone: "warn", text: `${context.baseLabel} 키캡과 색이 비슷해 잘 안 보여요. 더 밝거나 진한 키캡을 골라 보세요.` },
+    point >= 60 ? { tone: "good", text: `${context.baseLabel} 위에서 포인트가 또렷하게 보여요.` }
+      : point >= 30 ? { tone: "ok", text: `${withAnd(context.baseLabel)} 톤이 비슷해 은은하게 어울려요.` }
+        : { tone: "warn", text: `${withAnd(context.baseLabel)} 색이 비슷해 잘 안 보여요. 더 밝거나 진한 키캡을 골라 보세요.` },
     groups <= 1 ? { tone: "good", text: "색이 한 계열로 통일돼 깔끔해요." }
       : groups === 2 ? { tone: "ok", text: "포인트 두 가지 색 — 균형이 좋아요." }
         : { tone: "warn", text: `색이 ${groups}가지라 산만할 수 있어요. 한두 개를 빼 보세요.` },
-    !context.lightColor ? { tone: "info", text: resin ? "투명 레진 키캡은 조명을 켜면 속까지 빛나요." : "조명을 켜면 분위기를 더 볼 수 있어요." }
+    rgbLight ? (resin ? { tone: "good", text: "RGB 조명이 투명 레진 키캡 속까지 비춰서 더 빛나요." } : { tone: "info", text: "불투명 키캡이라 RGB 빛은 키 사이로만 은은하게 새어 나와요." })
+      : !context.lightColor ? { tone: "info", text: resin ? "투명 레진 키캡은 조명을 켜면 속까지 빛나요." : "조명을 켜면 분위기를 더 볼 수 있어요." }
       : lightFit >= 75 ? { tone: "good", text: `${context.lightLabel} 조명과 같은 계열이라 자연스럽게 이어져요.` }
         : { tone: "ok", text: `${context.lightLabel} 조명과 대비돼 키캡이 더 튀어 보여요.` },
   ];
