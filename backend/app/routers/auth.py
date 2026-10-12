@@ -17,11 +17,18 @@ from app.core.security import (
 from app.deps import CurrentUser, DbSession
 from app.models import User
 from app.schemas.common import Message
-from app.schemas.user import DevLoginIn, SignupIn, SignupPendingOut, UserOut
+from app.schemas.user import AuthProvidersOut, DevLoginIn, SignupIn, SignupPendingOut, UserOut
 from app.services.google_auth import find_google_user, google_callback_url, oauth, verified_google_info
 from app.services.nickname import TAKEN_MESSAGE, is_taken
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+@router.get("/providers", response_model=AuthProvidersOut, summary="사용 가능한 로그인 방법 (로그인 버튼 활성화용)")
+async def auth_providers():
+    return AuthProvidersOut(
+        google=bool(settings.google_client_id and settings.google_client_secret), dev_login=settings.is_local
+    )
 
 
 @router.get("/google/login", summary="구글 로그인 시작 (구글 로그인 화면으로 이동)")

@@ -10,6 +10,7 @@
 | POST | /api/auth/dev-login | [로컬 전용] 이메일로 로그인 (새 계정인데 닉네임이 겹치면 409 "이미 사용 중인 닉네임입니다.") | ✅ |
 | POST | /api/auth/logout | 로그아웃 (쿠키 삭제) | ✅ |
 | GET | /api/auth/me 🔒 | 내 정보 | ✅ |
+| GET | /api/auth/providers | 사용 가능한 로그인 방법 `{google, devLogin}` — 구글 키가 있으면 `google: true` (로그인 버튼 활성화용) | ✅ |
 | GET | /api/auth/google/login | 구글 로그인 시작 (키 없으면 503) | ✅ |
 | GET | /api/auth/google/callback | 구글 로그인 완료 → 기존 회원은 세션 쿠키·메인 이동, **새 사용자는 계정을 만들지 않고** 15분 가입 대기 쿠키(`pm_signup`)·`/signup` 이동 (실패 시 `/?loginError=google`) | ✅ |
 | GET | /api/auth/signup | 가입 대기 정보 `{email, googleName}` (대기 쿠키 없으면 404) | ✅ |

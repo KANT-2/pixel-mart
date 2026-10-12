@@ -56,3 +56,10 @@ class AvatarIn(CamelModel):
     avatar_url: Annotated[str, AfterValidator(validate_avatar_data_url)] = Field(
         examples=["data:image/png;base64,iVBORw0KGgo..."]
     )
+
+
+class AuthProvidersOut(CamelModel):
+    """로그인 화면이 켤 수 있는 로그인 방법 — 구글 키가 없는 PC에서는 google=false"""
+
+    google: bool
+    dev_login: bool

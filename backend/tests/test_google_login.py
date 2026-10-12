@@ -162,3 +162,17 @@ async def test_callback_with_forged_state_is_rejected(client, google_configured)
     assert res.status_code == 302
     assert res.headers["location"].endswith("/?loginError=google")
     assert "pm_session" not in res.cookies
+
+
+async def test_providers_reports_google_when_keys_exist(client, google_configured):
+    res = await client.get("/api/auth/providers")
+    assert res.status_code == 200
+    assert res.json() == {"google": True, "devLogin": True}
+
+
+@pytest.mark.parametrize("missing", ["google_client_id", "google_client_secret"])
+async def test_providers_google_false_without_keys(client, monkeypatch, missing):
+    monkeypatch.setattr(settings, "google_client_id", "id")
+    monkeypatch.setattr(settings, "google_client_secret", "secret")
+    monkeypatch.setattr(settings, missing, "")
+    assert (await client.get("/api/auth/providers")).json()["google"] is False

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { ApiError } from "@/lib/api";
+import { ApiError, api } from "@/lib/api";
 import NicknameField from "@/components/profile/NicknameField";
 import { safeNextPath } from "@/utils/safeNextPath";
 
@@ -14,9 +14,14 @@ export default function LoginForm({ next, devLoginEnabled }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [nickname, setNickname] = useState("");
   const [rejected, setRejected] = useState<string | null>(null);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
   const router = useRouter();
   const destination = safeNextPath(next);
   useEffect(() => { if (!loading && user) router.replace(destination); }, [user, loading, destination, router]);
+  // 구글 키가 설정된 서버에서만 버튼을 켠다 (키 없는 PC·백엔드 꺼짐은 계속 "준비 중")
+  useEffect(() => {
+    api.get<{ google: boolean }>("/auth/providers").then((p) => setGoogleEnabled(p.google)).catch(() => setGoogleEnabled(false));
+  }, []);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,9 +44,10 @@ export default function LoginForm({ next, devLoginEnabled }: LoginFormProps) {
       <button type="button" onClick={() => void refresh()} className="ml-2 underline">다시 확인</button>
     </div>}
     <div>
-      {/* TODO(#14): 활성화 시 <a href="/api/auth/google/login">로 교체 */}
-      <button type="button" disabled aria-disabled="true" className="h-12 w-full cursor-not-allowed btn-pixel font-semibold text-dim">Google로 계속하기</button>
-      <p className="mt-2 text-center text-sm text-dim">Google 로그인은 준비 중이에요.</p>
+      {googleEnabled ? <a href="/api/auth/google/login" className="flex h-12 w-full items-center justify-center btn-pixel font-semibold">Google로 계속하기</a> : <>
+        <button type="button" disabled aria-disabled="true" className="h-12 w-full cursor-not-allowed btn-pixel font-semibold text-dim">Google로 계속하기</button>
+        <p className="mt-2 text-center text-sm text-dim">Google 로그인은 준비 중이에요.</p>
+      </>}
     </div>
     {devLoginEnabled ? <form onSubmit={submit} className="pixel-panel p-5">
       <h2 className="mb-1 text-lg font-bold">개발용 이메일 로그인</h2>
