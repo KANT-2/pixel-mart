@@ -16,8 +16,10 @@ function MapSkeleton() {
 
 export default function LocalPage() {
   return <section className="mx-auto max-w-6xl px-4 pb-10 pt-4 md:px-8">
-    <LocalPageHeader kicker="FANDOM MAP" title="덕력지도" description="우리 동네 이웃들이 좋아하는 캐릭터·작품을 지도에서 찾아보세요."
-      actions={<Link href="/local/settings" className={localButton}>내 동네·취향 설정</Link>} />
+    <LocalPageHeader kicker="FANDOM MAP" title="덕력지도" description="우리 동네 이웃들이 좋아하는 작품을 지도에서 찾아보세요."
+      actions={<Link href="/local/settings" className={localButton} aria-label="내 동네·취향 설정">
+        <span aria-hidden="true" className="sm:hidden">⚙ 설정</span><span aria-hidden="true" className="hidden sm:inline">내 동네·취향 설정</span>
+      </Link>} />
     <Suspense fallback={<MapSkeleton />}><FandomMapScreen /></Suspense>
   </section>;
 }

@@ -1,14 +1,17 @@
 """PIXEL LOCAL ① 지역·취향 설정 (GPS 없이 시 › 구 › 동·생활권 직접 선택, 집계 참여·공개는 opt-in)"""
 
 import random
+from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import delete, func, select
 
 from app.deps import CurrentUser, DbSession
-from app.models import FandomSample, Interest, Region, User, UserInterest
+from app.models import FandomSample, Interest, Order, Region, User, UserInterest
 from app.schemas.local import (
+    BuyerRankingOut,
+    BuyerRankOut,
     FandomOut,
     FandomRankOut,
     InterestOut,
@@ -21,6 +24,7 @@ from app.schemas.local import (
 from app.services import local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, Period, period_start, present, rollup
 from app.services.regions import RegionTree, load_tree
+from app.services.sample_avatars import sample_avatars, sample_nicknames
 
 router = APIRouter(tags=["local"])
 
@@ -203,13 +207,75 @@ async def fandom_ranking(
     ]
 
 
-MAX_MAP_AVATARS = 6
+# 지역 블록 하나에 올리는 아바타 핀 최대 개수 — 구매 금액이 큰 이웃부터
+MAX_MAP_AVATARS = 10
+# 지역을 눌렀을 때 보여 주는 구매 순위 (금액은 내보내지 않는다)
+BUYER_RANK_SIZE = 10
+
+
+@dataclass
+class Crowd:
+    """지역 블록 하나의 핀 — 구매 금액 순으로 정렬된 (아바타, 공개 닉네임)"""
+
+    count: int
+    is_sample: bool
+    people: list[tuple[str | None, str | None]]
+
+
+async def _crowds(db: DbSession, tree: RegionTree, blocks: list[str], interest: int | None) -> dict[str, Crowd]:
+    """동의자가 5명 미만인 블록은 덕력지도 샘플 인원만큼 샘플 캐릭터로 채운다 (isSample)"""
+    # 취소되지 않은 주문 금액 합계 — 많이 산 이웃부터 (주문이 없으면 0)
+    spent = (
+        select(Order.user_id, func.sum(Order.total_price).label("total"))
+        .where(Order.status != "cancelled")
+        .group_by(Order.user_id)
+        .subquery()
+    )
+    stmt = (
+        select(
+            User.region_code,
+            User.avatar_url,
+            User.nickname,
+            User.nickname_public,
+            func.coalesce(spent.c.total, 0),
+        )
+        .outerjoin(spent, spent.c.user_id == User.id)
+        .where(
+            User.map_avatar_opt_in.is_(True),
+            User.region_code.is_not(None),
+            User.email.not_like(f"%{local_stats.EXCLUDED_EMAIL_SUFFIX}"),
+        )
+    )
+    if interest is not None:
+        stmt = stmt.join(UserInterest, UserInterest.user_id == User.id).where(UserInterest.interest_id == interest)
+    by_block: dict[str, list[tuple[int, float, str | None, str | None]]] = {code: [] for code in blocks}
+    for region_code, avatar_url, nickname, nickname_public, total in await db.execute(stmt):
+        tie = random.random()  # 같은 금액끼리는 매번 무작위 순서
+        shown = nickname if nickname_public else None  # 닉네임 공개 동의자만 (정책 15-1)
+        for code in tree.ancestors(region_code):  # 하위 지역 사람도 상위 블록에 포함
+            if code in by_block:
+                by_block[code].append((-total, tie, avatar_url, shown))
+
+    samples = await _sample_counts(db, tree, interest)
+    crowds = {}
+    for code in blocks:
+        people = sorted(by_block[code], key=lambda p: p[:2])
+        if len(people) < MIN_GROUP_SIZE and samples.get(code, 0) >= MIN_GROUP_SIZE:
+            n = samples[code]
+            key = f"{code}:{interest}"
+            shown = min(n, MAX_MAP_AVATARS)
+            crowds[code] = Crowd(
+                n, True, list(zip(sample_avatars(key, shown), sample_nicknames(key, shown), strict=True))
+            )
+        else:
+            crowds[code] = Crowd(len(people), False, [(a, nick) for _, _, a, nick in people[:MAX_MAP_AVATARS]])
+    return crowds
 
 
 @router.get(
     "/local/map-avatars",
     response_model=list[MapAvatarsOut],
-    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (5명 미만 비공개)",
+    summary="덕력지도 아바타 핀: 보고 있는 지역의 하위 지역별 동의자 아바타 (5명 미만 비공개, 구매 금액 상위 10명)",
 )
 async def map_avatars(
     db: DbSession,
@@ -219,32 +285,56 @@ async def map_avatars(
     tree = await load_tree(db)
     await _check_filters(db, tree, region, interest)
     blocks = [r.code for r in tree.by_code.values() if r.parent_code == region] or ([region] if region else [])
-
-    stmt = select(User.region_code, User.avatar_url).where(
-        User.map_avatar_opt_in.is_(True),
-        User.region_code.is_not(None),
-        User.email.not_like(f"%{local_stats.EXCLUDED_EMAIL_SUFFIX}"),
-    )
-    if interest is not None:
-        stmt = stmt.join(UserInterest, UserInterest.user_id == User.id).where(UserInterest.interest_id == interest)
-    by_block: dict[str, list[str | None]] = {code: [] for code in blocks}
-    for region_code, avatar_url in await db.execute(stmt):
-        for code in tree.ancestors(region_code):  # 하위 지역 사람도 상위 블록에 포함
-            if code in by_block:
-                by_block[code].append(avatar_url)
-
+    crowds = await _crowds(db, tree, blocks, interest)
     out = []
     for code in sorted(blocks):
-        avatars = by_block[code]
-        enough = len(avatars) >= MIN_GROUP_SIZE
+        crowd = crowds[code]
+        enough = crowd.count >= MIN_GROUP_SIZE
         out.append(
             MapAvatarsOut(
                 region_code=code,
                 region_name=tree.full_name(code),
-                count=len(avatars) if enough else None,
+                count=crowd.count if enough else None,
                 below_threshold=not enough,
-                # 매번 무작위로 뽑아 순서·구성으로 개인을 추정하기 어렵게 한다
-                avatars=random.sample(avatars, min(len(avatars), MAX_MAP_AVATARS)) if enough else [],
+                avatars=[avatar for avatar, _ in crowd.people] if enough else [],
+                is_sample=crowd.is_sample and enough,
             )
         )
     return out
+
+
+@router.get(
+    "/local/buyer-ranking",
+    response_model=BuyerRankingOut,
+    summary="지역 구매 순위 TOP 10: 아바타 표시 동의자를 구매 금액 순으로 (금액 비공개, 5명 미만 비공개)",
+)
+async def buyer_ranking(
+    db: DbSession,
+    region: Annotated[str, Query(max_length=12, description="지역 코드 — 하위 지역 합산")],
+    interest: Annotated[int | None, Query(description="이 취향을 고른 사람만")] = None,
+):
+    """금액은 내보내지 않고 순위만. 닉네임은 공개 동의자만, 나머지는 null(화면에서 '이웃 플레이어')"""
+    tree = await load_tree(db)
+    await _check_filters(db, tree, region, interest)
+    crowd = (await _crowds(db, tree, [region], interest))[region]
+    enough = crowd.count >= MIN_GROUP_SIZE
+    items = [
+        BuyerRankOut(rank=rank, avatar_url=avatar, nickname=nickname)
+        for rank, (avatar, nickname) in enumerate(crowd.people[:BUYER_RANK_SIZE], 1)
+    ]
+    return BuyerRankingOut(
+        region_code=region,
+        below_threshold=not enough,
+        is_sample=crowd.is_sample and enough,
+        items=items if enough else [],
+    )
+
+
+async def _sample_counts(db: DbSession, tree: RegionTree, interest: int | None) -> dict[str, int]:
+    """블록별 샘플 인원 — 취향을 고르면 그 취향, 아니면 1위 취향 인원 (덕력지도 이름표 숫자와 같은 기준)"""
+    rows = {(s.region_code, s.interest_id): s.count for s in await db.scalars(select(FandomSample))}
+    counts: dict[str, int] = {}
+    for (code, iid), n in rollup(tree, rows).items():
+        if interest is None or iid == interest:
+            counts[code] = max(counts.get(code, 0), n)
+    return counts

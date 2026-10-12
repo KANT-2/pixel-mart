@@ -35,6 +35,8 @@ async def seed_local(db: AsyncSession) -> str:
         values = {"id": i["id"], "type": i["type"], "name": i["name"], "parent_id": i["parentId"]}
         stmt = insert(Interest).values(**values)
         await db.execute(stmt.on_conflict_do_update(index_elements=[Interest.id], set_=values))
+    # JSON에서 뺀 취향은 지운다 — 사용자 취향·샘플은 함께 지워지고(CASCADE), 거래글 연결은 비운다(SET NULL)
+    await db.execute(delete(Interest).where(Interest.id.not_in([i["id"] for i in interests])))
     await db.execute(text("SELECT setval(pg_get_serial_sequence('interests', 'id'), (SELECT MAX(id) FROM interests))"))
 
     # Cold Start Mock 집계 (응답에 isSample) — JSON에서 뺀 값은 지워지도록 전체 교체

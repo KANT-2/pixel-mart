@@ -2,16 +2,30 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useCallback } from "react";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
+import { useLocalResource } from "@/components/local/useLocalResource";
+import { loadMapBlocks } from "@/lib/fandomMapData";
 import { MAP_VIEWS } from "@/lib/localMapData";
 
 const NAMES: Record<string, string> = { "11": "서울", "28": "인천", "41110": "수원", "41130": "성남", "41460": "용인" };
 
-/** 메인의 월드맵 입구 — 장식용 슬라임만 올린 전체 지도, 지역을 누르면 덕력지도로 들어간다 */
+/** 메인의 월드맵 입구 — 덕력지도와 같은 지도(캐릭터·지역 색·이름표·랜드마크), 지역이나 캐릭터를 누르면 덕력지도로 들어간다 */
 export default function WorldMapTeaser() {
   const router = useRouter();
   const view = MAP_VIEWS[""];
-  const blocks: MapBlock[] = view.legend.map((code) => ({ code, name: NAMES[code] ?? code, count: null, pins: [null, null], sample: false, hint: "이웃" }));
+  // 들어올 때마다 캐릭터 자리를 새로 섞는다 — 무작위 값은 렌더가 아니라 불러올 때 만든다 (메인은 미리 렌더되는 페이지)
+  const load = useCallback(async (signal: AbortSignal) => ({
+    visit: Math.random().toString(36).slice(2, 8),
+    blocks: await loadMapBlocks("", view.legend, null, signal),
+  }), [view.legend]);
+  const data = useLocalResource(load);
+  const blocks: MapBlock[] = view.legend.map((code) => {
+    const row = data.data?.blocks.find((block) => block.code === code);
+    return { code, name: NAMES[code] ?? code, tag: row?.topInterest ?? undefined, count: row?.count ?? null, pins: row?.pins ?? [],
+      sample: row?.sample ?? false, ranked: row?.ranked ?? false, hint: "이웃" };
+  });
+  const open = (code: string) => router.push(`/local?region=${encodeURIComponent(code)}`);
   return <div className="pixel-panel grid items-center gap-6 overflow-hidden p-5 md:grid-cols-[1fr_1.3fr] md:p-8">
     <div>
       <p className="mb-3 font-pixel text-xs tracking-widest text-mint">▶ WORLD MAP · PIXEL LOCAL</p>
@@ -22,7 +36,7 @@ export default function WorldMapTeaser() {
         <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 py-2 text-sm font-bold">동네 교환글</Link>
       </div>
     </div>
-    <PixelMap view={view} blocks={blocks} selected={null} seedKey="home" label="PIXEL LOCAL 월드맵 미리보기" namesOnly
-      onSelect={(code) => router.push(`/local?region=${encodeURIComponent(code)}`)} />
+    <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" heat landmarks
+      onSelect={open} onPinSelect={(code) => open(code)} />
   </div>;
 }

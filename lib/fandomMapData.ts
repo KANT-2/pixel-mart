@@ -9,8 +9,10 @@ export interface MapBlockData {
   /** 아바타 PNG data URL / null(기본 슬라임) */
   pins: (string | null)[];
   sample: boolean;
-  /** true면 핀이 '지도에 내 아바타 표시'에 동의한 실제 이웃 */
+  /** true면 핀이 '지도에 내 아바타 표시'에 동의한 실제 이웃 (샘플 캐릭터면 false) */
   real: boolean;
+  /** 핀 순서가 구매 순위(실제·샘플 아바타)인지 — 집계로 채운 슬라임이면 false */
+  ranked: boolean;
   /** 전체 모드에서 이 지역 1위 취향 */
   topInterest: string | null;
 }
@@ -43,7 +45,8 @@ async function mapLimited<T, R>(items: T[], limit: number, run: (item: T) => Pro
 }
 
 /**
- * 지도 블록 데이터 — 동의한 이웃이 5명 이상이면 실제 아바타, 아니면 취향 집계로 기본 슬라임 핀을 채운다 (정책 4.2).
+ * 지도 블록 데이터 — 동의한 이웃이 5명 이상이면 실제 아바타, 적으면 서버가 채운 샘플 캐릭터,
+ * 둘 다 없으면 취향 집계 인원만큼 기본 슬라임 핀 (정책 4.2, 블록당 구매 상위 10명 — 0번 핀이 1위).
  * 좌표·개인 정보는 다루지 않는다.
  */
 export async function loadMapBlocks(viewCode: string, legend: string[], interest: number | null, signal: AbortSignal): Promise<MapBlockData[]> {
@@ -70,9 +73,9 @@ export async function loadMapBlocks(viewCode: string, legend: string[], interest
     const real = avatarBy.get(code);
     const fallback = counts.get(code);
     if (real && !real.belowThreshold && real.avatars.length) {
-      return { code, count: real.count, pins: real.avatars, sample: false, real: true, topInterest: fallback?.top ?? null };
+      return { code, count: real.count, pins: real.avatars, sample: real.isSample, real: !real.isSample, ranked: true, topInterest: fallback?.top ?? null };
     }
     const count = fallback?.count ?? null;
-    return { code, count: count && count >= 5 ? count : null, pins: Array(pinCount(count)).fill(null), sample: fallback?.sample ?? false, real: false, topInterest: fallback?.top ?? null };
+    return { code, count: count && count >= 5 ? count : null, pins: Array(pinCount(count)).fill(null), sample: fallback?.sample ?? false, real: false, ranked: false, topInterest: fallback?.top ?? null };
   });
 }

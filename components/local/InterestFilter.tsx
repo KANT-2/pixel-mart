@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { INTEREST_TYPES, interestLabel } from "@/utils/local";
+import { interestIcon } from "@/utils/mapSprites";
+import PixelAvatar from "@/components/avatar/PixelAvatar";
 import type { ApiInterest, InterestType } from "@/types/api";
 
 interface InterestFilterProps {
@@ -35,7 +37,7 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", close); };
   }, [open]);
 
-  // 화면에는 이름만, 종류(캐릭터·작품 등)는 툴팁·스크린리더 이름으로
+  // 화면에는 이름만, 종류(작품)는 툴팁·스크린리더 이름으로
   const name = (item: ApiInterest) => item.name;
   const full = (item: ApiInterest) => interestLabel(item);
   const current = interests.find((item) => item.id === selected);
@@ -45,27 +47,30 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
   const list = interests.filter((item) => (type === "all" || item.type === type) && (!keyword || item.name.includes(keyword)));
   const pick = (id: number | null) => { onSelect(id); setOpen(false); setText(""); };
 
-  return <div ref={root} className="relative min-w-0">
-    <div role="group" aria-label="취향 필터" className="flex flex-wrap items-center gap-2">
+  return <div ref={root} className="relative min-w-0 flex-1 sm:flex-none">
+    {/* 모바일은 줄바꿈 없이 가로로 밀어 보기 */}
+    <div role="group" aria-label="취향 필터" className="flex items-center gap-2 overflow-x-auto px-0.5 py-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:p-0">
       <button type="button" onClick={() => pick(null)} aria-pressed={selected === null} className={`${chip} ${chipState}`}>전체 · 동네 인기 취향</button>
       {chips.map((item) => <button key={item.id} type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
-        title={full(item)} aria-label={full(item)} className={`${chip} ${chipState}`}>{name(item)}</button>)}
+        title={full(item)} aria-label={full(item)} className={`${chip} ${chipState} inline-flex items-center gap-1.5`}>
+        <PixelAvatar src={interestIcon(item)} className="w-4" />{name(item)}
+      </button>)}
       <button type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls={panelId}
         className={`${chip} text-ink`}>
-        취향 찾기{interests.length ? ` · ${interests.length}` : ""}
+        <span aria-hidden="true">⌕</span> 취향 찾기{interests.length ? ` · ${interests.length}` : ""}
       </button>
     </div>
     {open && <div id={panelId} role="dialog" aria-label="취향 찾기" className="pixel-panel absolute inset-x-0 top-full z-30 mt-2 p-4 sm:right-auto sm:w-[28rem]">
       <label htmlFor={`${panelId}-search`} className="sr-only">취향 이름 검색</label>
       <form role="search" aria-label="취향 이름 찾기" className="flex gap-1.5" onSubmit={(event) => { event.preventDefault(); if (list[0]) pick(list[0].id); }}>
         <input ref={search} id={`${panelId}-search`} value={text} onChange={(event) => setText(event.target.value.slice(0, 30))} enterKeyHint="search"
-          placeholder="캐릭터·작품·스타일 이름" autoComplete="off" className="pixel-input min-h-11 min-w-0 flex-1 px-3 text-sm text-ink" />
+          placeholder="작품 이름" autoComplete="off" className="pixel-input min-h-11 min-w-0 flex-1 px-3 text-sm text-ink" />
         <button type="submit" disabled={!text.trim() || !list.length} className="btn-lime min-h-11 shrink-0 px-3 text-sm font-bold disabled:opacity-50">찾기</button>
       </form>
-      <div role="tablist" aria-label="취향 종류" className="segmented mt-3 h-8 max-w-full overflow-x-auto text-xs font-bold">
+      {INTEREST_TYPES.length > 1 && <div role="tablist" aria-label="취향 종류" className="segmented mt-3 h-8 max-w-full overflow-x-auto text-xs font-bold">
         {[{ value: "all" as const, label: "전체" }, ...INTEREST_TYPES].map((item) => <button key={item.value} type="button" role="tab"
           aria-selected={type === item.value} onClick={() => setType(item.value)}>{item.label}</button>)}
-      </div>
+      </div>}
       <ul className="mt-3 grid max-h-60 grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3">
         {list.map((item) => <li key={item.id}>
           <button type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id} title={full(item)} aria-label={full(item)}

@@ -16,7 +16,7 @@ from app.services import local_stats
 from app.services.local_stats import period_start, present, rollup
 from app.services.regions import build_tree
 
-GHOST, MIMIC = 17, 18
+GHOST, MIMIC = 3, 4  # 작품: 픽셀 게임, 던전 크롤러
 TEST_REGIONS = [
     ("TST", "sido", None, "테스트시"),
     ("TST1", "sigungu", "TST", "테스트구"),
@@ -158,8 +158,8 @@ async def test_ranking_only_above_threshold(client, isolated_regions, count_test
         {
             "rank": 1,
             "interestId": GHOST,
-            "interest": "고스트",
-            "interestType": "character",
+            "interest": "픽셀 게임",
+            "interestType": "work",
             "count": 7,
             "isSample": False,
         }
@@ -167,17 +167,17 @@ async def test_ranking_only_above_threshold(client, isolated_regions, count_test
 
 
 async def test_sample_data_is_marked(client):
-    # 시드 샘플: 판교 오로치마루 팬 12명 (실제 집계 참여자가 없는 칸)
-    rows = (await client.get("/api/local/fandom", params={"region": "41135-01", "interest": 12})).json()
+    # 시드 샘플: 판교 나루토 팬 12명 (실제 집계 참여자가 없는 칸)
+    rows = (await client.get("/api/local/fandom", params={"region": "41135-01", "interest": 1})).json()
     if not rows:
         pytest.skip("덕력지도 샘플 시드 전입니다 (python -m scripts.seed)")
     assert rows == [
         {
             "regionCode": "41135-01",
             "regionName": "성남시 분당구 판교",
-            "interestId": 12,
-            "interest": "오로치마루",
-            "interestType": "character",
+            "interestId": 1,
+            "interest": "나루토",
+            "interestType": "work",
             "count": 12,
             "belowThreshold": False,
             "isSample": True,

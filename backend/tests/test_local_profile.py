@@ -60,13 +60,11 @@ async def test_regions_by_level(client, db_ready):
 
 
 async def test_interests_types_and_search(client, db_ready):
-    characters = (await client.get("/api/interests", params={"type": "character"})).json()
-    assert {i["type"] for i in characters} == {"character"}
-    assert next(i for i in characters if i["name"] == "오로치마루")["parentId"] == 1  # 작품 > 캐릭터
-
-    product_types = (await client.get("/api/interests", params={"type": "product_type"})).json()
-    assert "키캡" in [i["name"] for i in product_types]
-    assert [i["name"] for i in (await client.get("/api/interests", params={"q": "Ret"})).json()] == ["Retro"]
+    # 취향은 작품만 남겼다 (캐릭터·스타일·상품 종류 없음)
+    works = (await client.get("/api/interests", params={"type": "work"})).json()
+    assert [i["name"] for i in works] == ["나루토", "레트로 RPG", "픽셀 게임", "던전 크롤러"]
+    assert (await client.get("/api/interests", params={"type": "character"})).json() == []
+    assert [i["name"] for i in (await client.get("/api/interests", params={"q": "RPG"})).json()] == ["레트로 RPG"]
     assert (await client.get("/api/interests", params={"type": "genre"})).status_code == 422
 
 
@@ -77,12 +75,12 @@ async def test_local_profile_requires_login(client, db_ready):
 
 async def test_put_and_get_local_profile(client, db_ready):
     await client.post("/api/auth/dev-login", json={"email": "local1@pixelmart.test"})
-    body = {"regionCode": "41135-01", "interestIds": [71, 12, 12, 51], "fandomOptIn": True, "profilePublic": False}
+    body = {"regionCode": "41135-01", "interestIds": [4, 1, 1, 3], "fandomOptIn": True, "profilePublic": False}
     res = await client.put("/api/users/me/local", json=body)
     assert res.status_code == 200
     profile = res.json()
     assert profile["region"]["fullName"] == "성남시 분당구 판교"
-    assert sorted(i["id"] for i in profile["interests"]) == [12, 51, 71]  # 중복은 한 번만
+    assert sorted(i["id"] for i in profile["interests"]) == [1, 3, 4]  # 중복은 한 번만
     assert (profile["fandomOptIn"], profile["profilePublic"]) == (True, False)
     assert (await client.get("/api/users/me/local")).json() == profile
 
@@ -90,7 +88,7 @@ async def test_put_and_get_local_profile(client, db_ready):
 async def test_put_keeps_selected_time_of_unchanged_interests(client, db_ready):
     me = (await client.post("/api/auth/dev-login", json={"email": "local2@pixelmart.test"})).json()
     await client.put("/api/users/me/local", json={"interestIds": []})
-    await client.put("/api/users/me/local", json={"interestIds": [12, 51]})
+    await client.put("/api/users/me/local", json={"interestIds": [1, 2]})
 
     async def selected_at():
         async with engine.connect() as conn:
@@ -100,15 +98,15 @@ async def test_put_keeps_selected_time_of_unchanged_interests(client, db_ready):
             return dict(rows.all())
 
     before = await selected_at()
-    await client.put("/api/users/me/local", json={"interestIds": [12, 71]})
+    await client.put("/api/users/me/local", json={"interestIds": [1, 3]})
     after = await selected_at()
-    assert set(after) == {12, 71}
-    assert after[12] == before[12]
+    assert set(after) == {1, 3}
+    assert after[1] == before[1]
 
 
 async def test_clear_local_profile(client, db_ready):
     await client.post("/api/auth/dev-login", json={"email": "local3@pixelmart.test"})
-    await client.put("/api/users/me/local", json={"regionCode": "11680", "interestIds": [11], "fandomOptIn": True})
+    await client.put("/api/users/me/local", json={"regionCode": "11680", "interestIds": [1], "fandomOptIn": True})
     cleared = (await client.put("/api/users/me/local", json={"regionCode": None, "interestIds": []})).json()
     assert cleared == {
         "region": None,
@@ -122,7 +120,7 @@ async def test_clear_local_profile(client, db_ready):
 
 @pytest.mark.parametrize(
     "body",
-    [{"regionCode": "99999"}, {"interestIds": [12, 9999]}, {"interestIds": list(range(1, 22))}],
+    [{"regionCode": "99999"}, {"interestIds": [1, 9999]}, {"interestIds": list(range(1, 22))}],
     ids=["unknown-region", "unknown-interest", "too-many-interests"],
 )
 async def test_invalid_local_profile_is_422(client, db_ready, body):

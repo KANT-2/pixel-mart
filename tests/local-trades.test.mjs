@@ -58,7 +58,7 @@ test("가격은 빈 값=null, 0 포함 정수만 허용하고 소수·기호·�
 
 test("같은 이름의 취향은 종류와 id로 구분하고 단일 선택은 교체, A파트는 20개 유지", () => {
   const character = { id: 11, name: "나루토", type: "character" }, work = { id: 1, name: "나루토", type: "work" };
-  assert.equal(interestLabel(character), "나루토 · 캐릭터"); assert.equal(interestLabel(work), "나루토 · 작품");
+  assert.equal(interestLabel(work), "나루토 · 작품"); assert.equal(interestLabel(character), "나루토 · character"); // 정리된 종류는 원래 값 그대로
   assert.deepEqual(toggleInterest([character], work, true).items, [work]);
   assert.deepEqual(toggleInterest([work], work, true).items, []);
   assert.equal(toggleInterest([character], work).items.length, 2);
