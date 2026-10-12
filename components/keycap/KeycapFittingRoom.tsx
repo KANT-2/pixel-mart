@@ -5,9 +5,9 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
-import { KEYCAPS, KEYCAP_KIND_LABEL, type KeycapItem, type KeycapKind } from "@/data/keycaps";
+import { KEYCAPS, KEYCAP_KIND_LABEL, KEYCAP_TONES, type KeycapItem, type KeycapKind, type KeycapTone } from "@/data/keycaps";
 import { ARROW_KEYS, WOOTING_80HE as BOARD } from "@/data/keyboards";
-import { keycapImage, placeKeycap, recommendKeycaps, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
+import { keycapImage, placeKeycap, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 // 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 기본 키캡(무각 키캡 질감 × 색)으로 채워 내 키보드와 비슷하게 맞춘다.
@@ -56,6 +56,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const [view, setView] = useState<"before" | "after">("after");
   const [kind, setKind] = useState<KeycapKind | "all">("all");
   const [query, setQuery] = useState("");
+  const [tone, setTone] = useState<KeycapTone | "all">("all");
   const [picked, setPicked] = useState<string | null>(null);
   const [over, setOver] = useState<string | null>(null);
   const [message, setMessage] = useState(current ? `${withObject(current.name)} 끼워 봤어요. 다른 키캡도 끌어다 놓아 보세요.` : "키캡을 끌어다 빈 키 위에 놓아 보세요.");
@@ -98,8 +99,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
   const used = usedIds.map(byId).filter((item): item is KeycapItem => Boolean(item));
-  const recs = recommendKeycaps(KEYCAPS, usedIds, baseColor, used[0]?.color ?? "#a78bff");
-  const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query);
+  const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query, tone);
 
   function place(itemId: string | null, keyId: string) {
     const item = itemId ? byId(itemId) : undefined;
@@ -254,8 +254,16 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
             </div>
           </div>
         </div>
+        {/* 색으로 찾기 — 하나만 고르는 선택지 */}
+        <div className="overflow-x-auto pb-1">
+          <div role="group" aria-label="키캡 색" className="segmented h-9 text-xs font-bold">
+            <button type="button" aria-pressed={tone === "all"} onClick={() => setTone("all")}>모든 색</button>
+            {KEYCAP_TONES.map((item) => <button key={item.value} type="button" aria-pressed={tone === item.value} onClick={() => setTone(item.value)}>
+              <span aria-hidden="true" className="mr-1.5 size-3 rounded-sm border border-night" style={{ background: item.swatch }} />{item.label}</button>)}
+          </div>
+        </div>
         {tray.length ? <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6 phone-landscape:grid-cols-3 phone-landscape:gap-1.5">{tray.map((item) => capButton(item))}</div>
-          : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
+          : <p className="py-6 text-center text-sm text-sub">조건에 맞는 키캡이 없어요. 색이나 종류를 바꿔 보세요.</p>}
       </section>
     </div>
 
@@ -274,11 +282,6 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         {cartState === "done" && <Link href="/cart" className="block text-center text-sm font-bold text-mint">장바구니 보기 ▶</Link>}
         {cartState === "error" && <p role="alert" className="text-sm text-pink">장바구니에 담지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
         <p className="text-xs text-dim">✓ 체리 프로파일 · {BOARD.name}에 장착 가능</p>
-      </section>
-      <section aria-labelledby="keycap-recs" className="pixel-panel space-y-2.5 p-4">
-        <h2 id="keycap-recs" className="font-black">이 키보드에 어울리는 키캡</h2>
-        <div className="grid grid-cols-3 gap-2">{recs.map((item) => capButton(item, true))}</div>
-        <p className="text-xs text-dim">나머지 키 색과 대비가 좋고, 끼운 키캡과 색 계열이 가까운 순서예요.</p>
       </section>
 
       <Link href={`/products/${productId}`} className="btn-pixel grid h-11 place-items-center text-sm font-bold text-sub">{productName} 상세로 돌아가기</Link>

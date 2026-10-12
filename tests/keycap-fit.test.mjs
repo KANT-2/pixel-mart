@@ -5,12 +5,12 @@ import ts from "typescript";
 
 const source = await readFile(new URL("../utils/keycapFit.ts", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText;
-const { placeKeycap, removeKeycap, keycapImage, recommendKeycaps, trayKeycaps, withObject } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
+const { placeKeycap, removeKeycap, keycapImage, trayKeycaps, withObject } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
 
-const heart = { id: "resin-heart", name: "HP 하트 키캡", productId: 1, kind: "one", material: "resin", color: "#ad1d1d" };
-const space = { id: "coin-spacebar", name: "골드 코인 스페이스바 키캡", productId: 21, kind: "space", material: "opaque", color: "#d6aa44" };
-const arrows = { id: "star-arrows", name: "노란 별 방향키 세트", productId: 69, kind: "set", material: "opaque", color: "#ddb127" };
-const shield = { id: "resin-shield", name: "푸른 방패 아티산 키캡", productId: 51, kind: "one", material: "resin", color: "#193db0" };
+const heart = { id: "resin-heart", name: "HP 하트 키캡", productId: 1, kind: "one", material: "resin", color: "#ad1d1d", tone: "red" };
+const space = { id: "coin-spacebar", name: "골드 코인 스페이스바 키캡", productId: 21, kind: "space", material: "opaque", color: "#d6aa44", tone: "gold" };
+const arrows = { id: "star-arrows", name: "노란 별 방향키 세트", productId: 69, kind: "set", material: "opaque", color: "#ddb127", tone: "gold" };
+const shield = { id: "resin-shield", name: "푸른 방패 아티산 키캡", productId: 51, kind: "one", material: "resin", color: "#193db0", tone: "blue" };
 const esc = { id: "Escape", label: "Esc", w: 1 };
 const enter = { id: "Enter", label: "Enter", w: 2.25 };
 const spaceKey = { id: "Space", label: "", w: 6.25 };
@@ -43,14 +43,15 @@ test("서랍 — 보던 키캡이 맨 앞, 이름 검색은 띄어쓰기 무시"
   assert.deepEqual(trayKeycaps(all, null, "space", "").map((i) => i.id), ["coin-spacebar"]);
 });
 
-test("추천은 이미 끼운 키캡을 빼고 3개", () => {
-  const recs = recommendKeycaps([heart, space, shield, arrows], ["resin-heart"], "#2a2733", "#ad1d1d");
-  assert.equal(recs.length, 3);
-  assert.ok(!recs.some((i) => i.id === "resin-heart"));
-});
 
 test("조사 — 받침 있으면 을, 없으면 를", () => {
   assert.equal(withObject("HP 하트 키캡"), "HP 하트 키캡을");
   assert.equal(withObject("노란 별 방향키 세트"), "노란 별 방향키 세트를");
 });
 
+
+test("서랍 색 필터 — 고른 색 묶음만", () => {
+  const all = [space, shield, heart, arrows];
+  assert.deepEqual(trayKeycaps(all, "resin-heart", "all", "", "gold").map((i) => i.id), ["coin-spacebar", "star-arrows"]);
+  assert.deepEqual(trayKeycaps(all, "resin-heart", "one", "", "blue").map((i) => i.id), ["resin-shield"]);
+});
