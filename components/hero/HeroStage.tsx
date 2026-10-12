@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import HeroCharacter from "./HeroCharacter";
+import HeroHud from "./HeroHud";
 import MotionBoundary from "./MotionBoundary";
 import styles from "./HeroStage.module.css";
 
@@ -32,6 +33,7 @@ export default function HeroStage() {
       <SpriteLayer name="heart" x={11.5} y={6} width={5.625} />
       <SpriteLayer name="heart" x={18} y={6} width={5.625} className={styles.emptyHeart} />
       <SpriteLayer name="coin" x={80} y={6} width={5} className={styles.coin} />
+      <HeroHud />
       <SpriteLayer name="sword" x={64.625} y={49.667} width={7} />
       <SpriteLayer name="chest" x={75.75} y={55.25} width={13.5} />
       <HeroCharacter />
