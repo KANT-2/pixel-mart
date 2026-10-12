@@ -140,6 +140,7 @@ export interface ApiLocalProfile {
   profilePublic: boolean;
   mapAvatarOptIn: boolean;
   nicknamePublic?: boolean;
+  mapCardPublic?: boolean;
 }
 
 export interface LocalProfileInput {
@@ -149,6 +150,32 @@ export interface LocalProfileInput {
   profilePublic: boolean;
   mapAvatarOptIn?: boolean;
   nicknamePublic?: boolean;
+  mapCardPublic?: boolean;
+}
+
+/** 지도 캐릭터의 이웃 카드 — 카드 공개 동의자만 (사용자 id·정확한 점수·금액·위치 없음) */
+export interface ApiMapCard {
+  /** 닉네임 공개 동의자만 */
+  nickname: string | null;
+  /** 지역 커뮤니티 참여도 0~3 */
+  hearts: number;
+  level: string;
+  /** 완료한 교환·거래 구간 (예: "교환 5회+") */
+  coinBand: string | null;
+  interests: string[];
+  wantCount: number;
+  isMe: boolean;
+}
+
+/** 내 활동 점수 — 나에게만 정확한 값 */
+export interface ApiMyActivity {
+  score: number;
+  hearts: number;
+  level: string;
+  nextHeartAt: number | null;
+  coins: number;
+  coinBand: string | null;
+  recent: { label: string; points: number; createdAt: string }[];
 }
 
 /** 덕력지도 아바타 핀 — 동의한 이웃의 아바타만, 5명 미만은 비공개 (id·닉네임 없음) */
@@ -161,6 +188,8 @@ export interface ApiMapAvatars {
   avatars: (string | null)[];
   /** 동의자가 적은 지역을 샘플 캐릭터로 채운 블록 */
   isSample: boolean;
+  /** avatars와 같은 순서의 이웃 카드 — 카드를 공개하지 않은 이웃은 null */
+  cards?: (ApiMapCard | null)[];
 }
 
 export interface ApiFandom {

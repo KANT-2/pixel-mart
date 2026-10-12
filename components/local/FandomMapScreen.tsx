@@ -10,6 +10,7 @@ import { useLocalResource } from "@/components/local/useLocalResource";
 import { useRegionLocator } from "@/components/local/useRegionLocator";
 import { LocalError, localButton, localInput, localToolbar } from "@/components/local/LocalStates";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
+import NeighborCard from "@/components/local/NeighborCard";
 import { MapNotes, SearchToggle, searchRow } from "@/components/local/MobileToggles";
 import { HEAT_COLORS, HEAT_LABELS, characterIcon, shortRegionName } from "@/utils/mapSprites";
 import { loadMapBlocks } from "@/lib/fandomMapData";
@@ -17,7 +18,7 @@ import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
 import { interestProductHref, localHref, localSettingsHref, parseLocalQuery } from "@/utils/local";
 import { viewCodeFor, viewTrail } from "@/utils/localMap";
-import type { ApiBuyerRanking, ApiFandomRank, ApiRegion } from "@/types/api";
+import type { ApiBuyerRanking, ApiFandomRank, ApiMapCard, ApiRegion } from "@/types/api";
 
 
 export default function FandomMapScreen() {
@@ -61,14 +62,16 @@ export default function FandomMapScreen() {
 
   // 캐릭터를 누르면 그 지역으로 가고, 오른쪽 구매 순위에서 그 캐릭터 줄을 강조한다
   // 캐릭터를 누르면 지도는 그대로 두고(뒤의 지역은 눌리지 않음) 그 캐릭터 지역의 순위를 패널에 연다 — 지도를 옮기면 풀림
-  const [pinned, setPinned] = useState<{ view: string; code: string; rank: number | null } | null>(null);
+  const [pinned, setPinned] = useState<{ view: string; code: string; rank: number | null; neighbor: Neighbor } | null>(null);
   const pin = pinned?.view === viewCode ? pinned : null;
   // 모바일: 검색 줄은 눌러서 펼치고, 지역 정보는 동네·캐릭터를 눌렀을 때 아래 시트로
   const [searchOpen, setSearchOpen] = useState(false);
   const [sheet, setSheet] = useState(false);
   const pickPin = (code: string, index: number) => {
     const block = mapBlocks.find((item) => item.code === code);
-    setPinned({ view: viewCode, code, rank: block?.ranked ? index + 1 : null });
+    const data = blocks.data?.find((item) => item.code === code);
+    const neighbor = { avatar: block?.pins[index] ?? null, card: data?.cards[index] ?? null, sample: block?.sample ?? false };
+    setPinned({ view: viewCode, code, rank: block?.ranked ? index + 1 : null, neighbor });
     setSheet(true);
   };
   const choose = (code: string) => {
@@ -149,7 +152,8 @@ export default function FandomMapScreen() {
         </div>}
         <PlacePanel code={panelCode} region={panelCode ? byCode.get(panelCode) ?? null : null}
           block={mapBlocks.find((block) => block.code === (pin?.code ?? selected)) ?? null} interestName={interestName} interest={query.interest}
-          hasChildren={Boolean(panelCode && MAP_VIEWS[panelCode])} pickedRank={pin?.rank ?? null} />
+          hasChildren={Boolean(panelCode && MAP_VIEWS[panelCode])} pickedRank={pin?.rank ?? null}
+          neighbor={pin ? { ...pin.neighbor, rank: pin.rank } : null} onCloseNeighbor={() => setPinned(null)} />
       </div>
     </div>
   </div>;
@@ -189,9 +193,14 @@ interface PlacePanelProps {
   hasChildren: boolean;
   /** 지도에서 누른 캐릭터의 구매 순위 */
   pickedRank: number | null;
+  /** 지도에서 누른 캐릭터의 이웃 카드 */
+  neighbor: (Neighbor & { rank: number | null }) | null;
+  onCloseNeighbor: () => void;
 }
 
-function PlacePanel({ code, region, block, interest, interestName, hasChildren, pickedRank }: PlacePanelProps) {
+interface Neighbor { avatar: string | null; card: ApiMapCard | null; sample: boolean; }
+
+function PlacePanel({ code, region, block, interest, interestName, hasChildren, pickedRank, neighbor, onCloseNeighbor }: PlacePanelProps) {
   const loadRanking = useCallback((signal: AbortSignal) => code ? localApi.ranking(code, "all", signal) : Promise.resolve([] as ApiFandomRank[]), [code]);
   const ranking = useLocalResource(loadRanking);
   const loadBuyers = useCallback((signal: AbortSignal) => code ? localApi.buyerRanking(code, interest ?? undefined, signal) : Promise.resolve(null as ApiBuyerRanking | null), [code, interest]);
@@ -199,6 +208,7 @@ function PlacePanel({ code, region, block, interest, interestName, hasChildren, 
   if (!code || !region) return <PlaceGuide interest={interest} interestName={interestName} />;
   const top = (ranking.data ?? []).slice(0, 3);
   return <aside aria-label={`${region.fullName} 정보`} className="rounded-xl border-2 border-line bg-panel p-5">
+    {neighbor && <div className="mb-4"><NeighborCard avatar={neighbor.avatar} card={neighbor.card} rank={neighbor.rank} sample={neighbor.sample} onClose={onCloseNeighbor} /></div>}
     <p className="font-pixel text-xs text-mint">{hasChildren ? "AREA" : "NEIGHBORHOOD"}</p>
     <h2 className="mt-1 break-keep text-lg font-extrabold">{region.fullName}</h2>
     {block && <p className="mt-3 text-sm">

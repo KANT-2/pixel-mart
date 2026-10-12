@@ -35,6 +35,12 @@ async def users():
                     ),
                     {"c": code, "l": level, "p": parent, "n": name},
                 )
+            await conn.execute(
+                text(
+                    "DELETE FROM activity_points WHERE user_id IN "
+                    "(SELECT id FROM users WHERE email LIKE 'gift-%@pixelmart.test')"
+                )
+            )
     except Exception:
         pytest.skip("로컬 DB가 없거나 마이그레이션·시드 전입니다 (alembic upgrade head → python -m scripts.seed)")
 
@@ -52,6 +58,7 @@ async def users():
         ids = "SELECT id FROM users WHERE email LIKE 'gift-%@pixelmart.test'"
         await conn.execute(text(f"DELETE FROM gifts WHERE sender_id IN ({ids}) OR recipient_id IN ({ids})"))
         await conn.execute(text(f"DELETE FROM orders WHERE user_id IN ({ids})"))
+        await conn.execute(text(f"DELETE FROM activity_points WHERE user_id IN ({ids})"))
         await conn.execute(text("DELETE FROM trade_posts WHERE region_code LIKE 'GFT%'"))
         await conn.execute(text("UPDATE users SET region_code = NULL WHERE region_code LIKE 'GFT%'"))
         for level in ("zone", "sigungu", "sido"):
@@ -148,6 +155,9 @@ async def test_accept_creates_recipients_order_and_hides_address_from_sender(use
     assert sent[0]["statusLabel"] == "받았어요" and sent[0]["orderId"] is None
     assert ADDRESS["address"] not in json.dumps(sent) and "받는이" not in json.dumps(sent)
     assert (await recipient.post(f"/api/gifts/{gift_id}/accept", json=ADDRESS)).status_code == 400  # 두 번 못 받음
+    # 받은 선물이면 보낸 사람에게 '선물 보내기 완료' 하트 점수
+    recent = (await sender.get("/api/users/me/activity")).json()["recent"]
+    assert {"label": "선물 보내기 완료", "points": 10} in [{k: r[k] for k in ("label", "points")} for r in recent]
 
 
 async def test_decline_shows_refund_to_sender(users):
@@ -158,6 +168,7 @@ async def test_decline_shows_refund_to_sender(users):
     assert res.status_code == 200 and res.json()["status"] == "declined"
     assert (await sender.get("/api/gifts", params={"box": "sent"})).json()[0]["statusLabel"] == "거절 · 환불(데모)"
     assert (await recipient.post(f"/api/gifts/{gift_id}/decline")).status_code == 400
+    assert all(r["label"] != "선물 보내기 완료" for r in (await sender.get("/api/users/me/activity")).json()["recent"])
 
 
 async def test_accept_validates_address(users):
