@@ -2,13 +2,19 @@
   min-width: 0;
 }
 
+.carousel > .unframed {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .arrow {
   border: 0;
   box-shadow: none;
   border-radius: 0;
 }
 
-.carousel > div > div:last-child {
+.carousel > div > .controls {
   position: absolute;
   inset: auto 0 0;
   height: 44px;
@@ -168,7 +174,7 @@
     min-height: 3.3em;
   }
 
-  .carousel > div > div:last-child {
+  .carousel > div > .controls {
     height: 60px;
     justify-content: center;
     padding: 0 8px;

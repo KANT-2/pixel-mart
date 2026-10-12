@@ -24,7 +24,7 @@ export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps
   const data = useLocalResource(load);
   const blocks: MapBlock[] = view.legend.map((code) => {
     const row = data.data?.blocks.find((block) => block.code === code);
-    return { code, name: NAMES[code] ?? code, tag: row?.topInterest ?? undefined, count: row?.count ?? null, pins: row?.pins ?? [],
+    return { code, name: NAMES[code] ?? code, tag: row?.topInterest ?? undefined, count: row?.count ?? null, pins: (row?.pins ?? []).slice(0, 3),
       sample: row?.sample ?? false, ranked: row?.ranked ?? false, hint: "이웃" };
   });
   const open = (code: string) => router.push(`/local?region=${encodeURIComponent(code)}`);
@@ -38,7 +38,7 @@ export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps
         <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 py-2 text-sm font-bold">동네 교환글</Link>
       </div>
     </div>
-    <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" heat landmarks
+    <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" hideLabels pinScale={1.2} heat landmarks
       onSelect={open} onPinSelect={(code) => open(code)} />
   </div>;
 }

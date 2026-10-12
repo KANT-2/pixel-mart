@@ -7,6 +7,7 @@ import { giftApi } from "@/lib/gifts";
 import { localApi } from "@/lib/local";
 import { api } from "@/lib/api";
 import WorldMapTeaser from "@/components/home/WorldMapTeaser";
+import HeroStage from "@/components/hero/HeroStage";
 import styles from "./HomeCarousel.module.css";
 import { deskThemes } from "@/data/deskLookbook";
 import type { ApiProduct, ApiWishMapItem } from "@/types/api";
@@ -14,12 +15,14 @@ import type { ApiProduct, ApiWishMapItem } from "@/types/api";
 interface Activity { gifts: number; matches: number; trades: number }
 interface HomeState { activity: Activity | null; wishes: ApiWishMapItem[]; region: string | null; error: boolean }
 const empty: HomeState = { activity: null, wishes: [], region: null, error: false };
-const labels = ["내 퀘스트", "취향별 데스크", "토너먼트 예고", "월드맵"];
-const slideOrder = [3, 0, 1];
+const labels = ["내 퀘스트", "취향별 데스크", "토너먼트 예고", "월드맵", "픽셀마트 메인"];
+const slideOrder = [4, 3, 1];
 
-export default function HomeCarousel() {
+interface HomeCarouselProps { questOnly?: boolean }
+
+export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
   const { user, loading } = useAuth();
-  const [slide, setSlide] = useState(3);
+  const [slide, setSlide] = useState(questOnly ? 0 : 4);
   const [themeIndex, setThemeIndex] = useState(0);
   const [state, setState] = useState<HomeState>(empty);
   const [busy, setBusy] = useState(false);
@@ -66,18 +69,29 @@ export default function HomeCarousel() {
   // 사용자 전환 중 이전 계정의 활동을 노출하지 않습니다.
   const [loadedUser, setLoadedUser] = useState(user?.id);
   if (loadedUser !== user?.id) { setLoadedUser(user?.id); setState(empty); setBusy(false); }
-  const change = (index: number) => { interacted.current = true; setSlide(index); };
+  const change = (index: number) => { if (questOnly) return; interacted.current = true; setSlide(index); };
   const move = (direction: number) => change(slideOrder[(slideOrder.indexOf(slide) + direction + slideOrder.length) % slideOrder.length]);
   const neighborhood = state.wishes.length > 0;
   const title = slide === 0 ? "오늘의 퀘스트를 확인하세요." : slide === 1 ? neighborhood ? "이웃이 찾는 아이템, 내 취향에도 딱." : "일상에 아이템을 장착하세요." : "당신의 데스크가 다음 주인공.";
 
   return <section aria-label="메인 추천 배너" aria-roledescription="캐러셀" className={`${styles.carousel} mx-auto w-full max-w-[2012px] px-12 py-6 md:px-14 md:py-10`}>
-    <div tabIndex={0} className="pixel-panel relative focus-visible:outline-2 focus-visible:outline-mint" onKeyDown={(event) => { if (slide === 3 || event.target instanceof HTMLSelectElement) return; if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}
+    <div tabIndex={0} className={`pixel-panel relative focus-visible:outline-2 focus-visible:outline-mint ${styles.unframed}`} onKeyDown={(event) => { if (slide === 3 || event.target instanceof HTMLSelectElement) return; if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}
       onTouchStart={(event) => { if (event.target instanceof Element && event.target.closest("a, button, select")) { start.current = null; return; } const touch = event.touches[0]; start.current = { x: touch.clientX, y: touch.clientY }; }}
       onTouchCancel={() => { start.current = null; }}
       onTouchEnd={(event) => { const touch = event.changedTouches[0]; if (start.current && slide !== 3) { const dx = touch.clientX - start.current.x; const dy = touch.clientY - start.current.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1); } start.current = null; }}>
       <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-[0.85fr_1.15fr] md:gap-8 md:px-10 md:py-10 lg:gap-12">
-        {slide === 3 ? <div className="min-w-0 md:col-span-2"><WorldMapTeaser embedded /></div> : <>
+        {slide === 4 ? <>
+          <div className="min-w-0">
+            <p className="mb-4 font-pixel text-xs tracking-widest text-mint">GOOD ITEMS, BETTER DAYS</p>
+            <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">일상에 아이템을<br /><span className="text-mint">장착하세요.</span></h1>
+            <p className="mt-4 text-sm leading-relaxed text-sub">좋아하는 게임이 있는 하루는,<br />언제나 조금 더 특별하니까.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/products" className="btn-lime px-4 py-3 text-sm font-bold">▶ 아이템 둘러보기</Link>
+              <Link href="/local" className="btn-pixel px-4 py-3 text-sm font-bold">월드맵 열기</Link>
+            </div>
+          </div>
+          <div className="min-w-0"><HeroStage /></div>
+        </> : slide === 3 ? <div className="min-w-0 md:col-span-2"><WorldMapTeaser embedded /></div> : <>
         {slide === 1 && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element -- 최적화된 정적 배경 WebP */}
           <img src={theme.image} alt="" className="h-full w-full object-cover" />
@@ -136,12 +150,14 @@ export default function HomeCarousel() {
         </div>
         </>}
       </div>
+      {!questOnly && <>
       <button type="button" aria-label="이전 슬라이드" onClick={() => move(-1)} className={`${styles.arrow} absolute -left-11 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center bg-transparent text-3xl text-ink hover:text-mint focus-visible:outline-2 focus-visible:outline-mint md:-left-12`}>‹</button>
       <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className={`${styles.arrow} absolute -right-11 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center bg-transparent text-3xl text-ink hover:text-mint focus-visible:outline-2 focus-visible:outline-mint md:-right-12`}>›</button>
-      <div className="flex h-14 items-center justify-center border-t border-line px-5">
+      <div className={`${styles.controls} flex h-14 items-center justify-center border-t border-line px-5`}>
         <div className="flex" role="group" aria-label="슬라이드 선택">{slideOrder.map((id, index) => <button type="button" key={id} aria-label={`${index + 1}번 ${labels[id]}`} aria-current={slide === id ? "true" : undefined} onClick={() => change(id)} className="flex size-11 items-center justify-center rounded focus-visible:outline-2 focus-visible:outline-mint"><span aria-hidden="true" className={`size-3 rounded-full ${slide === id ? "bg-mint" : "bg-panel-2 border border-line"}`} /></button>)}</div>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 4 ? "일상에 아이템을 장착하세요." : slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
       </div>
+      </>}
     </div>
   </section>;
 }
