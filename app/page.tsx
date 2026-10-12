@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import ProductCard from "@/components/ProductCard";
 import HomeCarousel from "@/components/home/HomeCarousel";
-import WorldMapTeaser from "@/components/home/WorldMapTeaser";
 import { getProducts } from "@/lib/products";
 import { EmptyProducts, ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 
@@ -50,9 +49,6 @@ export default function Home() {
       </section>
 
       {/* PIXEL LOCAL 월드맵 입구 */}
-      <section className="mx-auto max-w-6xl px-4 pb-20 md:px-8">
-        <WorldMapTeaser />
-      </section>
     </>
   );
 }

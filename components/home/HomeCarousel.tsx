@@ -5,17 +5,21 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { giftApi } from "@/lib/gifts";
 import { localApi } from "@/lib/local";
+import { api } from "@/lib/api";
+import WorldMapTeaser from "@/components/home/WorldMapTeaser";
+import styles from "./HomeCarousel.module.css";
 import { deskThemes } from "@/data/deskLookbook";
-import type { ApiWishMapItem } from "@/types/api";
+import type { ApiProduct, ApiWishMapItem } from "@/types/api";
 
 interface Activity { gifts: number; matches: number; trades: number }
 interface HomeState { activity: Activity | null; wishes: ApiWishMapItem[]; region: string | null; error: boolean }
 const empty: HomeState = { activity: null, wishes: [], region: null, error: false };
-const labels = ["내 퀘스트", "취향별 데스크", "토너먼트 예고"];
+const labels = ["내 퀘스트", "취향별 데스크", "토너먼트 예고", "월드맵"];
+const slideOrder = [3, 0, 1];
 
 export default function HomeCarousel() {
   const { user, loading } = useAuth();
-  const [slide, setSlide] = useState(1);
+  const [slide, setSlide] = useState(3);
   const [themeIndex, setThemeIndex] = useState(0);
   const [state, setState] = useState<HomeState>(empty);
   const [busy, setBusy] = useState(false);
@@ -23,6 +27,17 @@ export default function HomeCarousel() {
   const interacted = useRef(false);
   const start = useRef<{ x: number; y: number } | null>(null);
   const theme = deskThemes[themeIndex];
+  const [themeProducts, setThemeProducts] = useState<{ slug: string; items: ApiProduct[]; failed: boolean } | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(8000)]);
+    let active = true;
+    void Promise.allSettled(theme.productIds.map((id) => api.get<ApiProduct>(`/products/${id}`, { signal }))).then((results) => {
+      if (!active) return;
+      setThemeProducts({ slug: theme.slug, items: results.flatMap((result) => result.status === "fulfilled" ? [result.value] : []), failed: results.some((result) => result.status === "rejected") });
+    });
+    return () => { active = false; controller.abort(); };
+  }, [theme]);
 
   useEffect(() => {
     if (!user) return;
@@ -43,7 +58,6 @@ export default function HomeCarousel() {
         error: activity.status === "rejected" || local.status === "rejected",
       };
       setState(next);
-      if (!interacted.current) setSlide(next.activity && (next.activity.gifts || next.activity.matches || next.activity.trades) ? 0 : 1);
       setBusy(false);
     });
     return () => { active = false; controller.abort(); };
@@ -52,16 +66,24 @@ export default function HomeCarousel() {
   // 사용자 전환 중 이전 계정의 활동을 노출하지 않습니다.
   const [loadedUser, setLoadedUser] = useState(user?.id);
   if (loadedUser !== user?.id) { setLoadedUser(user?.id); setState(empty); setBusy(false); }
-  const change = (index: number) => { interacted.current = true; setSlide((index + 3) % 3); };
+  const change = (index: number) => { interacted.current = true; setSlide(index); };
+  const move = (direction: number) => change(slideOrder[(slideOrder.indexOf(slide) + direction + slideOrder.length) % slideOrder.length]);
   const neighborhood = state.wishes.length > 0;
   const title = slide === 0 ? "오늘의 퀘스트를 확인하세요." : slide === 1 ? neighborhood ? "이웃이 찾는 아이템, 내 취향에도 딱." : "일상에 아이템을 장착하세요." : "당신의 데스크가 다음 주인공.";
 
-  return <section aria-label="메인 추천 배너" aria-roledescription="캐러셀" className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
-    <div tabIndex={0} className="pixel-panel relative overflow-hidden focus-visible:outline-2 focus-visible:outline-mint" onKeyDown={(event) => { if (event.target instanceof HTMLSelectElement) return; if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); change(slide + (event.key === "ArrowRight" ? 1 : -1)); } }}
-      onTouchStart={(event) => { const touch = event.touches[0]; start.current = { x: touch.clientX, y: touch.clientY }; }}
-      onTouchEnd={(event) => { const touch = event.changedTouches[0]; if (start.current) { const dx = touch.clientX - start.current.x; const dy = touch.clientY - start.current.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) change(slide + (dx < 0 ? 1 : -1)); } start.current = null; }}>
-      <div className="grid min-h-[640px] items-center gap-6 px-12 py-5 md:min-h-[450px] md:grid-cols-[0.85fr_1.15fr] md:px-16 md:py-8">
-        <div>
+  return <section aria-label="메인 추천 배너" aria-roledescription="캐러셀" className={`${styles.carousel} mx-auto w-full max-w-[2012px] px-12 py-6 md:px-14 md:py-10`}>
+    <div tabIndex={0} className="pixel-panel relative focus-visible:outline-2 focus-visible:outline-mint" onKeyDown={(event) => { if (slide === 3 || event.target instanceof HTMLSelectElement) return; if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}
+      onTouchStart={(event) => { if (event.target instanceof Element && event.target.closest("a, button, select")) { start.current = null; return; } const touch = event.touches[0]; start.current = { x: touch.clientX, y: touch.clientY }; }}
+      onTouchCancel={() => { start.current = null; }}
+      onTouchEnd={(event) => { const touch = event.changedTouches[0]; if (start.current && slide !== 3) { const dx = touch.clientX - start.current.x; const dy = touch.clientY - start.current.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1); } start.current = null; }}>
+      <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-[0.85fr_1.15fr] md:gap-8 md:px-10 md:py-10 lg:gap-12">
+        {slide === 3 ? <div className="min-w-0 md:col-span-2"><WorldMapTeaser embedded /></div> : <>
+        {slide === 1 && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          {/* eslint-disable-next-line @next/next/no-img-element -- 최적화된 정적 배경 WebP */}
+          <img src={theme.image} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-night/95 via-night/75 to-night/85 md:bg-gradient-to-r md:from-night/95 md:via-night/75 md:to-night/25" />
+        </div>}
+        <div className="min-w-0">
           <p className="mb-4 font-pixel text-xs tracking-widest text-mint">{slide === 0 ? "PIXEL QUEST" : slide === 1 ? "DESK LOOKBOOK" : "COMING SOON"}</p>
           <h1 className="text-3xl leading-tight font-extrabold text-ink md:text-4xl">{title}</h1>
           <p className="mt-4 min-h-14 text-sm leading-relaxed text-sub">{slide === 0 ? "도착한 선물과 매칭, 진행 중인 거래를 한눈에 확인하세요." : slide === 1 ? neighborhood ? "공개 기준을 충족한 우리 동네의 인기 찜 상품을 살펴보세요." : "키캡·장패드·소품으로 나만의 데스크를 꾸며보세요." : "취향으로 꾸민 데스크를 만나는 토너먼트를 준비하고 있어요."}</p>
@@ -76,7 +98,33 @@ export default function HomeCarousel() {
           {slide === 0 ? <div className="rounded-lg border border-line bg-panel-2 p-5">
             <h2 className="font-pixel text-lg text-mint">MY QUEST</h2>
             {loading || busy ? <p role="status" className="mt-5 animate-pulse text-sub">활동을 확인하고 있어요…</p> : !user ? <p className="mt-5 text-sub">로그인하면 내 선물과 거래를 확인할 수 있어요.</p> : state.activity ? <dl className="mt-5 grid grid-cols-3 gap-2">{[["수락 대기 선물", state.activity.gifts], ["현재 매칭", state.activity.matches], ["진행 중 거래", state.activity.trades]].map(([label, count]) => <div key={label} className="rounded border border-line bg-panel p-3"><dt className="text-xs text-sub">{label}</dt><dd className="mt-3 text-3xl font-bold text-mint">{count}</dd></div>)}</dl> : <p className="mt-5 text-sub">활동을 불러오지 못했어요.</p>}
+            {user && !loading && !busy && state.activity && <div className="mt-4 space-y-2">
+              <h3 className="text-xs font-bold tracking-wide text-sub">활동 바로가기</h3>
+              <Link href="/mypage/gifts" className="flex items-center justify-between gap-3 rounded border border-line bg-panel px-3 py-2 text-sm hover:border-mint focus-visible:outline-2 focus-visible:outline-mint">
+                <span>🎁 {state.activity.gifts > 0 ? `수락을 기다리는 선물 ${state.activity.gifts}개` : "수락 대기 중인 선물이 없어요"}</span><span aria-hidden="true" className="text-mint">→</span>
+              </Link>
+              <Link href="/local/trades/mine" className="flex items-center justify-between gap-3 rounded border border-line bg-panel px-3 py-2 text-sm hover:border-mint focus-visible:outline-2 focus-visible:outline-mint">
+                <span>🤝 {state.activity.matches > 0 ? `현재 거래 매칭 ${state.activity.matches}개 확인하기` : "현재 연결된 거래 매칭이 없어요"}</span><span aria-hidden="true" className="text-mint">→</span>
+              </Link>
+              <Link href="/local/trades/mine" className="flex items-center justify-between gap-3 rounded border border-line bg-panel px-3 py-2 text-sm hover:border-mint focus-visible:outline-2 focus-visible:outline-mint">
+                <span>📋 {state.activity.trades > 0 ? `진행 중인 내 거래 ${state.activity.trades}개 관리하기` : "진행 중인 내 거래가 없어요"}</span><span aria-hidden="true" className="text-mint">→</span>
+              </Link>
+              {state.activity.gifts === 0 && state.activity.matches === 0 && state.activity.trades === 0 && <p className="pt-1 text-xs leading-relaxed text-sub">아직 진행 중인 퀘스트가 없어요. <Link href="/local/trades" className="text-mint underline underline-offset-4">동네 교환글 둘러보기 →</Link></p>}
+            </div>}
             {user && state.error && <button type="button" onClick={() => setRetry((value) => value + 1)} className="btn-pixel mt-4 px-3 py-2 text-xs">다시 확인</button>}
+          </div> : slide === 1 ? <div className="self-end rounded-lg border border-line bg-night/85 p-3 md:p-4">
+            <h2 className="mb-3 text-sm font-bold text-ink">{theme.name} 테마 추천</h2>
+            {themeProducts?.slug !== theme.slug ? <p role="status" className="animate-pulse py-8 text-sm text-sub">테마 상품을 불러오고 있어요…</p> : <>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">{themeProducts.items.slice(0, 3).map((product) => <Link key={product.id} href={`/products/${product.id}`} className="min-w-0 rounded border border-line bg-panel p-2 hover:border-mint focus-visible:outline-2 focus-visible:outline-mint">
+                {/* eslint-disable-next-line @next/next/no-img-element -- 상품 목록과 동일한 이미지 방식 */}
+                <img src={product.imageUrl} alt={product.name} className="aspect-[2/1] w-full rounded object-cover" />
+                <p className="mt-2 truncate text-xs text-ink">{product.name}</p>
+                <p className="mt-1 text-xs font-bold text-lime">{product.price.toLocaleString("ko-KR")}원</p>
+              </Link>)}</div>
+              {themeProducts.failed && <p role="status" className="mt-3 text-xs text-sub">일부 상품을 불러오지 못했어요. 테마 상품 보기에서 다시 확인해 주세요.</p>}
+            </>}
+            <p className="mt-3 text-xs text-sub">AI 상품 배치 예시 · 실제 크기와 형태는 상세 정보 참고</p>
+            {neighborhood && <ul className="mt-3 space-y-1 text-xs">{state.wishes.map((item) => <li key={item.product.id}><Link href={`/products/${item.product.id}`} className="text-sub hover:text-mint">동네 인기 찜 · {item.product.name} · {item.count}명 →</Link></li>)}</ul>}
           </div> : <div>
             {/* 생성 이미지는 실제 상품의 정확한 크기·형태를 보장하지 않습니다. */}
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 룩북 파일 */}
@@ -86,12 +134,13 @@ export default function HomeCarousel() {
             {slide === 1 && state.error && <p className="mt-2 text-xs text-sub">동네 정보 일부를 확인하지 못해 데스크 추천을 보여드려요.</p>}
           </div>}
         </div>
+        </>}
       </div>
-      <div className="flex items-center justify-center border-t border-line px-5 py-5">
-        <button type="button" aria-label="이전 슬라이드" onClick={() => change(slide - 1)} className="btn-pixel absolute left-1 top-[calc(50%-24px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:left-3">←</button>
-        <div className="flex gap-2">{labels.map((label, index) => <button type="button" key={label} aria-label={`${index + 1}번 ${label}`} aria-current={slide === index ? "true" : undefined} onClick={() => change(index)} className={`h-3 w-7 rounded-full ${slide === index ? "bg-mint" : "bg-panel-2 border border-line"}`} />)}</div>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">{slide + 1}/3 {title}</span>
-        <button type="button" aria-label="다음 슬라이드" onClick={() => change(slide + 1)} className="btn-pixel absolute right-1 top-[calc(50%-24px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:right-3">→</button>
+      <div className="flex h-14 items-center justify-center border-t border-line px-5">
+        <button type="button" aria-label="이전 슬라이드" onClick={() => move(-1)} className="btn-pixel absolute -left-11 top-[calc(50%-28px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:-left-12">←</button>
+        <div className="flex" role="group" aria-label="슬라이드 선택">{slideOrder.map((id, index) => <button type="button" key={id} aria-label={`${index + 1}번 ${labels[id]}`} aria-current={slide === id ? "true" : undefined} onClick={() => change(id)} className="flex size-11 items-center justify-center rounded focus-visible:outline-2 focus-visible:outline-mint"><span aria-hidden="true" className={`size-3 rounded-full ${slide === id ? "bg-mint" : "bg-panel-2 border border-line"}`} /></button>)}</div>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
+        <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className="btn-pixel absolute -right-11 top-[calc(50%-28px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:-right-12">→</button>
       </div>
     </div>
   </section>;
