@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
 import { KEYCAPS, KEYCAP_KIND_LABEL, type KeycapItem, type KeycapKind } from "@/data/keycaps";
 import { ARROW_KEYS, WOOTING_80HE as BOARD } from "@/data/keyboards";
-import { keycapImage, matchKeycaps, placeKeycap, recommendKeycaps, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
+import { keycapImage, placeKeycap, recommendKeycaps, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 // 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 그 색 키캡으로 채워 내 키보드와 비슷하게 맞춘다
@@ -19,7 +19,6 @@ const BASES = {
   cream: { label: "크림", bg: "#efe4cb", side: "#c7b693", fg: "#5c4b2d" },
 } as const;
 const KINDS: [KeycapKind | "all", string][] = [["all", "전체"], ["one", "1u"], ["set", "방향키 세트"], ["space", "스페이스바"]];
-const TONE = { good: "var(--color-lime)", ok: "var(--color-mint)", warn: "#ffd166", info: "var(--color-dim)" } as const;
 
 type BaseKey = keyof typeof BASES;
 
@@ -52,8 +51,6 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
   const used = usedIds.map(byId).filter((item): item is KeycapItem => Boolean(item));
-  // 비워 두면 검은 몸체와 비교, 사진의 RGB 조명 기준
-  const match = matchKeycaps(used, { baseColor: B.bg, baseLabel: base === "none" ? "검은 몸체" : `${B.label} 키캡`, lightColor: "rgb", lightLabel: "RGB" });
   const recs = recommendKeycaps(KEYCAPS, usedIds, B.bg, used[0]?.color ?? "#a78bff");
   const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query);
 
@@ -170,46 +167,9 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         <p role="status" className="mt-3 flex items-center gap-2 text-sm text-sub"><span className="size-2 bg-mint shadow-[0_0_8px_var(--color-mint)]" />{message}</p>
       </section>
 
-      {/* 3. 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
-      <section aria-label="키캡 서랍" className="pixel-panel space-y-3 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p><strong>키캡 서랍</strong><span className="ml-2 text-sm text-dim">끌어서 놓거나, 누른 뒤 키를 눌러도 돼요</span></p>
-          <div className="flex flex-wrap items-center gap-2">
-            <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
-            <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm" />
-            <div role="group" aria-label="키캡 종류" className="segmented h-9 text-xs font-bold">
-              {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
-            </div>
-          </div>
-        </div>
-        {tray.length ? <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6">{tray.map((item) => capButton(item))}</div>
-          : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
-      </section>
     </div>
 
     <aside className="space-y-4">
-      {/* 어울림 — 이 화면의 핵심 */}
-      <section aria-labelledby="keycap-match" className="pixel-panel space-y-3 p-4">
-        <div className="flex items-baseline justify-between"><h2 id="keycap-match" className="text-lg font-black">어울림 체크</h2><span className="font-pixel text-xs text-mint">MATCH</span></div>
-        {match ? <>
-          <div className="flex items-center justify-between rounded-md border-2 bg-night p-3" style={{ borderColor: TONE[match.tone] }}>
-            <strong className="text-base" style={{ color: TONE[match.tone] }}>{match.verdict}</strong>
-            <span className="font-pixel text-xl" style={{ color: TONE[match.tone] }}>{match.score}</span>
-          </div>
-          {[["포인트", match.point, "var(--color-lime)"], ["통일감", match.unity, "var(--color-mint)"], ["조명 궁합", match.lightFit, "var(--color-violet)"]].map(([label, value, color]) => <div key={label as string}>
-            <div className="mb-1 flex justify-between text-sm"><span className="text-sub">{label}</span><strong>{value}</strong></div>
-            <div className="h-2.5 overflow-hidden rounded-sm border-2 border-[#0b0f1e] bg-night"><span className="block h-full" style={{ width: `${value}%`, background: color as string }} /></div>
-          </div>)}
-          <ul className="space-y-2">{match.hints.map((hint) => <li key={hint.text} className="flex gap-2.5 rounded-md bg-night p-2.5 text-sm leading-relaxed"><span className="mt-1.5 size-2.5 shrink-0 rounded-sm" style={{ background: TONE[hint.tone] }} />{hint.text}</li>)}</ul>
-        </> : <p className="rounded-md border-2 border-dashed border-frame p-4 text-center text-sm text-sub">키캡을 하나 끼우면 어울림을 알려 드려요.</p>}
-      </section>
-
-      <section aria-labelledby="keycap-recs" className="pixel-panel space-y-2.5 p-4">
-        <h2 id="keycap-recs" className="font-black">이 키보드에 어울리는 키캡</h2>
-        <div className="grid grid-cols-3 gap-2">{recs.map((item) => capButton(item, true))}</div>
-        <p className="text-xs text-dim">지금 키캡 색과 대비가 좋고, 끼운 키캡과 색 계열이 가까운 순서예요.</p>
-      </section>
-
       <section aria-labelledby="keycap-combo" className="pixel-panel space-y-2.5 p-4">
         <div className="flex items-baseline justify-between"><h2 id="keycap-combo" className="font-black">내 조합</h2><span className="text-sm text-sub">{used.length ? `키캡 ${used.length}종 · ${Object.keys(placed).length}개` : "비어 있음"}</span></div>
         {used.map((item) => <div key={item.id} className="flex items-center gap-2.5 rounded-md bg-night p-2">
@@ -225,6 +185,27 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         {cartState === "error" && <p role="alert" className="text-sm text-pink">장바구니에 담지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
         <p className="text-xs text-dim">✓ 체리 프로파일 · {BOARD.name}에 장착 가능</p>
       </section>
+      {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
+      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4">
+        <div>
+          <h2 id="keycap-drawer" className="font-black">키캡 서랍</h2>
+          <p className="mt-0.5 text-xs text-dim">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</p>
+        </div>
+        <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
+        <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-full py-0 text-sm" />
+        <div role="group" aria-label="키캡 종류" className="segmented flex h-9 w-full text-xs font-bold [&>button]:flex-1 [&>button]:px-1">
+          {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
+        </div>
+        {/* 30종이라 칸 안에서 스크롤 — 키보드와 같이 보이게 */}
+        {tray.length ? <div className="grid max-h-[560px] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4 lg:grid-cols-3">{tray.map((item) => capButton(item))}</div>
+          : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
+      </section>
+      <section aria-labelledby="keycap-recs" className="pixel-panel space-y-2.5 p-4">
+        <h2 id="keycap-recs" className="font-black">이 키보드에 어울리는 키캡</h2>
+        <div className="grid grid-cols-3 gap-2">{recs.map((item) => capButton(item, true))}</div>
+        <p className="text-xs text-dim">나머지 키 색과 대비가 좋고, 끼운 키캡과 색 계열이 가까운 순서예요.</p>
+      </section>
+
       <Link href={`/products/${productId}`} className="btn-pixel grid h-11 place-items-center text-sm font-bold text-sub">{productName} 상세로 돌아가기</Link>
     </aside>
   </div>;
