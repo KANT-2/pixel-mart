@@ -223,7 +223,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
               <button type="button" aria-pressed={view === "before"} onClick={() => setView("before")}>끼우기 전</button>
               <button type="button" aria-pressed={view === "after"} onClick={() => setView("after")}>끼운 후</button>
             </div>
-            <button type="button" onClick={() => { setPlaced({}); setMessage("모든 키캡을 뺐어요."); }} className="btn-pixel h-9 px-3 text-xs font-bold text-sub">모두 빼기</button>
+            <button type="button" onClick={() => { setPlaced({}); setBase("none"); setMessage("모든 키캡을 뺐어요. 기본 키캡도 빼서 스위치만 남았어요."); setCartState("idle"); }} className="btn-pixel h-9 px-3 text-xs font-bold text-sub">모두 빼기</button>
           </div>
         </div>
         {/* 모바일에서는 상자 안에서 가로로 밀어 보기 */}
