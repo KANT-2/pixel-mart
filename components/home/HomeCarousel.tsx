@@ -136,11 +136,11 @@ export default function HomeCarousel() {
         </div>
         </>}
       </div>
+      <button type="button" aria-label="이전 슬라이드" onClick={() => move(-1)} className={`${styles.arrow} absolute -left-11 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center bg-transparent text-3xl text-ink hover:text-mint focus-visible:outline-2 focus-visible:outline-mint md:-left-12`}>‹</button>
+      <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className={`${styles.arrow} absolute -right-11 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center bg-transparent text-3xl text-ink hover:text-mint focus-visible:outline-2 focus-visible:outline-mint md:-right-12`}>›</button>
       <div className="flex h-14 items-center justify-center border-t border-line px-5">
-        <button type="button" aria-label="이전 슬라이드" onClick={() => move(-1)} className="btn-pixel absolute -left-11 top-[calc(50%-28px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:-left-12">←</button>
         <div className="flex" role="group" aria-label="슬라이드 선택">{slideOrder.map((id, index) => <button type="button" key={id} aria-label={`${index + 1}번 ${labels[id]}`} aria-current={slide === id ? "true" : undefined} onClick={() => change(id)} className="flex size-11 items-center justify-center rounded focus-visible:outline-2 focus-visible:outline-mint"><span aria-hidden="true" className={`size-3 rounded-full ${slide === id ? "bg-mint" : "bg-panel-2 border border-line"}`} /></button>)}</div>
         <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
-        <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className="btn-pixel absolute -right-11 top-[calc(50%-28px)] z-10 flex size-10 -translate-y-1/2 items-center justify-center md:-right-12">→</button>
       </div>
     </div>
   </section>;

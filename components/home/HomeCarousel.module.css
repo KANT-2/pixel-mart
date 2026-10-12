@@ -2,6 +2,12 @@
   min-width: 0;
 }
 
+.arrow {
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
 .carousel > div > div:last-child {
   position: absolute;
   inset: auto 0 0;
@@ -164,16 +170,21 @@
 
   .carousel > div > div:last-child {
     height: 60px;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 8px;
   }
 
   .carousel button[aria-label="이전 슬라이드"],
   .carousel button[aria-label="다음 슬라이드"] {
-    position: static;
+    position: absolute;
+    top: auto;
+    bottom: 8px;
     transform: none;
     width: 44px;
     height: 44px;
     flex-shrink: 0;
   }
+
+  .carousel button[aria-label="이전 슬라이드"] { left: 8px; }
+  .carousel button[aria-label="다음 슬라이드"] { right: 8px; }
 }
