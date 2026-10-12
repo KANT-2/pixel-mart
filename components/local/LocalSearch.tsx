@@ -14,6 +14,8 @@ interface LocalSearchProps {
   onRegion: (code: string) => void;
   onNickname: (nickname: string) => void;
   onItem: (item: string) => void;
+  /** 보여 줄 검색 방법 (거래·교환은 동네 검색 없이 닉네임·아이템만) */
+  modes?: LocalSearchMode[];
 }
 
 const MODES: { value: LocalSearchMode; label: string; placeholder: string; max: number }[] = [
@@ -23,9 +25,10 @@ const MODES: { value: LocalSearchMode; label: string; placeholder: string; max: 
 ];
 
 /** 위시맵·거래·교환 공통 검색 — 동네 | 닉네임 | 아이템 중 하나를 골라 검색창 하나로 찾는다 */
-export default function LocalSearch({ regions, mode: initialMode = "region", value = "", onRegion, onNickname, onItem }: LocalSearchProps) {
+export default function LocalSearch({ regions, mode: initialMode = "region", value = "", onRegion, onNickname, onItem, modes }: LocalSearchProps) {
   const id = useId();
-  const [mode, setMode] = useState<LocalSearchMode>(initialMode);
+  const shown = modes ? MODES.filter((item) => modes.includes(item.value)) : MODES;
+  const [mode, setMode] = useState<LocalSearchMode>(shown.some((item) => item.value === initialMode) ? initialMode : shown[0].value);
   const [text, setText] = useState(value);
   const [notFound, setNotFound] = useState(false);
   const current = MODES.find((item) => item.value === mode)!;
@@ -41,10 +44,10 @@ export default function LocalSearch({ regions, mode: initialMode = "region", val
     else setNotFound(true);
   }
 
-  return <form role="search" aria-label="동네·닉네임·아이템 찾기" className="flex w-full min-w-0 gap-1.5 sm:w-auto"
+  return <form role="search" aria-label={`${shown.map((item) => item.label).join("·")} 찾기`} className="flex w-full min-w-0 gap-1.5 sm:w-auto"
     onSubmit={(event) => { event.preventDefault(); submit(); }}>
     <div role="group" aria-label="찾는 방법" className="segmented h-11 text-xs font-bold">
-      {MODES.map((item) => <button key={item.value} type="button" aria-pressed={mode === item.value}
+      {shown.map((item) => <button key={item.value} type="button" aria-pressed={mode === item.value}
         onClick={() => { setMode(item.value); setText(""); setNotFound(false); }}>{item.label}</button>)}
     </div>
     <div className="relative min-w-0 flex-1 sm:w-52 sm:flex-none">
