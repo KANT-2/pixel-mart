@@ -49,7 +49,10 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const router = useRouter();
   const { user } = useAuth();
   const { add } = useCart();
-  const [base, setBase] = useState<BaseKey>("none");
+  const [base, setBaseKey] = useState<BaseKey>("none");
+  // 기본 키캡을 하나씩 뺀 자리 — 색을 새로 고르면 다시 모두 채운다
+  const [baseOff, setBaseOff] = useState<ReadonlySet<string>>(() => new Set());
+  const setBase = (key: BaseKey) => { setBaseKey(key); setBaseOff(new Set()); };
   const [customColor, setCustomColor] = useState("#6ef2d6");
   const [modelId, setModelId] = useState(KEYBOARDS[0].id);
   const [switchId, setSwitchId] = useState(KEYBOARDS[0].switches[0].id);
@@ -130,6 +133,14 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
     const item = placed[keyId] ? byId(placed[keyId]) : undefined;
     if (item) { setPlaced(removeKeycap(placed, keyId, item.kind)); setMessage(`${withObject(item.name)} 뺐어요.`); setCartState("idle"); }
     else if (picked) place(picked, keyId);
+    // 고른 키캡 없이 누르면 그 자리 기본 키캡만 빼기 / 다시 끼우기
+    else if (base !== "none") {
+      const label = BOARD.keys.find((key) => key.id === keyId)?.label || "스페이스바";
+      const next = new Set(baseOff);
+      if (next.has(keyId)) { next.delete(keyId); setMessage(`${label} 자리에 기본 키캡을 다시 끼웠어요.`); }
+      else { next.add(keyId); setMessage(`${label} 자리의 기본 키캡을 뺐어요. 다시 누르면 끼워져요.`); }
+      setBaseOff(next);
+    }
   }
   function pick(item: KeycapItem) {
     const next = picked === item.id ? null : item.id;
@@ -234,7 +245,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
             {BOARD.keys.map((key) => {
               const item = placed[key.id] ? byId(placed[key.id]) : undefined;
               const show = item && view === "after";
-              const fill = !show && base !== "none";
+              const fill = !show && base !== "none" && !baseOff.has(key.id);
               const [rx, ry, rw, rh] = key.rect;
               return <button key={key.id} type="button" aria-label={`${key.label || "스페이스바"}${item ? ` — ${item.name} 끼움, 눌러서 빼기` : " 자리"}`}
                 onClick={() => clickKey(key.id)}
