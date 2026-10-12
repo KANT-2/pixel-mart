@@ -167,6 +167,22 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         <p role="status" className="mt-3 flex items-center gap-2 text-sm text-sub"><span className="size-2 bg-mint shadow-[0_0_8px_var(--color-mint)]" />{message}</p>
       </section>
 
+
+      {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
+      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</span></p>
+          <div className="flex flex-wrap items-center gap-2">
+            <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
+            <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm" />
+            <div role="group" aria-label="키캡 종류" className="segmented h-9 text-xs font-bold">
+              {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
+            </div>
+          </div>
+        </div>
+        {tray.length ? <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-6">{tray.map((item) => capButton(item))}</div>
+          : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
+      </section>
     </div>
 
     <aside className="space-y-4">
@@ -184,21 +200,6 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         {cartState === "done" && <Link href="/cart" className="block text-center text-sm font-bold text-mint">장바구니 보기 ▶</Link>}
         {cartState === "error" && <p role="alert" className="text-sm text-pink">장바구니에 담지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
         <p className="text-xs text-dim">✓ 체리 프로파일 · {BOARD.name}에 장착 가능</p>
-      </section>
-      {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
-      <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4">
-        <div>
-          <h2 id="keycap-drawer" className="font-black">키캡 서랍</h2>
-          <p className="mt-0.5 text-xs text-dim">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</p>
-        </div>
-        <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
-        <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-full py-0 text-sm" />
-        <div role="group" aria-label="키캡 종류" className="segmented flex h-9 w-full text-xs font-bold [&>button]:flex-1 [&>button]:px-1">
-          {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
-        </div>
-        {/* 30종이라 칸 안에서 스크롤 — 키보드와 같이 보이게 */}
-        {tray.length ? <div className="grid max-h-[560px] grid-cols-3 gap-2 overflow-y-auto pr-1 sm:grid-cols-4 lg:grid-cols-3">{tray.map((item) => capButton(item))}</div>
-          : <p className="py-6 text-center text-sm text-sub">&lsquo;{query}&rsquo;에 맞는 키캡이 없어요.</p>}
       </section>
       <section aria-labelledby="keycap-recs" className="pixel-panel space-y-2.5 p-4">
         <h2 id="keycap-recs" className="font-black">이 키보드에 어울리는 키캡</h2>
