@@ -7,7 +7,8 @@ from sqlalchemy import func, or_, select
 from app.deps import DbSession, OptionalUser
 from app.models import Category, Product, User, Wishlist
 from app.schemas.common import Page
-from app.schemas.product import CategoryOut, ProductWithWishOut
+from app.schemas.product import CategoryOut, ProductWithWishOut, RarityOut
+from app.services.rarity import BY_KEY, TIERS, price_condition
 
 router = APIRouter(tags=["products"])
 
@@ -42,6 +43,26 @@ async def list_categories(db: DbSession):
     return result.all()
 
 
+def category_filter(category: str | None) -> list:
+    slugs = [s.strip() for s in (category or "").split(",") if s.strip()]
+    return [Product.category_slug.in_(slugs)] if slugs else []
+
+
+@router.get("/rarities", response_model=list[RarityOut], summary="등급별 카테고리 (가격대 등급 · 상품 개수)")
+async def list_rarities(
+    db: DbSession,
+    category: Annotated[str | None, Query(max_length=200, description="이 카테고리 안에서만 개수 세기")] = None,
+):
+    filters = category_filter(category)
+    out = []
+    for tier in TIERS:
+        count = await db.scalar(select(func.count()).select_from(Product).where(*filters, price_condition(tier))) or 0
+        out.append(
+            RarityOut(key=tier.key, label=tier.label, min_price=tier.min_price, max_price=tier.max_price, count=count)
+        )
+    return out
+
+
 @router.get("/products", response_model=Page[ProductWithWishOut])
 async def list_products(
     db: DbSession,
@@ -53,6 +74,9 @@ async def list_products(
     min_price: Annotated[int | None, Query(alias="minPrice", ge=0, description="최소 가격(원, 포함)")] = None,
     max_price: Annotated[int | None, Query(alias="maxPrice", ge=0, description="최대 가격(원, 포함)")] = None,
     is_new: Annotated[bool | None, Query(alias="isNew", description="true면 신상품만")] = None,
+    rarity: Annotated[
+        str | None, Query(max_length=60, description="등급, 쉼표로 여러 개 (common,uncommon,rare,epic)")
+    ] = None,
     sort: Literal["id", "new", "price_asc", "price_desc", "popular"] = "id",
     page: Annotated[int, Query(ge=1)] = 1,
     size: Annotated[int, Query(ge=1, le=60)] = 12,
@@ -60,10 +84,13 @@ async def list_products(
     if min_price is not None and max_price is not None and min_price > max_price:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "최소 가격이 최대 가격보다 클 수 없습니다.")
 
-    filters = []
-    if category:
-        slugs = [s.strip() for s in category.split(",") if s.strip()]
-        filters.append(Product.category_slug.in_(slugs))
+    filters = category_filter(category)
+    if rarity:
+        keys = [k.strip().lower() for k in rarity.split(",") if k.strip()]
+        if unknown := [k for k in keys if k not in BY_KEY]:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"알 수 없는 등급입니다: {', '.join(unknown)}")
+        if keys:
+            filters.append(or_(*(price_condition(BY_KEY[k]) for k in keys)))
     if q:
         keyword = f"%{q.strip()}%"
         filters.append(or_(Product.name.ilike(keyword), Product.description.ilike(keyword)))

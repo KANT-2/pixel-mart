@@ -22,8 +22,9 @@
 | GET | /api/avatars/ai | AI 아바타 사용 가능 여부 `{enabled, provider: cloudflare\|null, providerName, maxPhotoSide}` — 동의 문구·사진 축소 크기용 (키 값은 내보내지 않음) | ✅ |
 | POST | /api/avatars/ai 🔒 | AI 픽셀 아바타 — `{photo: JPEG/PNG/WebP data URL ≤4MB, consent: true}` → `{image}` (Cloudflare FLUX.2 klein 생성 원본, 저장 안 함, 안전 필터 오탐은 최대 5번 재시도). 동의 없음 422, 키 미설정 503, 인식 실패·안전 차단 422, 외부 오류 502, 사용량 초과(Cloudflare 일일 무료 할당 소진 포함) 429 | ✅ |
 | GET | /api/categories | 카테고리 6개 | ✅ |
-| GET | /api/products?category=&q=&minPrice=&maxPrice=&isNew=&sort=&page=&size= | 목록 (category는 쉼표로 여러 개, sort: `id/new/price_asc/price_desc/popular`(찜 많은 순), 응답에 `isWished`) | ✅ |
-| GET | /api/products/{id} | 상세 (없으면 404, 응답에 `isWished`) | ✅ |
+| GET | /api/rarities?category= | 등급별 카테고리 — `common/uncommon/rare/epic`의 가격 범위(`minPrice` 포함·`maxPrice` 미포함, EPIC은 상한 없음)와 상품 개수 | ✅ |
+| GET | /api/products?category=&q=&minPrice=&maxPrice=&isNew=&rarity=&sort=&page=&size= | 목록 (category·rarity는 쉼표로 여러 개, 없는 등급 422, sort: `id/new/price_asc/price_desc/popular`(찜 많은 순), 응답에 `isWished`·`rarity`) | ✅ |
+| GET | /api/products/{id} | 상세 (없으면 404, 응답에 `isWished`·`rarity`) | ✅ |
 | GET · POST · PATCH · DELETE | /api/cart, /api/cart/items/{productId} 🔒 | 장바구니 조회·담기(같은 상품은 수량 합산, 최대 99)·수량변경·삭제 — 응답은 모두 장바구니 전체 | ✅ |
 | GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록(Page, 최근 찜한 순)·찜(이미 있으면 그대로)·해제 | ✅ |
 
