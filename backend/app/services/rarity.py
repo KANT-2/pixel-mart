@@ -1,4 +1,4 @@
-"""상품 아이템 등급 (COMMON · UNCOMMON · RARE · EPIC) — 가격대로 정한다
+"""상품 아이템 등급 (COMMON · RARE · EPIC · UNIQUE) — 가격대로 정한다
 
 프론트 utils/gameItem.ts 의 rarityOf와 같은 기준이다. 기준을 바꾸면 두 곳을 함께 바꾼다.
 """
@@ -11,7 +11,7 @@ from sqlalchemy.sql.elements import ColumnElement
 
 from app.models import Product
 
-Rarity = Literal["common", "uncommon", "rare", "epic"]
+Rarity = Literal["common", "rare", "epic", "unique"]
 
 
 @dataclass(frozen=True)
@@ -24,9 +24,9 @@ class RarityTier:
 
 TIERS: tuple[RarityTier, ...] = (
     RarityTier("common", "COMMON", 0, 10_000),
-    RarityTier("uncommon", "UNCOMMON", 10_000, 20_000),
-    RarityTier("rare", "RARE", 20_000, 30_000),
-    RarityTier("epic", "EPIC", 30_000, None),
+    RarityTier("rare", "RARE", 10_000, 20_000),
+    RarityTier("epic", "EPIC", 20_000, 30_000),
+    RarityTier("unique", "UNIQUE", 30_000, None),
 )
 BY_KEY: dict[str, RarityTier] = {t.key: t for t in TIERS}
 

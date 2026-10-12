@@ -9,8 +9,8 @@ const g = await import(`data:text/javascript;base64,${Buffer.from(compiled).toSt
 
 test("가격대별 아이템 등급", () => {
   assert.deepEqual([null, 0, 9_900, 10_000, 19_900, 20_000, 29_900, 30_000, 99_000].map((p) => g.rarityOf(p).key),
-    ["common", "common", "common", "uncommon", "uncommon", "rare", "rare", "epic", "epic"]);
-  assert.equal(g.rarityOf(45_000).label, "EPIC");
+    ["common", "common", "common", "rare", "rare", "epic", "epic", "unique", "unique"]);
+  assert.equal(g.rarityOf(45_000).label, "UNIQUE");
 });
 
 test("물건 상태 → 내구도", () => {

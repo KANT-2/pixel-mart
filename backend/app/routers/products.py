@@ -75,7 +75,7 @@ async def list_products(
     max_price: Annotated[int | None, Query(alias="maxPrice", ge=0, description="최대 가격(원, 포함)")] = None,
     is_new: Annotated[bool | None, Query(alias="isNew", description="true면 신상품만")] = None,
     rarity: Annotated[
-        str | None, Query(max_length=60, description="등급, 쉼표로 여러 개 (common,uncommon,rare,epic)")
+        str | None, Query(max_length=60, description="등급, 쉼표로 여러 개 (common,rare,epic,unique)")
     ] = None,
     sort: Literal["id", "new", "price_asc", "price_desc", "popular"] = "id",
     page: Annotated[int, Query(ge=1)] = 1,

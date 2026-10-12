@@ -141,9 +141,7 @@ async def _check_filters(db: DbSession, tree: RegionTree, region: str | None, in
         raise HTTPException(status.HTTP_404_NOT_FOUND, "존재하지 않는 취향입니다.")
 
 
-@router.get(
-    "/local/fandom", response_model=list[FandomOut], summary="덕력지도: 지역 × 취향 인원 (0명은 숫자 없음)"
-)
+@router.get("/local/fandom", response_model=list[FandomOut], summary="덕력지도: 지역 × 취향 인원 (0명은 숫자 없음)")
 async def fandom_map(
     db: DbSession,
     region: Annotated[str | None, Query(max_length=12, description="지역 코드 — 하위 지역 합산")] = None,

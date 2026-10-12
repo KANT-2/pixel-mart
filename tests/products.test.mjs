@@ -18,9 +18,10 @@ const dependencies = {
   "@/data/products": await moduleUrl("../data/products.ts"),
   "@/lib/api": await moduleUrl("../lib/api.ts"),
   "@/utils/productQuery": await moduleUrl("../utils/productQuery.ts"),
+  "@/utils/gameItem": await moduleUrl("../utils/gameItem.ts"),
 };
 const productModule = await moduleUrl("../lib/products.ts", dependencies);
-const { getCategories, getProducts, getProduct, getProductParams } = await import(productModule);
+const { getCategories, getProducts, getProduct, getProductParams, getRarityCounts } = await import(productModule);
 
 async function withFetch(fetcher, run) {
   const original = globalThis.fetch;
@@ -163,4 +164,22 @@ test("빌드 경로는 API 전체 페이지를 사용하고 장애·빈 API에�
       assert.deepEqual(params[0], { id: "1" });
     });
   }
+});
+
+test("등급 필터는 API에 rarity로 보내고, API가 안 되면 정적 상품을 가격대로 거른다", async () => {
+  let requested;
+  await withFetch(async (url) => {
+    requested = new URL(url).searchParams.get("rarity");
+    return json({ items: [], total: 0, page: 1, size: 12, totalPages: 1 });
+  }, async () => { await getProducts({ rarity: ["unique", "common"] }); });
+  assert.equal(requested, "common,unique");
+
+  await withFetch(async () => { throw new Error("down"); }, async () => {
+    const result = await getProducts({ rarity: ["common"], size: 60 });
+    assert.equal(result.fallback, true);
+    assert.ok(result.data.items.length > 0 && result.data.items.every((item) => item.price < 10_000));
+    const counts = await getRarityCounts("keycap");
+    assert.deepEqual(counts.map((row) => row.key), ["common", "rare", "epic", "unique"]);
+    assert.ok(counts.every((row) => Number.isInteger(row.count)));
+  });
 });

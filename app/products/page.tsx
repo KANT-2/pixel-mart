@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import CategoryTabs from "@/components/CategoryTabs";
+import ProductFilterBar from "@/components/ProductFilterBar";
+import { products } from "@/data/products";
 import Pagination from "@/components/Pagination";
 import ProductCard from "@/components/ProductCard";
 import ProductFilters from "@/components/ProductFilters";
-import { getCategories, getProducts, PAGE_SIZE } from "@/lib/products";
+import { getCategories, getProducts, PAGE_SIZE, getRarityCounts } from "@/lib/products";
 import { ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
 import { normalizeProductQuery, productHref, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
@@ -48,7 +49,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
   const categoryResult = await getCategories();
   const query = normalizeProductQuery(productQueryParams(requestedQuery), categoryResult.data.map((item) => item.slug));
   const category = categoryResult.data.find((item) => item.slug === query.category);
-  const result = await getProducts(query);
+  const [result, rarityCounts] = await Promise.all([getProducts(query), getRarityCounts(query.category)]);
   const { items, page, totalPages, total } = result.data;
   const currentQuery = { ...query, page };
   const canonical = productQueryParams(currentQuery);
@@ -67,8 +68,13 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
         </p>
       </header>
 
-      <ProductFilters key={canonical.toString()} query={currentQuery} />
-      <CategoryTabs current={query.category} categories={categoryResult.data} query={currentQuery} />
+      <ProductFilters key={canonical.toString()} query={currentQuery}>
+        <ProductFilterBar query={currentQuery} rarityCounts={rarityCounts} categories={[
+        // TODO(#16): API productCount로 교체 — 지금은 정적 상품 수 (예전 카테고리 탭과 같은 값)
+        { name: "전체", count: products.length },
+        ...categoryResult.data.map((item) => ({ slug: item.slug, name: item.name, count: products.filter((product) => product.category === item.name).length })),
+        ]} />
+      </ProductFilters>
       {(result.fallback || categoryResult.fallback) && <ProductFallbackNotice />}
       {result.fallback && query.sort === "popular" && (
         <p role="status" className="mb-6 text-sm text-sub">인기순 정보를 불러오지 못해 기본순으로 표시합니다.</p>

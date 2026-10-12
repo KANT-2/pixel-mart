@@ -1,6 +1,6 @@
 // 상품·거래글을 게임 아이템처럼 보여 주는 규칙 (등급·내구도·거래 종류) — 표시용, 데이터는 바꾸지 않는다
 
-export type Rarity = "common" | "uncommon" | "rare" | "epic";
+export type Rarity = "common" | "rare" | "epic" | "unique";
 
 export interface RarityInfo {
   key: Rarity;
@@ -11,17 +11,31 @@ export interface RarityInfo {
 
 const RARITIES: Record<Rarity, RarityInfo> = {
   common: { key: "common", label: "COMMON", color: "var(--color-sub)" },
-  uncommon: { key: "uncommon", label: "UNCOMMON", color: "var(--color-lime)" },
   rare: { key: "rare", label: "RARE", color: "var(--color-mint)" },
   epic: { key: "epic", label: "EPIC", color: "var(--color-violet)" },
+  unique: { key: "unique", label: "UNIQUE", color: "#ffd54a" },
 };
 
-/** 가격대로 등급 — 1만원 미만 COMMON, 2만원 미만 UNCOMMON, 3만원 미만 RARE, 그 이상 EPIC */
+/** 등급 순서 (낮은 것부터) — 백엔드 /api/rarities와 같은 키 */
+export const RARITY_KEYS: readonly Rarity[] = ["common", "rare", "epic", "unique"];
+
+/** 등급 정보 */
+export const rarityInfo = (key: Rarity): RarityInfo => RARITIES[key];
+
+/** 등급 가격대 설명 (탭·툴팁용) */
+export const RARITY_RANGES: Record<Rarity, string> = {
+  common: "1만원 미만",
+  rare: "1만~2만원",
+  epic: "2만~3만원",
+  unique: "3만원 이상",
+};
+
+/** 가격대로 등급 — 1만원 미만 COMMON, 2만원 미만 RARE, 3만원 미만 EPIC, 그 이상 UNIQUE(노란색) */
 export function rarityOf(price: number | null | undefined): RarityInfo {
   if (price == null || price < 10_000) return RARITIES.common;
-  if (price < 20_000) return RARITIES.uncommon;
-  if (price < 30_000) return RARITIES.rare;
-  return RARITIES.epic;
+  if (price < 20_000) return RARITIES.rare;
+  if (price < 30_000) return RARITIES.epic;
+  return RARITIES.unique;
 }
 
 /** 물건 상태 → 내구도 바 */

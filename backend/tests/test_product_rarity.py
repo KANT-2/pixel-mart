@@ -15,12 +15,12 @@ from app.services.rarity import TIERS, rarity_of
     [
         (0, "common"),
         (9_999, "common"),
-        (10_000, "uncommon"),
-        (19_999, "uncommon"),
-        (20_000, "rare"),
-        (29_999, "rare"),
-        (30_000, "epic"),
-        (1_000_000, "epic"),
+        (10_000, "rare"),
+        (19_999, "rare"),
+        (20_000, "epic"),
+        (29_999, "epic"),
+        (30_000, "unique"),
+        (1_000_000, "unique"),
     ],
 )
 def test_rarity_boundaries(price, expected):
@@ -49,7 +49,7 @@ async def db_ready():
 
 async def test_rarities_cover_all_products(client, db_ready):
     rarities = (await client.get("/api/rarities")).json()
-    assert [r["key"] for r in rarities] == ["common", "uncommon", "rare", "epic"]
+    assert [r["key"] for r in rarities] == ["common", "rare", "epic", "unique"]
     assert rarities[0] == {**rarities[0], "label": "COMMON", "minPrice": 0, "maxPrice": 10_000}
     assert rarities[-1]["maxPrice"] is None
     total = (await client.get("/api/products", params={"size": 1})).json()["total"]
@@ -72,12 +72,12 @@ async def test_product_items_carry_rarity(client, db_ready):
 async def test_filter_by_rarity_matches_counts(client, db_ready):
     counts = {r["key"]: r["count"] for r in (await client.get("/api/rarities")).json()}
 
-    epic = (await client.get("/api/products", params={"rarity": "epic", "size": 60})).json()
-    assert epic["total"] == counts["epic"]
-    assert all(item["price"] >= 30_000 and item["rarity"] == "epic" for item in epic["items"])
+    epic = (await client.get("/api/products", params={"rarity": "unique", "size": 60})).json()
+    assert epic["total"] == counts["unique"]
+    assert all(item["price"] >= 30_000 and item["rarity"] == "unique" for item in epic["items"])
 
-    both = (await client.get("/api/products", params={"rarity": "common,EPIC", "size": 1})).json()
-    assert both["total"] == counts["common"] + counts["epic"]
+    both = (await client.get("/api/products", params={"rarity": "common,UNIQUE", "size": 1})).json()
+    assert both["total"] == counts["common"] + counts["unique"]
 
 
 async def test_rarity_with_category(client, db_ready):

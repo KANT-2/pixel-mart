@@ -5,7 +5,7 @@ import ts from "typescript";
 
 const source = await readFile(new URL("../utils/productQuery.ts", import.meta.url), "utf8");
 const output = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText;
-const { normalizeProductQuery, productQueryParams, productHref, changeProductQuery, PRODUCT_MAX_PRICE } = await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
+const { normalizeProductQuery, productQueryParams, productHref, changeProductQuery, toggleRarity, PRODUCT_MAX_PRICE } = await import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
 
 test("기본값·빈 검색어는 URL에서 생략하고 최대 가격 0은 유지", () => {
   const query = normalizeProductQuery({ q: "   ", sort: "id", page: "1", minPrice: "0", new: "0" });
@@ -58,4 +58,20 @@ test("URL 왕복 시 조건 보존, 필터 변경·해제는 항상 페이지 1"
   assert.equal(cleared.page, 1);
   assert.equal(query.page, 3);
   assert.equal(productHref(changeProductQuery(query, { q: undefined, category: undefined, sort: "id", minPrice: undefined, maxPrice: undefined, new: undefined })), "/products");
+});
+
+test("등급은 네 가지 키만, 여러 개는 낮은 등급부터 쉼표로, 바꾸면 1페이지로", () => {
+  assert.deepEqual(normalizeProductQuery({ rarity: "unique,common,unique" }).rarity, ["common", "unique"]);
+  assert.equal(normalizeProductQuery({ rarity: "legendary,uncommon" }).rarity, undefined);
+  assert.equal(productHref({ sort: "id", page: 1, category: "keycap", rarity: ["epic"] }), "/products?category=keycap&rarity=epic");
+  assert.equal(productQueryParams({ sort: "id", page: 1, rarity: ["rare", "common"] }).get("rarity"), "common,rare");
+  const next = changeProductQuery({ sort: "id", page: 3, rarity: ["rare"] }, { rarity: undefined });
+  assert.deepEqual(next, { sort: "id", page: 1 });
+});
+
+test("등급 버튼은 다시 누르면 해제되고 여러 개를 함께 고를 수 있다", () => {
+  assert.deepEqual(toggleRarity(undefined, "epic"), ["epic"]);
+  assert.deepEqual(toggleRarity(["epic"], "common"), ["common", "epic"]);
+  assert.deepEqual(toggleRarity(["common", "epic"], "epic"), ["common"]);
+  assert.equal(toggleRarity(["common"], "common"), undefined);
 });
