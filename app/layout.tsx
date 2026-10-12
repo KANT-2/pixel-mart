@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className="h-full">
+    // 커서·다크모드 같은 브라우저 확장이 <html>에 붙이는 속성 차이만 무시 (하위 요소의 진짜 하이드레이션 오류는 그대로 잡힘)
+    <html lang="ko" className="h-full" suppressHydrationWarning>
       <head>
         {/* 한글 본문 폰트(Pretendard) + 픽셀 폰트(Galmuri) */}
         <link
