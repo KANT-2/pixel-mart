@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
-import { KEYCAPS, KEYCAP_KIND_LABEL, KEYCAP_TONES, type KeycapItem, type KeycapKind, type KeycapTone } from "@/data/keycaps";
+import { KEYCAPS, KEYCAP_KIND_LABEL, KEYCAP_TONES, keycapByProduct, type KeycapItem, type KeycapKind, type KeycapTone } from "@/data/keycaps";
 import { ARROW_KEYS, KEYBOARDS } from "@/data/keyboards";
 import { keycapImage, placeKeycap, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
@@ -48,7 +48,7 @@ const subscribePortrait = subscribeMedia(PORTRAIT);
 export default function KeycapFittingRoom({ current, productName, productId }: KeycapFittingRoomProps) {
   const router = useRouter();
   const { user } = useAuth();
-  const { add } = useCart();
+  const { add, cart } = useCart();
   const [base, setBaseKey] = useState<BaseKey>("none");
   // 기본 키캡을 하나씩 바꾼 자리 — 나머지 키를 채웠으면 '뺀 자리', 비워 뒀으면 '끼운 자리'. 색을 새로 고르면 초기화
   const [toggled, setToggled] = useState<ReadonlySet<string>>(() => new Set());
@@ -101,6 +101,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   }
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
+  // 장바구니에 이미 담아 둔 키캡 — 다시 들어와도 바로 골라 끼워 볼 수 있게
+  const cartKeycaps = (cart?.items ?? []).flatMap((line) => { const item = keycapByProduct(line.product.id); return item ? [{ item, quantity: line.quantity }] : []; });
   const fillKey = base === "none" ? lastBase : base;
   const baseColor = fillKey === "custom" ? customColor : BASES[fillKey].color;
   // 각인 색 — 칠한 색(질감과 곱해 조금 어두워짐)이 밝으면 어두운 글자, 어두우면 밝은 글자
@@ -319,6 +321,19 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
         <p className="text-xs text-dim">✓ 체리 프로파일 · {BOARD.name}에 장착 가능</p>
       </section>
 
+      {cartKeycaps.length > 0 && <section aria-labelledby="keycap-in-cart" className="pixel-panel space-y-2.5 p-4">
+        <div className="flex items-baseline justify-between"><h2 id="keycap-in-cart" className="font-black">장바구니에 담긴 키캡</h2><Link href="/cart" className="text-xs font-bold text-mint">장바구니 ▶</Link></div>
+        {cartKeycaps.map(({ item, quantity }) => {
+          const on = usedIds.includes(item.id);
+          return <div key={item.id} className="flex items-center gap-2.5 rounded-md bg-night p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- 키캡 그림 */}
+            <img src={keycapImage(item)} alt="" className="h-8 max-w-16 object-contain" />
+            <span className="min-w-0 flex-1"><Link href={`/products/${item.productId}`} className="block truncate text-sm font-bold hover:text-mint">{item.name}</Link><span className="text-xs text-dim">{quantity}개 담음</span></span>
+            {on ? <span className="text-xs font-bold text-lime">끼움 ✓</span>
+              : <button type="button" aria-pressed={picked === item.id} onClick={() => pick(item)} className={`btn-pixel h-8 shrink-0 px-2.5 text-xs font-bold ${picked === item.id ? "text-lime" : "text-mint"}`}>{picked === item.id ? "키를 눌러 주세요" : "끼워 보기"}</button>}
+          </div>;
+        })}
+      </section>}
       <Link href={`/products/${productId}`} className="btn-pixel grid h-11 place-items-center text-sm font-bold text-sub">{productName} 상세로 돌아가기</Link>
     </aside>
   </div>;
