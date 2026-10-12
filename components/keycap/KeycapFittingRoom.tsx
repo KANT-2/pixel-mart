@@ -10,14 +10,19 @@ import { ARROW_KEYS, WOOTING_80HE as BOARD } from "@/data/keyboards";
 import { keycapImage, placeKeycap, recommendKeycaps, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
-// 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 그 색 키캡으로 채워 내 키보드와 비슷하게 맞춘다
+// 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 기본 키캡(무각 키캡 질감 × 색)으로 채워 내 키보드와 비슷하게 맞춘다.
+// color는 곱하기 전 색이라 실제 보이는 색은 조금 어둡다 — 그래서 블랙도 약간 밝게 둔다
 const BASES = {
-  none: { label: "비우기", bg: "#1e1c26", side: "#1e1c26", fg: "transparent" },
-  black: { label: "블랙", bg: "#2a2733", side: "#16141d", fg: "#8f8aa8" },
-  white: { label: "화이트", bg: "#ecebf3", side: "#b6b3c6", fg: "#5a5672" },
-  lavender: { label: "라벤더", bg: "#c9b8f0", side: "#9a86cf", fg: "#3c2e66" },
-  cream: { label: "크림", bg: "#efe4cb", side: "#c7b693", fg: "#5c4b2d" },
+  none: { label: "비우기", color: "#1e1c26" },
+  black: { label: "블랙", color: "#57545f" },
+  white: { label: "화이트", color: "#ffffff" },
+  lavender: { label: "라벤더", color: "#d9cbff" },
+  cream: { label: "크림", color: "#fff0d2" },
+  mint: { label: "민트", color: "#b9f6e8" },
+  pink: { label: "핑크", color: "#ffc7de" },
+  custom: { label: "직접 고르기", color: "" },
 } as const;
+const BLANK_KEYCAP = "/images/keycaps/blank.webp";
 const KINDS: [KeycapKind | "all", string][] = [["all", "전체"], ["one", "1u"], ["set", "방향키 세트"], ["space", "스페이스바"]];
 
 type BaseKey = keyof typeof BASES;
@@ -30,16 +35,22 @@ interface KeycapFittingRoomProps {
 }
 
 const pct = (value: number, total: number) => `${(value / total) * 100}%`;
-// 손가락으로 쓰는 화면(휴대폰·태블릿)인지 — 끌어다 놓기가 안 되는 곳
-const COARSE = "(pointer: coarse)";
+// 손가락으로 쓰는 화면(휴대폰·태블릿)이거나 휴대폰 폭 — 끌어다 놓기 대신 '누르고 → 키 누르기' 안내
+const COARSE = "(pointer: coarse), (max-width: 767px)";
 const isCoarse = () => window.matchMedia(COARSE).matches;
-const subscribeCoarse = (onChange: () => void) => { const media = window.matchMedia(COARSE); media.addEventListener("change", onChange); return () => media.removeEventListener("change", onChange); };
+const subscribeMedia = (query: string) => (onChange: () => void) => { const media = window.matchMedia(query); media.addEventListener("change", onChange); return () => media.removeEventListener("change", onChange); };
+const subscribeCoarse = subscribeMedia(COARSE);
+// 세로로 든 휴대폰 — 가로로 돌려 보라는 안내 (globals.css의 phone-portrait와 같은 조건)
+const PORTRAIT = "(orientation: portrait) and (max-width: 767px)";
+const isPortrait = () => window.matchMedia(PORTRAIT).matches;
+const subscribePortrait = subscribeMedia(PORTRAIT);
 
 export default function KeycapFittingRoom({ current, productName, productId }: KeycapFittingRoomProps) {
   const router = useRouter();
   const { user } = useAuth();
   const { add } = useCart();
   const [base, setBase] = useState<BaseKey>("none");
+  const [customColor, setCustomColor] = useState("#6ef2d6");
   const [switchId, setSwitchId] = useState(BOARD.switches[0].id);
   const [placed, setPlaced] = useState<Placement>(() => current ? placeKeycap({}, current, current.kind === "space" ? { id: "Space", label: "", w: 6.25 } : { id: "Escape", label: "Esc", w: 1 }).placed : {});
   const [view, setView] = useState<"before" | "after">("after");
@@ -54,6 +65,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const [rotateNote, setRotateNote] = useState(false);
   // 터치 화면은 끌어다 놓기가 안 돼서 '누르고 → 키 누르기' 사용법을 알림으로
   const touch = useSyncExternalStore(subscribeCoarse, isCoarse, () => false);
+  const portrait = useSyncExternalStore(subscribePortrait, isPortrait, () => false);
   const [tipClosed, setTipClosed] = useState(false);
   const touchTip = touch && !tipClosed;
   useEffect(() => {
@@ -82,11 +94,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   }
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
-  const B = BASES[base];
+  const baseColor = base === "custom" ? customColor : BASES[base].color;
   const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
   const used = usedIds.map(byId).filter((item): item is KeycapItem => Boolean(item));
-  const recs = recommendKeycaps(KEYCAPS, usedIds, B.bg, used[0]?.color ?? "#a78bff");
+  const recs = recommendKeycaps(KEYCAPS, usedIds, baseColor, used[0]?.color ?? "#a78bff");
   const tray = trayKeycaps(KEYCAPS, current?.id ?? null, kind, query);
 
   function place(itemId: string | null, keyId: string) {
@@ -152,7 +164,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
     </div>
     {touchTip && <div role="status" className="fixed inset-x-3 bottom-4 z-40 mx-auto flex max-w-md items-start gap-3 rounded-md border-2 border-mint/60 bg-panel p-3 shadow-[4px_4px_0_var(--color-shadow)]">
       <span aria-hidden="true" className="font-pixel text-lg text-mint">TIP</span>
-      <p className="min-w-0 flex-1 text-sm leading-relaxed text-ink"><strong className="text-mint">① 키캡을 먼저 누르고</strong> → <strong className="text-mint">② 끼울 키 자리를 누르면</strong> 끼워져요. 끼운 키를 다시 누르면 빠져요.</p>
+      <div className="min-w-0 flex-1 space-y-2 text-sm leading-relaxed text-ink">
+        <p><strong className="text-mint">① 키캡을 먼저 누르고</strong> → <strong className="text-mint">② 끼울 키 자리를 누르면</strong> 끼워져요. 끼운 키를 다시 누르면 빠져요.</p>
+        {portrait && <p className="flex flex-wrap items-center gap-2 border-t border-frame pt-2"><span>⟲ 휴대폰을 <strong className="text-mint">가로로 돌리면</strong> 키보드가 크게 보여요.</span>
+          <button type="button" onClick={() => void openLandscape()} className="btn-pixel h-8 px-2.5 text-xs font-bold text-mint">가로로 크게 보기</button></p>}
+      </div>
       <button type="button" onClick={() => setTipClosed(true)} aria-label="사용법 알림 닫기" className="btn-pixel size-9 shrink-0 text-sm">✕</button>
     </div>}
     {fullscreen && <button type="button" onClick={() => void document.exitFullscreen()} className="btn-pixel fixed right-3 top-3 z-30 h-9 px-3 text-xs font-bold">✕ 나가기</button>}
@@ -162,14 +178,20 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       <section aria-label="내 키보드" className="pixel-panel flex flex-wrap items-center gap-x-5 gap-y-3 p-4 phone-landscape:col-span-2 phone-landscape:gap-y-2 phone-landscape:p-2.5">
         <span className="font-pixel text-xs text-mint">STEP 1 · MY KEYBOARD</span>
         <label className="flex items-center gap-2 text-sm font-bold">모델
-          <select className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={() => undefined}><option value={BOARD.id}>{BOARD.name}</option></select>
+          <select id="keycap-board" name="board" className="pixel-input h-9 py-0 text-sm" value={BOARD.id} onChange={() => undefined}><option value={BOARD.id}>{BOARD.name}</option></select>
         </label>
         <div role="group" aria-label="스위치" className="segmented h-9 text-xs font-bold">
           {BOARD.switches.map((item) => <button key={item.id} type="button" aria-pressed={switchId === item.id} onClick={() => setSwitchId(item.id)}>{item.label}</button>)}
         </div>
         <div role="group" aria-label="나머지 키" className="flex items-center gap-2"><span className="text-sm font-bold">나머지 키</span>
-          {(Object.keys(BASES) as BaseKey[]).map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={key === "none" ? "나머지 키 비우기 (스위치 보기)" : `나머지 키를 ${BASES[key].label} 키캡으로`} title={BASES[key].label}
-            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].bg }} />)}
+          {(Object.keys(BASES) as BaseKey[]).filter((key) => key !== "custom").map((key) => <button key={key} type="button" aria-pressed={base === key} aria-label={key === "none" ? "나머지 키 비우기 (스위치 보기)" : `나머지 키를 ${BASES[key].label} 키캡으로`} title={BASES[key].label}
+            onClick={() => setBase(key)} className={`size-8 rounded-md border-2 ${key === "none" ? "border-dashed border-sub" : "border-frame"} ${base === key ? "outline-3 outline-offset-2 outline-mint" : ""}`} style={{ background: key === "none" ? "transparent" : BASES[key].color }} />)}
+          {/* 원하는 색 직접 고르기 */}
+          <label title="직접 고르기" className={`relative size-8 cursor-pointer overflow-hidden rounded-md border-2 border-frame ${base === "custom" ? "outline-3 outline-offset-2 outline-mint" : ""}`}
+            style={{ background: base === "custom" ? customColor : "conic-gradient(#ff7ab6, #ffd166, #b6ff5c, #6ef2d6, #a78bff, #ff7ab6)" }}>
+            <span className="sr-only">나머지 키 색 직접 고르기</span>
+            <input id="keycap-base-color" name="baseColor" type="color" value={customColor} onChange={(event) => { setCustomColor(event.target.value); setBase("custom"); }} className="absolute inset-0 cursor-pointer opacity-0" />
+          </label>
         </div>
       </section>
 
@@ -205,7 +227,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
                   left: pct(key.x + inset, BOARD.width), top: pct(key.y + inset, BOARD.height),
                   width: pct(key.w * BOARD.unitPx - 2 * inset, BOARD.width), height: pct(BOARD.unitPx - 2 * inset, BOARD.height),
                 }}>
-                {fill && <span className="absolute inset-0 flex items-start rounded-[6px] px-1.5 py-1 font-pixel text-[10px]" style={{ background: B.bg, color: B.fg, boxShadow: `inset 0 -5px 0 ${B.side}` }}>{key.label}</span>}
+                {/* 기본 키캡 — 밝은 무각 키캡 질감에 색을 곱해 칠하고, 긴 키는 경사면을 그대로 둔 채 가운데만 늘림 */}
+                {fill && <span className="absolute inset-0 isolate [container-type:size]">
+                  <span className="absolute inset-[2%] rounded-[14cqh]" style={{ background: baseColor }} />
+                  <span className="absolute inset-0 mix-blend-multiply" style={{ borderStyle: "solid", borderImage: `url(${BLANK_KEYCAP}) 12% fill / 13cqh stretch` }} />
+                </span>}
                 {/* eslint-disable-next-line @next/next/no-img-element -- 끼운 키캡 그림 */}
                 {show && <img src={keycapImage(item, key.id)} alt="" draggable={false} className="absolute inset-0 h-full w-full object-fill drop-shadow-[0_3px_2px_rgb(0_0_0/0.45)]" />}
               </button>;
@@ -222,7 +248,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
           <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim phone-landscape:hidden">{touch ? "키캡을 누른 뒤, 끼울 키 자리를 눌러 주세요" : "끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요"}</span></p>
           <div className="flex flex-wrap items-center gap-2 phone-landscape:w-full">
             <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
-            <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm phone-landscape:w-full" />
+            <input id="keycap-search" name="keycapQuery" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm phone-landscape:w-full" />
             <div role="group" aria-label="키캡 종류" className="segmented h-9 text-xs font-bold phone-landscape:flex phone-landscape:w-full phone-landscape:[&>button]:flex-1 phone-landscape:[&>button]:px-1">
               {KINDS.map(([value, label]) => <button key={value} type="button" aria-pressed={kind === value} onClick={() => setKind(value)}>{label}</button>)}
             </div>
