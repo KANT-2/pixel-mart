@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { api, ApiError } from "@/lib/api";
-import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar } from "@/lib/aiAvatar";
-import { assertAvatarSize, getOutputSize, getPngByteSize } from "@/utils/pixelate";
+import { aiAvatarStatus, aiImageToGrid, DEFAULT_PHOTO_SIDE, photoToGrid, preparePhoto, requestAiAvatar, type AiSubject } from "@/lib/aiAvatar";
+import { assertAvatarSize, getOutputSize, getPngByteSize, MAX_AVATAR_BYTES } from "@/utils/pixelate";
 import { isEmpty, type PixelGridData } from "@/utils/pixelCanvas";
 import type { ApiAiAvatarStatus, ApiUser } from "@/types/api";
 import PixelAvatar from "./PixelAvatar";
@@ -22,14 +22,18 @@ function gridToPng(grid: PixelGridData, large: boolean): { dataUrl: string; byte
   small.height = grid.rows;
   small.getContext("2d")!.putImageData(new ImageData(new Uint8ClampedArray(grid.pixels), grid.cols, grid.rows), 0, 0);
   const size = large ? getOutputSize(1024, 1024, { cols: grid.cols, rows: grid.rows }) : getOutputSize(grid.cols, grid.rows, { cols: grid.cols, rows: grid.rows });
-  const output = document.createElement("canvas");
-  output.width = size.width;
-  output.height = size.height;
-  const context = output.getContext("2d")!;
-  context.imageSmoothingEnabled = false;
-  context.drawImage(small, 0, 0, size.width, size.height);
-  const dataUrl = output.toDataURL("image/png");
-  return { dataUrl, bytes: getPngByteSize(dataUrl), width: size.width, height: size.height };
+  // 큰 격자(최대 256칸)는 키운 PNG가 200KB를 넘을 수 있어, 넘으면 배율을 한 단계씩 낮춘다 (마지막은 1배)
+  for (let scale = size.scale; ; scale--) {
+    const output = document.createElement("canvas");
+    output.width = grid.cols * scale;
+    output.height = grid.rows * scale;
+    const context = output.getContext("2d")!;
+    context.imageSmoothingEnabled = false;
+    context.drawImage(small, 0, 0, output.width, output.height);
+    const dataUrl = output.toDataURL("image/png");
+    const bytes = getPngByteSize(dataUrl);
+    if (bytes <= MAX_AVATAR_BYTES || scale <= 1) return { dataUrl, bytes, width: output.width, height: output.height };
+  }
 }
 
 function ModerationNotice() {
@@ -95,11 +99,13 @@ function AvatarForm({ user }: AvatarFormProps) {
               className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{saving ? "저장 중…" : "이 그림으로 저장"}</button>
           </div>}
       </div>
-      <aside className="space-y-3">
+      {/* 넓은 화면에서는 캔버스(또는 AI 패널) 윗선에 맞춰 시작 — 탭 줄(+캔버스 크기 줄)만큼 내린다 */}
+      <aside className={`space-y-3 ${mode === "canvas" ? "md:mt-[112px]" : "md:mt-[60px]"}`}>
         <div className="pixel-panel p-4">
           <h2 className="mb-3 text-sm font-bold">지금 내 아바타</h2>
-          <MotionBoundary className="grid aspect-square place-items-center rounded-md bg-night">
-            <div className={`${heroStyles.bob} grid h-3/5 w-3/5 place-items-center`}>
+          {/* 큰 아바타(최대 256칸)도 칸 안에 비율 그대로 — 퍼센트 크기가 먹도록 절대 위치로 */}
+          <MotionBoundary className="relative aspect-square overflow-hidden rounded-md bg-night">
+            <div className={`${heroStyles.bob} absolute inset-[12%] grid place-items-center`}>
               {user.avatarUrl ? <PixelAvatar src={user.avatarUrl} alt="현재 픽셀 아바타" className="h-full w-full" /> : (
                 // eslint-disable-next-line @next/next/no-img-element -- 무대와 같은 기존 픽셀 스프라이트
                 <img src="/images/hero-slime.svg" alt="기본 슬라임" className="w-full [image-rendering:pixelated]" />
@@ -127,6 +133,7 @@ interface AiPanelProps {
 function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
   const [photo, setPhoto] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  const [subject, setSubject] = useState<AiSubject>("person");
   const [working, setWorking] = useState(false);
   const [result, setResult] = useState<{ grid: PixelGridData; preview: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -154,7 +161,7 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
     const id = ++request.current;
     setWorking(true); setError(null); setResult(null);
     try {
-      const grid = kind === "ai" ? await aiImageToGrid(await requestAiAvatar(photo)) : await photoToGrid(photo);
+      const grid = kind === "ai" ? await aiImageToGrid(await requestAiAvatar(photo, subject), subject, photo) : await photoToGrid(photo);
       if (id !== request.current) return;
       const small = document.createElement("canvas");
       small.width = grid.cols; small.height = grid.rows;
@@ -167,7 +174,13 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
 
   return <div className="space-y-4">
     <div className="pixel-panel space-y-4 p-5">
-      <p className="text-sm leading-relaxed text-sub">사진 속 <strong className="text-ink">사람·동물·캐릭터</strong>를 AI가 알아보고, 자세·옷차림·비율을 살린 <strong className="text-lime">픽셀아트 캐릭터</strong>로 다시 그려 줘요. 결과는 픽셀 캔버스에서 다듬을 수 있어요.</p>
+      <p className="text-sm leading-relaxed text-sub">사람 사진은 옷차림·머리·소품을 살린 <strong className="text-lime">머리:몸 1:2 미니미</strong>로, 동물·캐릭터·사물은 <strong className="text-ink">원래 모양 그대로</strong> 픽셀아트로 그려 줘요. 결과는 픽셀 캔버스에서 다듬을 수 있어요.</p>
+      <div role="group" aria-label="사진 속 대상" className="segmented h-10 text-sm font-bold">
+        {([["person", "사람"], ["other", "동물·캐릭터·사물"]] as const).map(([value, label]) => (
+          <button key={value} type="button" aria-pressed={subject === value} disabled={disabled || working}
+            onClick={() => { setSubject(value); setResult(null); }}>{label}</button>
+        ))}
+      </div>
       <label htmlFor="ai-photo" className="block text-sm font-bold">사진 고르기 <span className="font-normal text-dim">(JPEG·PNG·WebP, 10MB 이하)</span></label>
       <input id="ai-photo" type="file" accept="image/jpeg,image/png,image/webp" disabled={disabled || working} onChange={(event) => void choose(event.target.files?.[0])}
         className="block w-full min-w-0 text-sm text-sub file:mr-3 file:rounded-md file:border-2 file:border-frame file:bg-panel-2 file:px-4 file:py-2 file:font-semibold file:text-ink" />
@@ -195,9 +208,9 @@ function AiPanel({ disabled, onSave, onEdit }: AiPanelProps) {
       </figure>
       <figure className="pixel-panel p-4">
         <figcaption className="mb-3 text-sm font-bold">AI 픽셀 아바타</figcaption>
-        <div className="grid aspect-square place-items-center overflow-hidden rounded-md bg-night">
+        <div className="relative grid aspect-square place-items-center overflow-hidden rounded-md bg-night">
           {working ? <p role="status" className="font-pixel text-sm text-lime motion-safe:animate-[pulse_1s_steps(2)_infinite]">LOADING…</p>
-            : result ? <PixelAvatar src={result.preview} alt="AI가 만든 픽셀 아바타" className="h-4/5 w-4/5" />
+            : result ? <PixelAvatar src={result.preview} alt="AI가 만든 픽셀 아바타" className="absolute inset-[8%] h-[84%] w-[84%]" />
               : <p className="px-4 text-center text-sm text-dim">결과가 여기에 보여요.</p>}
         </div>
         {result && <div className="mt-3 flex flex-wrap gap-2">
