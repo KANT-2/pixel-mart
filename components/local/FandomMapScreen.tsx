@@ -66,25 +66,26 @@ export default function FandomMapScreen() {
   const interestName = interests.data?.find((item) => item.id === query.interest)?.name;
 
   return <div className="space-y-3">
-    {/* 탭 공통 도구 막대 — 왼쪽 지도 위치, 오른쪽 동네 검색 · 내 위치 */}
-    <div className={localToolbar}>
-      <nav aria-label="지도 위치" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 px-1 font-pixel text-sm">
-          <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
-          {trail.map((code) => <span key={code} className="flex items-center gap-1">
-            <span aria-hidden="true" className="text-dim">›</span>
-            <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
-              className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
-          </span>)}
-        </nav>
+    {/* 1줄: 지도 위치 / 2줄: 왼쪽 취향 칩, 오른쪽 동네 검색 · 내 위치 — 위시맵과 같은 줄 구성이라 탭을 바꿔도 지도가 같은 자리 */}
+    <nav aria-label="지도 위치" className="flex min-w-0 flex-wrap items-center gap-1 font-pixel text-sm">
+      <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
+      {trail.map((code) => <span key={code} className="flex items-center gap-1">
+        <span aria-hidden="true" className="text-dim">›</span>
+        <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
+          className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
+      </span>)}
+    </nav>
+    <div className={`${localToolbar} min-h-11 justify-between`}>
+      <InterestFilter interests={interests.data ?? []} quick={quickInterests} selected={query.interest}
+        onSelect={(id) => go(focus ?? "", id)} />
+      <div className="ml-auto flex min-w-0 gap-2">
       <RegionSearch regions={catalog} onPick={go} />
       <button type="button" onClick={() => locator.locate((code) => go(code))} disabled={locator.busy || locator.denied || !catalog.length}
         aria-label="내 위치로 보기 — 누를 때만 위치 권한을 요청하고 좌표는 저장하지 않아요" className={`${localButton} shrink-0 gap-1.5`}>
         <span aria-hidden="true">◎</span><span className="hidden sm:inline">{locator.busy ? "찾는 중…" : "내 위치로 보기"}</span></button>
+      </div>
     </div>
     {locator.message && <p role="status" className="text-xs text-sub">{locator.message}</p>}
-
-    <InterestFilter interests={interests.data ?? []} quick={quickInterests} selected={query.interest}
-      onSelect={(id) => go(focus ?? "", id)} />
 
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="mx-auto w-full" style={{ maxWidth: `calc((100dvh - 15rem) * ${view.cols / view.rows})` }}>

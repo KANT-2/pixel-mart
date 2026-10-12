@@ -95,7 +95,8 @@ function AvatarForm({ user }: AvatarFormProps) {
               className="btn-lime min-h-11 px-6 py-2 font-bold disabled:opacity-50">{saving ? "저장 중…" : "이 그림으로 저장"}</button>
           </div>}
       </div>
-      <aside className="space-y-3">
+      {/* 넓은 화면에서는 캔버스(또는 AI 패널) 윗선에 맞춰 시작 — 탭 줄(+캔버스 크기 줄)만큼 내린다 */}
+      <aside className={`space-y-3 ${mode === "canvas" ? "md:mt-[112px]" : "md:mt-[60px]"}`}>
         <div className="pixel-panel p-4">
           <h2 className="mb-3 text-sm font-bold">지금 내 아바타</h2>
           <MotionBoundary className="grid aspect-square place-items-center rounded-md bg-night">
