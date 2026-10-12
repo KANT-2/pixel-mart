@@ -93,7 +93,14 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   };
   const capButton = (item: KeycapItem, compact = false) => (
     <button key={item.id} type="button" draggable aria-pressed={picked === item.id}
-      onDragStart={(event) => { event.dataTransfer.setData("text/plain", item.id); event.dataTransfer.effectAllowed = "copy"; setPicked(item.id); }}
+      onDragStart={(event) => {
+        event.dataTransfer.setData("text/plain", item.id);
+        event.dataTransfer.effectAllowed = "copy";
+        // 끌 때는 카드가 아니라 키캡 그림만 따라오게
+        const image = event.currentTarget.querySelector("img");
+        if (image) event.dataTransfer.setDragImage(image, image.clientWidth / 2, image.clientHeight / 2);
+        setPicked(item.id);
+      }}
       onClick={() => pick(item)}
       className={`relative flex min-w-0 cursor-grab flex-col items-center gap-1.5 rounded-md border-2 bg-night px-1.5 py-2 text-center ${picked === item.id ? "border-lime/60" : item.id === current?.id ? "border-sub" : "border-frame/70"}`}>
       {item.id === current?.id && !compact && <span className="absolute left-1 top-1 rounded bg-sub px-1.5 text-[10px] font-black text-night">지금 보는 키캡</span>}
