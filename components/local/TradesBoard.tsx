@@ -18,29 +18,24 @@ import { TRADE_KIND_GAME } from "@/utils/gameItem";
 export default function TradesBoard() {
   const params = useSearchParams(), router = useRouter();
   const parsed = parseTradeQuery(params);
-  // 위시(want)는 위시맵 탭에서 — 거래·교환 탭은 HAVE·SELL만
-  const query = parsed.kind === "want" ? { ...parsed, kind: undefined } : parsed;
+  // 위시(want)는 위시맵 탭에서 — 거래·교환 탭은 HAVE·SELL만.
+  // 지역 고르기는 없애서, URL에 지역이 없으면 전체 지역 글을 보여 준다 (지도에서 넘어온 지역은 유지)
+  const base = parsed.hasRegion ? parsed : { ...parsed, region: null, hasRegion: true };
+  const query = base.kind === "want" ? { ...base, kind: undefined } : base;
   const selection = useLocalSelection(query);
   const { catalog, profile, selected, loading, invalid } = selection;
   if (catalog.error) return <LocalError message={catalog.error} onRetry={() => void catalog.refresh()} />;
   if (loading || !catalog.data) return <LocalSkeleton label="거래 게시판 준비 중" />;
   const effective = { ...query, region: selected?.code ?? null, hasRegion: true };
-  const ownRegion = profile.data?.region?.code ?? null;
   function change(patch: Partial<TradeQuery>) { router.push(tradeHref(changeTradeQuery(effective, patch)), { scroll: false }); }
   return <div className="space-y-6">
     {profile.error && <LocalError message={`내 동네 조회에 실패했어요. 지역을 직접 선택할 수 있어요. ${profile.error}`} onRetry={() => void profile.refresh()} />}
     {/* 거래소 도구 막대 — 지역 · 종류를 한 줄에 */}
     <section aria-label="게시판 필터" className="space-y-2">
-      <div className={localToolbar}>
-        {/* 위시맵과 같은 검색 하나 — 동네 | 닉네임 | 아이템 */}
-        <LocalSearch key={`${query.nickname ?? ""}|${query.q ?? ""}`} regions={catalog.data} mode={query.nickname ? "nickname" : query.q ? "item" : "region"} value={query.nickname ?? query.q ?? ""}
+      {/* 검색은 왼쪽, 글 종류는 오른쪽 */}
+      <div className={`${localToolbar} justify-between`}>
+        <LocalSearch key={`${query.nickname ?? ""}|${query.q ?? ""}`} regions={catalog.data} modes={["nickname", "item"]} mode={query.nickname ? "nickname" : "item"} value={query.nickname ?? query.q ?? ""}
           onRegion={(region) => change({ region })} onNickname={(nickname) => change({ nickname, q: undefined })} onItem={(q) => change({ q, nickname: undefined })} />
-        {/* 지역 범위는 하나만 — 한 덩어리 버튼 */}
-        <div role="group" aria-label="지역 범위" className="segmented h-11 text-xs font-bold">
-          {ownRegion && <button type="button" aria-pressed={selected?.code === ownRegion} onClick={() => change({ region: ownRegion })}>내 동네</button>}
-          <button type="button" aria-pressed={!selected} onClick={() => change({ region: null })}>전체 지역</button>
-        </div>
-        {/* 지역과 헷갈리지 않게 글 종류는 구분선 뒤 한 덩어리(세그먼트)로 */}
         <div role="group" aria-label="글 종류 필터" className="segmented h-11 font-pixel text-xs">
           {[{ value: undefined, label: "ALL", name: "모든 글", icon: undefined }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: TRADE_KIND_GAME[item.value].tag, name: item.label, icon: TRADE_KIND_GAME[item.value].icon }))].map((item) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
@@ -52,6 +47,7 @@ export default function TradesBoard() {
       {/* 지금 보고 있는 범위와 검색 — 지우기로 바로 해제 */}
       <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-dim">
         <span><strong className="text-sub">{selected ? selected.fullName : "전체 지역"}</strong>{selected ? " 일대" : ""} 진행 중인 글</span>
+        {selected && <button type="button" onClick={() => change({ region: null })} className="underline hover:text-ink">전체 지역 보기</button>}
         {query.nickname && <span>· 닉네임 &lsquo;{query.nickname}&rsquo; <button type="button" onClick={() => change({ nickname: undefined })} className="underline hover:text-ink">지우기</button></span>}
         {query.q && <span>· 아이템 &lsquo;{query.q}&rsquo; <button type="button" onClick={() => change({ q: undefined })} className="underline hover:text-ink">지우기</button></span>}
         <span>· 글은 저장된 내 동네로 작성돼요.</span>
