@@ -36,6 +36,70 @@
   right: 5%;
 }
 
+/* 시안의 말풍선 */
+.tagline {
+  position: absolute;
+  top: 22%;
+  left: 7%;
+  z-index: 2;
+  padding: 1.6cqw 2cqw;
+  font-family: var(--font-pixel);
+  font-size: 2.3cqw;
+  line-height: 1.5;
+  color: var(--color-mint);
+  background: rgb(13 11 26 / 0.75);
+  border: 3px solid var(--color-mint);
+  pointer-events: none;
+}
+
+.tagline::after {
+  content: "";
+  position: absolute;
+  right: -9px;
+  bottom: 8px;
+  width: 9px;
+  height: 9px;
+  background: var(--color-mint);
+}
+
+/* 무대 아래 퀘스트 카드 — 유리 질감 */
+.quest {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: 4%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: rgb(24 21 45 / 0.6);
+  backdrop-filter: blur(12px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 10px 30px rgb(0 0 0 / 0.35);
+}
+
+.questIcon {
+  width: 36px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.questBtn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--color-ink);
+  color: var(--color-night);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.questBtn:hover {
+  background: var(--color-mint);
+}
+
 .background {
   display: block;
   width: 100%;
@@ -176,5 +240,24 @@
   .motionBoundary * {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* 좁은 화면에서는 카드를 낮게 — 슬라임을 가리지 않게 */
+@container (max-width: 420px) {
+  .quest {
+    gap: 8px;
+    padding: 6px 8px;
+    bottom: 3%;
+  }
+  .quest p:first-child {
+    display: none;
+  }
+  .questIcon {
+    width: 24px;
+  }
+  .questBtn {
+    padding: 5px 10px;
+    font-size: 0.78rem;
   }
 }
