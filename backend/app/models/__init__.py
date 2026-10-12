@@ -6,6 +6,7 @@ from app.models.gift import Gift
 from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest, WishSample
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
+from app.models.question import ProductQuestion
 from app.models.review import Review
 from app.models.user import User
 from app.models.wishlist import Wishlist
@@ -22,6 +23,7 @@ __all__ = [
     "OrderItem",
     "OrderStatusHistory",
     "Product",
+    "ProductQuestion",
     "Region",
     "Review",
     "TradePost",
