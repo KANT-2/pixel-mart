@@ -41,8 +41,9 @@
 | GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 | ✅ |
 | POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) | ✅ |
 | DELETE | /api/products/{id}/reviews/{reviewId} 🔒 | 내 리뷰 삭제 (남의 리뷰는 404, 삭제 후 다시 작성 가능) | ✅ |
-| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) |  |
-| POST | /api/products/{id}/questions 🔒 | 문의 작성 |  |
+| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) | ✅ |
+| POST | /api/products/{id}/questions 🔒 | 문의 작성 | ✅ |
+| POST | /api/dev/questions/{id}/answer 🔒 | [로컬 전용] 문의에 답변 달기 (비밀글 내용은 작성자 외에는 응답에서도 가림) | ✅ |
 | GET | /api/faqs?category= | FAQ | ✅ |
 | GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) |  |
 | GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) |  |
