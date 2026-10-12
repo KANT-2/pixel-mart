@@ -1,8 +1,18 @@
+import { networkInterfaces } from "node:os";
 import type { NextConfig } from "next";
+
+// 같은 와이파이의 다른 기기(휴대폰·팀원 PC)에서 http://<이 PC IP>:3000 으로 열 때,
+// 개발 서버가 다른 주소의 요청을 막아 화면 요소가 그려지지 않던 문제 — 이 PC의 사내망 IPv4를 허용
+// (그 밖의 주소는 DEV_ORIGINS=호스트1,호스트2 로 추가)
+const lanAddresses = Object.values(networkInterfaces()).flat()
+  .filter((net) => net && net.family === "IPv4" && !net.internal)
+  .map((net) => net!.address);
+const extraOrigins = (process.env.DEV_ORIGINS ?? "").split(",").map((host) => host.trim()).filter(Boolean);
 
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  allowedDevOrigins: [...lanAddresses, ...extraOrigins],
   experimental: {
     // AI 아바타는 안전 필터 오탐 재시도로 30초를 넘길 수 있어 /api 프록시 대기 시간을 늘림 (기본 30초)
     proxyTimeout: 90_000,
