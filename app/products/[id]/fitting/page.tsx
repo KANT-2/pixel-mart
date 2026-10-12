@@ -38,7 +38,7 @@ async function FittingContent({ params }: { params: Promise<{ id: string }> }) {
     <header className="mb-6 mt-3">
       <p className="stage-kicker mb-2 font-pixel text-sm text-mint">KEYCAP FITTING ROOM</p>
       <h1 className="mb-2 text-3xl font-extrabold md:text-4xl">내 키보드에 어울릴까?</h1>
-      <p className="text-sub">내 키보드 색을 고르고, 키캡을 끌어다 빈 키 위에 놓아 보세요. 어울림을 바로 알려 드려요.</p>
+      <p className="text-sub">키캡을 빈 키 위에 끌어다 놓거나, 키캡을 누른 뒤 키 자리를 눌러 끼워 보세요.</p>
       {!current && <p role="status" className="mt-3 text-sm text-pink">이 상품은 끼워 볼 수 있는 키캡이 아니에요. 서랍의 다른 키캡으로 꾸며 보세요.</p>}
     </header>
     <KeycapFittingRoom current={current} productName={product.name} productId={product.id} />

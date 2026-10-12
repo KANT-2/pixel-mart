@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
@@ -30,6 +30,10 @@ interface KeycapFittingRoomProps {
 }
 
 const pct = (value: number, total: number) => `${(value / total) * 100}%`;
+// 손가락으로 쓰는 화면(휴대폰·태블릿)인지 — 끌어다 놓기가 안 되는 곳
+const COARSE = "(pointer: coarse)";
+const isCoarse = () => window.matchMedia(COARSE).matches;
+const subscribeCoarse = (onChange: () => void) => { const media = window.matchMedia(COARSE); media.addEventListener("change", onChange); return () => media.removeEventListener("change", onChange); };
 
 export default function KeycapFittingRoom({ current, productName, productId }: KeycapFittingRoomProps) {
   const router = useRouter();
@@ -48,6 +52,15 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
   const rootRef = useRef<HTMLDivElement>(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [rotateNote, setRotateNote] = useState(false);
+  // 터치 화면은 끌어다 놓기가 안 돼서 '누르고 → 키 누르기' 사용법을 알림으로
+  const touch = useSyncExternalStore(subscribeCoarse, isCoarse, () => false);
+  const [tipClosed, setTipClosed] = useState(false);
+  const touchTip = touch && !tipClosed;
+  useEffect(() => {
+    if (!touch) return;
+    const timer = window.setTimeout(() => setTipClosed(true), 8000);
+    return () => window.clearTimeout(timer);
+  }, [touch]);
   useEffect(() => {
     const sync = () => setFullscreen(document.fullscreenElement === rootRef.current);
     document.addEventListener("fullscreenchange", sync);
@@ -137,6 +150,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       <p role="status" className="min-w-0 flex-1 text-sm text-sub">{rotateNote ? <>이 휴대폰은 자동으로 돌릴 수 없어요. <strong className="text-ink">휴대폰을 가로로 돌려 주세요.</strong></> : <>휴대폰을 <strong className="text-ink">가로로 돌리면</strong> 키보드가 크게 보이고 키캡 목록이 옆에 나와요.</>}</p>
       <button type="button" onClick={() => void openLandscape()} className="btn-pixel h-10 shrink-0 px-3 text-xs font-bold text-mint">가로로 크게 보기</button>
     </div>
+    {touchTip && <div role="status" className="fixed inset-x-3 bottom-4 z-40 mx-auto flex max-w-md items-start gap-3 rounded-md border-2 border-mint/60 bg-panel p-3 shadow-[4px_4px_0_var(--color-shadow)]">
+      <span aria-hidden="true" className="font-pixel text-lg text-mint">TIP</span>
+      <p className="min-w-0 flex-1 text-sm leading-relaxed text-ink"><strong className="text-mint">① 키캡을 먼저 누르고</strong> → <strong className="text-mint">② 끼울 키 자리를 누르면</strong> 끼워져요. 끼운 키를 다시 누르면 빠져요.</p>
+      <button type="button" onClick={() => setTipClosed(true)} aria-label="사용법 알림 닫기" className="btn-pixel size-9 shrink-0 text-sm">✕</button>
+    </div>}
     {fullscreen && <button type="button" onClick={() => void document.exitFullscreen()} className="btn-pixel fixed right-3 top-3 z-30 h-9 px-3 text-xs font-bold">✕ 나가기</button>}
     {/* 휴대폰 가로 — 왼쪽 키보드, 오른쪽 키캡 목록(따로 스크롤)의 분할 화면 */}
     <div className="min-w-0 space-y-5 phone-landscape:grid phone-landscape:grid-cols-[minmax(0,1fr)_36%] phone-landscape:gap-3 phone-landscape:space-y-0">
@@ -158,7 +176,7 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
       {/* 2. 키보드 — 키캡을 끌어다 놓거나, 고른 뒤 키를 눌러 끼우기 */}
       <section aria-label="키보드 미리보기" className="pixel-panel p-4 phone-landscape:sticky phone-landscape:top-2 phone-landscape:self-start phone-landscape:p-2.5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <span className="font-pixel text-xs text-mint">STEP 2 · 키캡을 끌어다 키 위에 놓기</span>
+          <span className="font-pixel text-xs text-mint">STEP 2 · {touch ? "키캡을 누르고 키 자리를 눌러 끼우기" : "키캡을 끌어다 키 위에 놓기"}</span>
           <div className="flex items-center gap-2">
             <div role="group" aria-label="비교" className="segmented h-9 text-xs font-bold">
               <button type="button" aria-pressed={view === "before"} onClick={() => setView("before")}>끼우기 전</button>
@@ -194,14 +212,14 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
             })}
           </div>
         </div>
-        <p role="status" className="mt-3 flex items-center gap-2 text-sm text-sub"><span className="size-2 bg-mint shadow-[0_0_8px_var(--color-mint)]" />{message}</p>
+        <p role="status" className="mt-3 flex items-center gap-2 text-sm text-sub"><span className="size-2 bg-mint shadow-[0_0_8px_var(--color-mint)]" />{touch ? message.replace("다른 키캡도 끌어다 놓아 보세요.", "다른 키캡을 누르고 키 자리를 눌러 보세요.").replace("키캡을 끌어다 빈 키 위에 놓아 보세요.", "키캡을 누르고 끼울 키 자리를 눌러 보세요.") : message}</p>
       </section>
 
 
       {/* 키캡 서랍 — 보던 키캡이 맨 앞, 종류·이름으로 찾기 */}
       <section aria-labelledby="keycap-drawer" className="pixel-panel space-y-3 p-4 phone-landscape:max-h-[calc(100svh-16px)] phone-landscape:overflow-y-auto phone-landscape:p-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim phone-landscape:hidden">끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요</span></p>
+          <p><strong id="keycap-drawer">키캡 서랍</strong><span className="ml-2 text-sm text-dim phone-landscape:hidden">{touch ? "키캡을 누른 뒤, 끼울 키 자리를 눌러 주세요" : "끌어서 키 위에 놓거나, 누른 뒤 키를 눌러도 돼요"}</span></p>
           <div className="flex flex-wrap items-center gap-2 phone-landscape:w-full">
             <label htmlFor="keycap-search" className="sr-only">키캡 이름 검색</label>
             <input id="keycap-search" value={query} onChange={(event) => setQuery(event.target.value.slice(0, 20))} placeholder="키캡 이름 (예: 포션)" autoComplete="off" className="pixel-input h-9 w-48 py-0 text-sm phone-landscape:w-full" />
