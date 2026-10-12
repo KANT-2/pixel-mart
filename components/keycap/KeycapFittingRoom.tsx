@@ -97,6 +97,11 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
 
   const byId = (id: string) => KEYCAPS.find((item) => item.id === id);
   const baseColor = base === "custom" ? customColor : BASES[base].color;
+  // 각인 색 — 칠한 색(질감과 곱해 조금 어두워짐)이 밝으면 어두운 글자, 어두우면 밝은 글자
+  const legendColor = (() => {
+    const [r, g, b] = [1, 3, 5].map((i) => parseInt(baseColor.slice(i, i + 2), 16));
+    return (0.299 * r + 0.587 * g + 0.114 * b) * 0.85 > 140 ? "rgb(40 36 56 / 0.85)" : "rgb(244 242 255 / 0.85)";
+  })();
   const BOARD = KEYBOARDS.find((item) => item.id === modelId) ?? KEYBOARDS[0];
   const board = BOARD.switches.find((item) => item.id === switchId) ?? BOARD.switches[0];
   const usedIds = useMemo(() => [...new Set(Object.values(placed))], [placed]);
@@ -244,6 +249,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
                 {fill && <span className="absolute inset-0 isolate [container-type:size]">
                   <span className="absolute inset-[2%] rounded-[14cqh]" style={{ background: baseColor }} />
                   <span className="absolute inset-0 mix-blend-multiply" style={{ borderStyle: "solid", borderImage: `url(${BLANK_KEYCAP}) 12% fill / 13cqh stretch` }} />
+                  {/* 키 이름 각인 — 윗면 왼쪽 위 (스페이스바는 비워 둠) */}
+                  {key.id !== "Space" && <span aria-hidden="true" className="absolute left-[17cqh] top-[14cqh] font-bold leading-none" style={{ color: legendColor, fontSize: key.label.length > 3 ? "15cqh" : "19cqh" }}>{key.label}</span>}
                 </span>}
                 {/* eslint-disable-next-line @next/next/no-img-element -- 끼운 키캡 그림 */}
                 {show && <img src={keycapImage(item, key.id)} alt="" draggable={false} className="absolute inset-0 h-full w-full object-fill drop-shadow-[0_3px_2px_rgb(0_0_0/0.45)]" />}
