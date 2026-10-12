@@ -3,6 +3,7 @@ import { categories } from "@/data/categories";
 import { products } from "@/data/products";
 import { ApiError, serverFetch } from "@/lib/api";
 import type { ApiCategory, ApiProduct, Page } from "@/types/api";
+import { RARITY_KEYS, rarityOf, type Rarity } from "@/utils/gameItem";
 import { normalizeProductQuery, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
 export const PAGE_SIZE = 12;
@@ -51,7 +52,8 @@ export async function getProducts(options: Partial<ProductQuery> & { size?: numb
       && (!keyword || product.name.toLowerCase().includes(keyword) || product.description.toLowerCase().includes(keyword))
       && (query.minPrice === undefined || product.price >= query.minPrice)
       && (query.maxPrice === undefined || product.price <= query.maxPrice)
-      && (!query.new || product.isNew),
+      && (!query.new || product.isNew)
+      && (!query.rarity || query.rarity.includes(rarityOf(product.price).key)),
     );
     filtered.sort((a, b) => {
       if (query.sort === "new") return Number(b.isNew) - Number(a.isNew) || b.id - a.id;
@@ -68,6 +70,19 @@ export async function getProducts(options: Partial<ProductQuery> & { size?: numb
     };
   }
 }
+
+export interface RarityCount { key: Rarity; count: number; }
+
+/** 등급별 상품 수 (카테고리 안) — API가 안 되면 정적 데이터로 센다 */
+export const getRarityCounts = cache(async (category?: string): Promise<RarityCount[]> => {
+  try {
+    const rows = await serverFetch<{ key: Rarity; count: number }[]>(`/rarities${category ? `?category=${encodeURIComponent(category)}` : ""}`);
+    return RARITY_KEYS.map((key) => ({ key, count: rows.find((row) => row.key === key)?.count ?? 0 }));
+  } catch {
+    const pool = fallbackProducts.filter((product) => !category || product.categorySlug === category);
+    return RARITY_KEYS.map((key) => ({ key, count: pool.filter((product) => rarityOf(product.price).key === key).length }));
+  }
+});
 
 export const getProduct = cache(async (id: string): Promise<ProductResult<ApiProduct | undefined>> => {
   if (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) < 1) return { data: undefined, fallback: false };
