@@ -78,13 +78,12 @@ export function seededRandom(seed: number): () => number {
   };
 }
 
-/** 지역 인원 → 장식 핀 개수 (약 4~5명당 1개, 최대 6개, 5명 미만은 0) */
 /** 지역 블록 하나에 올리는 핀 최대 개수 (백엔드 map-avatars와 같은 값) */
 export const MAX_PINS = 10;
 
-/** 핀 개수 — 5명 미만 0개, 그 이상은 인원만큼(구매 상위 10명까지) */
+/** 핀 개수 — 없으면 0개, 있으면 인원만큼(구매 상위 10명까지) */
 export function pinCount(count: number | null | undefined): number {
-  if (!count || count < 5) return 0;
+  if (!count) return 0;
   return Math.min(MAX_PINS, count);
 }
 

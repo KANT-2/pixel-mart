@@ -111,7 +111,7 @@ function WantPanel({ title, kicker, region, nickname, item, onClear }: WantPanel
   const loadTop = useCallback((signal: AbortSignal) => region ? localApi.wishMap(region, signal) : Promise.resolve([]), [region]);
   const top = useLocalResource(loadTop);
   const rows = wants.data?.items ?? [];
-  const popular = (top.data ?? []).filter((row) => row.count >= 5).slice(0, 3);
+  const popular = (top.data ?? []).filter((row) => row.count > 0).slice(0, 3);
   return <aside aria-label={`${title} WISH 글`} className="pixel-panel overflow-hidden">
     <header className="border-b-2 border-frame bg-panel-2 px-4 py-3">
       <p className="font-pixel text-[10px] tracking-widest text-lime">▶ {kicker}</p>

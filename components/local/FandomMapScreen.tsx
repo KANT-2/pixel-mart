@@ -135,7 +135,6 @@ export default function FandomMapScreen() {
             </span>)}
           </div>
           <MapNotes><ul className="space-y-1">
-            <li className="flex items-center gap-1.5"><span aria-hidden="true" className="w-4 text-center">ⓘ</span>5명 미만 지역은 정확한 인원수를 표시하지 않아요.</li>
             <li className="flex items-center gap-1.5"><PixelAvatar src={characterIcon("slime-1")} className="w-4" />캐릭터는 아바타 또는 장식이며 실제 위치·인원수와 일치하지 않아요.</li>
             <li className="flex items-center gap-1.5"><span aria-hidden="true" className="w-4 text-center">★</span>지역마다 구매 금액 상위 10명(금액 비공개) · 누르면 오른쪽 순위에서 찾아 줘요 · +/−로 확대</li>
           </ul></MapNotes>
@@ -212,7 +211,7 @@ function PlacePanel({ code, region, block, interest, interestName, hasChildren, 
     <p className="font-pixel text-xs text-mint">{hasChildren ? "AREA" : "NEIGHBORHOOD"}</p>
     <h2 className="mt-1 break-keep text-lg font-extrabold">{region.fullName}</h2>
     {block && <p className="mt-3 text-sm">
-      {block.count ? <><strong className="text-lime">{block.count}명</strong>의 {block.hint === "지도 표시 이웃" ? "이웃이 지도에 아바타를 보여 주고" : `${interestName ? `${interestName} 팬` : block.hint ?? "이웃"}이`} 있어요</> : "아직 소수의 이웃이 있어요"}
+      {block.count ? <><strong className="text-lime">{block.count}명</strong>의 {block.hint === "지도 표시 이웃" ? "이웃이 지도에 아바타를 보여 주고" : `${interestName ? `${interestName} 팬` : block.hint ?? "이웃"}이`} 있어요</> : "아직 이웃이 없어요"}
     </p>}
     {top.length > 0 && <div className="mt-4">
       <p className="mb-2 text-xs text-dim">이 동네 인기 취향</p>
@@ -241,7 +240,7 @@ function BuyerRanking({ ranking, loading, picked }: BuyerRankingProps) {
       <span>구매 순위 TOP 10 {ranking.isSample && <span className="ml-1 rounded bg-panel-2 px-1 text-[10px] text-sub">샘플</span>}</span>
       <span>금액 비공개</span>
     </p>
-    {ranking.items.length === 0 ? <p className="text-sm text-sub">아바타를 보여 주는 이웃이 5명 이상 모이면 순위가 열려요.</p> : (
+    {ranking.items.length === 0 ? <p className="text-sm text-sub">아직 순위에 오른 이웃이 없어요.</p> : (
       <ol className="space-y-1">{ranking.items.map((row) => <li key={row.rank} aria-current={row.rank === picked || undefined}
         className="flex items-center gap-2 rounded px-1 text-sm aria-[current=true]:bg-panel-2 aria-[current=true]:outline aria-[current=true]:outline-2 aria-[current=true]:outline-lime">
         <span className={`w-5 shrink-0 text-center font-pixel ${row.rank <= 3 ? "text-lime" : "text-violet"}`}>{row.rank}</span>

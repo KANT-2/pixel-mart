@@ -1,4 +1,4 @@
-"""PIXEL LOCAL ② 덕력지도 — 5명 미만 숫자 비공개 · 하위 지역 합산 · 집계 참여자만 · 샘플 표시
+"""PIXEL LOCAL ② 덕력지도 — 1명부터 숫자 공개(0명만 숨김) · 하위 지역 합산 · 집계 참여자만 · 샘플 표시
 
 다른 테스트·샘플 데이터와 섞이지 않게 테스트 전용 지역(TST › TST1 › TST1-01/02)을 만들었다가 지운다.
 """
@@ -37,10 +37,12 @@ def test_rollup_sums_children_into_parents():
     assert total[("TST", MIMIC)] == 3
 
 
-def test_present_hides_numbers_below_five():
+def test_present_shows_any_positive_count():
+    # 최소 인원 제한 없음 — 0명만 "기준 미만"으로 숨긴다
     assert present(5) == (5, False)
-    assert present(4) == (None, True)
-    assert present(1) == (None, True)
+    assert present(4) == (4, False)
+    assert present(1) == (1, False)
+    assert present(0) == (None, True)
 
 
 def test_period_start():
@@ -103,10 +105,10 @@ def cells(rows: list[dict]) -> dict[tuple[str, int], tuple[int | None, bool]]:
     return {(r["regionCode"], r["interestId"]): (r["count"], r["belowThreshold"]) for r in rows}
 
 
-async def test_zone_counts_and_below_threshold(client, isolated_regions, count_test_accounts):
+async def test_zone_counts_show_small_groups(client, isolated_regions, count_test_accounts):
     await make_fans()
     rows = (await client.get("/api/local/fandom", params={"region": "TST1-01"})).json()
-    assert cells(rows) == {("TST1-01", GHOST): (5, False), ("TST1-01", MIMIC): (None, True)}
+    assert cells(rows) == {("TST1-01", GHOST): (5, False), ("TST1-01", MIMIC): (3, False)}
     assert rows[0]["regionName"] == "테스트시 테스트구 가동"
     assert rows[0]["isSample"] is False
 
@@ -118,7 +120,7 @@ async def test_parent_regions_sum_children(client, isolated_regions, count_test_
     city = cells((await client.get("/api/local/fandom", params={"region": "TST", "interest": GHOST})).json())
     assert city == {("TST", GHOST): (7, False)}
     zone_b = cells((await client.get("/api/local/fandom", params={"region": "TST1-02"})).json())
-    assert zone_b == {("TST1-02", GHOST): (None, True)}
+    assert zone_b == {("TST1-02", GHOST): (2, False)}  # 2명도 숫자 공개
 
 
 async def test_no_personal_info_in_response(client, isolated_regions, count_test_accounts):
@@ -146,12 +148,12 @@ async def test_period_filter(client, isolated_regions, count_test_accounts):
             {"g": GHOST, "a": "fan-a4@pixelmart.test", "b": "fan-a5@pixelmart.test"},
         )
     recent = cells((await client.get("/api/local/fandom", params={"region": "TST1-01", "period": "90d"})).json())
-    assert recent[("TST1-01", GHOST)] == (None, True)  # 3명
+    assert recent[("TST1-01", GHOST)] == (3, False)  # 최근 90일은 3명
     everything = cells((await client.get("/api/local/fandom", params={"region": "TST1-01"})).json())
     assert everything[("TST1-01", GHOST)] == (5, False)
 
 
-async def test_ranking_only_above_threshold(client, isolated_regions, count_test_accounts):
+async def test_ranking_orders_by_count(client, isolated_regions, count_test_accounts):
     await make_fans()
     ranking = (await client.get("/api/local/fandom/ranking", params={"region": "TST1"})).json()
     assert ranking == [
@@ -162,7 +164,15 @@ async def test_ranking_only_above_threshold(client, isolated_regions, count_test
             "interestType": "work",
             "count": 7,
             "isSample": False,
-        }
+        },
+        {
+            "rank": 2,
+            "interestId": MIMIC,
+            "interest": "던전 크롤러",
+            "interestType": "work",
+            "count": 3,  # 5명 미만도 순위에 들어간다
+            "isSample": False,
+        },
     ]
 
 

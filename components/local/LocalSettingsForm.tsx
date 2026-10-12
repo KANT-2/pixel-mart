@@ -97,7 +97,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
       <legend className="px-2 text-lg font-bold">03 · 활용과 공개</legend>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={fandomOptIn} onChange={(event) => setFandomOptIn(event.target.checked)} aria-describedby="fandom-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
-        <span><span className="block font-bold">덕력지도 집계 참여</span><span id="fandom-purpose" className="mt-2 block text-sm leading-relaxed text-sub">선택한 취향은 PIXEL LOCAL 추천과 덕력지도 집계에 활용할 수 있습니다. 참여하면 지역 단위의 익명 취향 인원에 반영돼요. 5명 미만의 정확한 인원은 공개하지 않아요.</span></span>
+        <span><span className="block font-bold">덕력지도 집계 참여</span><span id="fandom-purpose" className="mt-2 block text-sm leading-relaxed text-sub">선택한 취향은 PIXEL LOCAL 추천과 덕력지도 집계에 활용할 수 있습니다. 참여하면 지역 단위의 익명 취향 인원에 반영돼요.</span></span>
       </label>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={profilePublic} onChange={(event) => setProfilePublic(event.target.checked)} aria-describedby="public-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
@@ -105,7 +105,7 @@ function SettingsForm({ profile, regions, candidate, locator }: SettingsFormProp
       </label>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={mapAvatarOptIn} onChange={(event) => setMapAvatarOptIn(event.target.checked)} aria-describedby="avatar-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />
-        <span><span className="block font-bold">지도에 내 아바타 표시</span><span id="avatar-purpose" className="mt-2 block text-sm leading-relaxed text-sub">덕력지도의 내 동네에 내 픽셀 아바타(없으면 기본 슬라임)가 캐릭터로 나타나요. 같은 동네에서 표시에 동의한 이웃이 5명 이상일 때만, 구매 금액 상위 최대 10명이 보이며(금액은 비공개) 정확한 위치는 보여 주지 않아요.</span></span>
+        <span><span className="block font-bold">지도에 내 아바타 표시</span><span id="avatar-purpose" className="mt-2 block text-sm leading-relaxed text-sub">덕력지도의 내 동네에 내 픽셀 아바타(없으면 기본 슬라임)가 캐릭터로 나타나요. 구매 금액 상위 최대 10명이 보이며(금액은 비공개) 정확한 위치는 보여 주지 않아요.</span></span>
       </label>
       <label className="flex cursor-pointer items-start gap-3">
         <input type="checkbox" role="switch" checked={nicknamePublic} onChange={(event) => setNicknamePublic(event.target.checked)} aria-describedby="nickname-purpose" className="mt-1 size-5 shrink-0 accent-mint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint" />

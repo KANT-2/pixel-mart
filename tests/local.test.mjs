@@ -47,18 +47,19 @@ test("취향은 id 기준으로 중복 없이 20개까지, 상한에서도 해�
   assert.equal(selected.length, 19);
 });
 
-test("5명 미만·null은 숫자와 막대를 숨기고 샘플 여부는 독립적으로 표시", () => {
+test("0명·null·기준 미만 표시는 숫자와 막대를 숨기고 샘플 여부는 독립적으로 표시", () => {
   for (const row of [
     { count: null, belowThreshold: true, isSample: true },
-    { count: 2, belowThreshold: false, isSample: false },
+    { count: 0, belowThreshold: false, isSample: false },
     { count: 100, belowThreshold: true, isSample: false },
   ]) {
     assert.equal(fandomPresentation(row).count, null);
     const html = renderToStaticMarkup(createElement(FandomCount, { row, maximum: 100 }));
-    assert.match(html, /5명 미만/);
-    assert.doesNotMatch(html, /style=|100명|2명/);
+    assert.match(html, /아직 없음/);
+    assert.doesNotMatch(html, /style=|100명/);
     assert.equal(html.includes("샘플 데이터"), row.isSample);
   }
+  assert.deepEqual(fandomPresentation({ count: 2, belowThreshold: false, isSample: false }), { count: 2, label: "2명", sample: null });
   assert.deepEqual(fandomPresentation({ count: 5, belowThreshold: false, isSample: false }), { count: 5, label: "5명", sample: null });
   assert.equal(fandomPresentation({ count: 8, belowThreshold: false, isSample: true }).sample, "샘플 데이터");
 });

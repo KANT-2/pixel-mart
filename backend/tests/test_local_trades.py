@@ -92,6 +92,10 @@ async def users():
 
     async with engine.begin() as conn:
         await conn.execute(text("DELETE FROM trade_posts WHERE region_code LIKE 'TRD%'"))
+        # 찜도 지운다 — 1명부터 집계되므로 남은 찜이 다음 테스트의 Wish Map에 섞인다
+        await conn.execute(
+            text("DELETE FROM wishlists WHERE user_id IN (SELECT id FROM users WHERE region_code LIKE 'TRD%')")
+        )
         await conn.execute(text("UPDATE users SET region_code = NULL WHERE region_code LIKE 'TRD%'"))
         for level in ("zone", "sigungu", "sido"):
             await conn.execute(text("DELETE FROM regions WHERE code LIKE 'TRD%' AND level = :l"), {"l": level})
@@ -214,7 +218,7 @@ async def test_wish_map_ranks_opted_in_neighbors(users, monkeypatch):
     await off.put("/api/wishlist/131")  # 집계 미참여
 
     zone = (await zone_a[0].get("/api/local/wish-map", params={"region": ZONE_A})).json()
-    assert [(r["rank"], r["product"]["id"], r["count"]) for r in zone] == [(1, 130, 5)]  # 131은 4명
+    assert [(r["rank"], r["product"]["id"], r["count"]) for r in zone] == [(1, 130, 5), (2, 131, 4)]  # 4명도 공개
     district = (await zone_a[0].get("/api/local/wish-map", params={"region": "TRD1"})).json()
     assert [(r["product"]["id"], r["count"]) for r in district] == [(130, 5), (131, 5)]
 
@@ -234,9 +238,10 @@ async def test_wish_map_samples_fill_gaps_and_real_data_wins(users, monkeypatch)
         await c.put("/api/wishlist/130")  # 실제 5명 → 샘플 9명 대신 실제 값
 
     rows = (await zone_a[0].get("/api/local/wish-map", params={"region": ZONE_A})).json()
-    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in rows] == [(132, 7, True), (130, 5, False)]
+    expected = [(132, 7, True), (130, 5, False), (133, 4, True)]  # 4명 샘플도 공개
+    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in rows] == expected
     district = (await zone_a[0].get("/api/local/wish-map", params={"region": "TRD1"})).json()  # 하위 지역 합산
-    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in district] == [(132, 7, True), (130, 5, False)]
+    assert [(r["product"]["id"], r["count"], r["isSample"]) for r in district] == expected
 
 
 async def test_seeded_wish_samples_are_marked(client):
@@ -244,7 +249,7 @@ async def test_seeded_wish_samples_are_marked(client):
     rows = (await client.get("/api/local/wish-map", params={"region": "41135-01"})).json()
     if not rows:
         pytest.skip("Wish Map 샘플 시드 전입니다 (python -m scripts.seed)")
-    assert all(r["isSample"] and r["count"] >= 5 for r in rows)
+    assert all(r["isSample"] and r["count"] >= 1 for r in rows)
     assert [r["rank"] for r in rows] == list(range(1, len(rows) + 1))
     assert [r["count"] for r in rows] == sorted((r["count"] for r in rows), reverse=True)
 

@@ -39,8 +39,8 @@ export function toggleInterest(selected: ApiInterest[], item: ApiInterest, singl
 }
 
 export function fandomPresentation(row: Pick<ApiFandom, "count" | "belowThreshold" | "isSample">) {
-  const hidden = row.belowThreshold || row.count === null || row.count < 5;
-  return { label: hidden ? "5명 미만" : `${row.count}명`, count: hidden ? null : row.count, sample: row.isSample ? "샘플 데이터" : null };
+  const hidden = row.belowThreshold || row.count === null || row.count < 1;
+  return { label: hidden ? "아직 없음" : `${row.count}명`, count: hidden ? null : row.count, sample: row.isSample ? "샘플 데이터" : null };
 }
 
 export function parseLocalQuery(params: { get(name: string): string | null }) {

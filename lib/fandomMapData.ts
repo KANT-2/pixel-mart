@@ -4,7 +4,7 @@ import type { ApiFandom, ApiFandomRank, ApiMapAvatars, ApiMapCard } from "@/type
 
 export interface MapBlockData {
   code: string;
-  /** 이름표 인원 — 아바타 동의자 수 또는 취향 집계(5명 미만은 null) */
+  /** 이름표 인원 — 아바타 동의자 수 또는 취향 집계(없으면 null) */
   count: number | null;
   /** 아바타 PNG data URL / null(기본 슬라임) */
   pins: (string | null)[];
@@ -47,7 +47,7 @@ async function mapLimited<T, R>(items: T[], limit: number, run: (item: T) => Pro
 }
 
 /**
- * 지도 블록 데이터 — 동의한 이웃이 5명 이상이면 실제 아바타, 적으면 서버가 채운 샘플 캐릭터,
+ * 지도 블록 데이터 — 동의한 이웃이 있으면 실제 아바타, 없으면 서버가 채운 샘플 캐릭터,
  * 둘 다 없으면 취향 집계 인원만큼 기본 슬라임 핀 (정책 4.2, 블록당 구매 상위 10명 — 0번 핀이 1위).
  * 좌표·개인 정보는 다루지 않는다.
  */
@@ -78,6 +78,6 @@ export async function loadMapBlocks(viewCode: string, legend: string[], interest
       return { code, count: real.count, pins: real.avatars, cards: real.cards ?? [], sample: real.isSample, real: !real.isSample, ranked: true, topInterest: fallback?.top ?? null };
     }
     const count = fallback?.count ?? null;
-    return { code, count: count && count >= 5 ? count : null, pins: Array(pinCount(count)).fill(null), cards: [], sample: fallback?.sample ?? false, real: false, ranked: false, topInterest: fallback?.top ?? null };
+    return { code, count: count && count > 0 ? count : null, pins: Array(pinCount(count)).fill(null), cards: [], sample: fallback?.sample ?? false, real: false, ranked: false, topInterest: fallback?.top ?? null };
   });
 }
