@@ -10,6 +10,7 @@ import { rarityOf } from "@/utils/gameItem";
 import { getProduct, getProducts, getProductParams } from "@/lib/products";
 import { ProductFallbackNotice } from "@/components/products/ProductStates";
 import ProductDetailTabs from "@/components/products/ProductDetailTabs";
+import { keycapByProduct } from "@/data/keycaps";
 
 // API가 꺼져 있어도 정적 상품 ID로 상세 경로를 생성합니다.
 export function generateStaticParams() {
@@ -100,6 +101,13 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
 
           <div className="mt-auto flex flex-col gap-3">
             <AddToCartButton productId={product.id} />
+            {/* 키캡은 내 키보드에 끼워 보고 어울림을 확인 */}
+            {keycapByProduct(product.id) && (
+              <Link href={`/products/${product.id}/fitting`} className="btn-pixel flex items-center justify-center gap-2 px-6 py-3 font-bold text-mint">
+                <svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><path d="M1 4h14v8H1zM3 6h1M5 6h1M7 6h1M9 6h1M11 6h2M3 8h1M5 8h1M7 8h1M9 8h1M11 8h2M4 10h8" /></svg>
+                내 키보드에 끼워 보기
+              </Link>
+            )}
             <Link
               href="/products"
               className="btn-pixel grid place-items-center px-6 py-3 font-bold text-sub hover:text-ink"
