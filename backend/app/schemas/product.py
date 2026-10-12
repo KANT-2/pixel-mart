@@ -20,7 +20,7 @@ class ProductOut(CamelModel):
     image_url: str
     description: str
     is_new: bool
-    rarity: Rarity  # 가격대 아이템 등급 (common/uncommon/rare/epic)
+    rarity: Rarity  # 가격대 아이템 등급 (common/rare/epic/unique)
 
     @classmethod
     def from_model(cls, product: Product) -> "ProductOut":
