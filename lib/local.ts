@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiMapAvatars, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
+import type { ApiBuyerRanking, ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiMapAvatars, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
 import type { ApiProduct, ApiTradePost, ApiTradeMatch, ApiWishMapItem, ApiWishWants, Page, TradeInput } from "@/types/api";
 import type { TradeQuery } from "@/utils/localTrades";
 
@@ -23,6 +23,9 @@ export const localApi = {
     api.get<ApiFandom[]>(`/local/fandom?${query({ interest, period, limit: 200 })}`, options(signal)),
   mapAvatars: (region: string, interest?: number, signal?: AbortSignal) =>
     api.get<ApiMapAvatars[]>(`/local/map-avatars?${query({ region: region || undefined, interest })}`, options(signal)),
+  /** 지역 구매 순위 TOP 10 (금액 비공개) */
+  buyerRanking: (region: string, interest?: number, signal?: AbortSignal) =>
+    api.get<ApiBuyerRanking>(`/local/buyer-ranking?${query({ region, interest })}`, options(signal)),
   ranking: (region: string, period: FandomPeriod, signal?: AbortSignal) =>
     api.get<ApiFandomRank[]>(`/local/fandom/ranking?${query({ region, period, limit: 10 })}`, options(signal)),
   /** 거래·교환 탭 — 종류를 고르지 않으면 HAVE·SELL만 (위시는 위시맵 탭) */

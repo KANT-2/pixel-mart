@@ -1,9 +1,7 @@
 import type { ApiFandom, ApiInterest, ApiRegion, FandomPeriod, InterestType, RegionLevel } from "@/types/api";
 
-export const INTEREST_TYPES: { value: InterestType; label: string }[] = [
-  { value: "character", label: "캐릭터" }, { value: "work", label: "작품" },
-  { value: "style", label: "스타일" }, { value: "product_type", label: "상품 종류" },
-];
+// 취향은 작품만 운영한다 (캐릭터·스타일·상품 종류는 정리) — 종류가 하나면 종류 고르기 UI를 숨긴다
+export const INTEREST_TYPES: { value: InterestType; label: string }[] = [{ value: "work", label: "작품" }];
 export const FANDOM_PERIODS: { value: FandomPeriod; label: string }[] = [
   { value: "all", label: "전체" }, { value: "30d", label: "최근 30일" }, { value: "90d", label: "최근 90일" },
 ];

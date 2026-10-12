@@ -79,30 +79,68 @@ export function seededRandom(seed: number): () => number {
 }
 
 /** 지역 인원 → 장식 핀 개수 (약 4~5명당 1개, 최대 6개, 5명 미만은 0) */
+/** 지역 블록 하나에 올리는 핀 최대 개수 (백엔드 map-avatars와 같은 값) */
+export const MAX_PINS = 10;
+
+/** 핀 개수 — 5명 미만 0개, 그 이상은 인원만큼(구매 상위 10명까지) */
 export function pinCount(count: number | null | undefined): number {
   if (!count || count < 5) return 0;
-  return Math.min(6, Math.max(1, Math.round(count / 4.5)));
+  return Math.min(MAX_PINS, count);
 }
 
-/** 블록 안 임의 칸 n개 — 서로 떨어지게 고르고, 이름표 칸은 피한다 */
-export function pickPinCells(cells: Cell[], n: number, seed: number, avoid: Cell | null = null): Cell[] {
+/** 핀끼리 이만큼(칸) 떨어지면 겹치지 않는다 — 핀 너비가 지도 칸 1.8개 */
+export const PIN_GAP = 2;
+const PIN_HALF = 0.9;
+
+/** 핀을 놓지 않을 영역 (이름표) — 가운데 좌표와 절반 크기, 지도 칸 단위 */
+export interface Box { x: number; y: number; halfW: number; halfH: number; }
+
+/** 이름표 칸에서 만든 기본 영역 — 실제 크기를 재기 전에는 좌우 4칸·위아래 1칸 */
+export const labelBox = (cell: Cell, halfW = 4, halfH = 1): Box => ({ x: cell[0] + 0.5, y: cell[1] + 0.5, halfW, halfH });
+
+// 핀은 칸 가운데 아래쪽에 서서 위로 약 1.8칸 — 가운데는 대략 그 칸 위쪽 끝
+const pinHits = ([x, y]: Cell, box: Box) => Math.abs(x + 0.5 - box.x) < box.halfW + PIN_HALF && Math.abs(y + 0.1 - box.y) < box.halfH + PIN_HALF;
+const gap = (a: Cell, b: Cell) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]));
+
+export interface PinOptions {
+  /** 핀을 놓지 않을 이름표 영역 */
+  avoid?: Box[];
+  /** true면 서로 겹치지 않는 만큼만 돌려준다 (n개보다 적을 수 있음) */
+  spaced?: boolean;
+  /** 이웃 블록에 이미 놓인 핀 — 경계 너머 핀과도 간격을 둔다 */
+  taken?: Cell[];
+}
+
+/**
+ * 블록 안 임의 칸 n개 — 서로 PIN_GAP칸 이상 떨어지게(가능하면 더 넓게) 무작위로 고르고, 이름표 영역은 비운다.
+ * spaced가 아니면 블록이 좁을 때 이름표 쪽·더 가까이 순서로 물러서고, 그래도 모자라면 같은 칸을 다시 쓴다.
+ */
+export function pickPinCells(cells: Cell[], n: number, seed: number, { avoid = [], spaced = false, taken = [] }: PinOptions = {}): Cell[] {
   if (n <= 0 || !cells.length) return [];
   const random = seededRandom(seed);
-  const pool = cells.filter((cell) => !avoid || Math.abs(cell[0] - avoid[0]) + Math.abs(cell[1] - avoid[1]) > 1);
-  const candidates = (pool.length >= n ? pool : cells).slice();
-  for (let i = candidates.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
-  }
+  const shuffle = (list: Cell[]) => {
+    const out = list.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(random() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  };
+  const pool = shuffle(cells.filter((cell) => !avoid.some((box) => pinHits(cell, box))));
+  const all = shuffle(cells);
   const picked: Cell[] = [];
-  for (const minGap of [3, 2, 1, 0]) {
-    for (const cell of candidates) {
+  // 이름표를 피한 자리부터 채우고, 모자라면 이름표 아래 자리도 쓴다(이름표가 위에 그려져 글자는 가려지지 않음)
+  const steps: [Cell[], number][] = [[pool, PIN_GAP + 1], [pool, PIN_GAP], [all, PIN_GAP], ...(spaced ? [] : [[all, 1], [all, 0]] as [Cell[], number][])];
+  for (const [list, minGap] of steps) {
+    for (const cell of list) {
       if (picked.length >= n) break;
-      if (picked.includes(cell)) continue;
-      if (picked.every((p) => Math.max(Math.abs(p[0] - cell[0]), Math.abs(p[1] - cell[1])) >= minGap)) picked.push(cell);
+      if (picked.some((p) => p[0] === cell[0] && p[1] === cell[1])) continue;
+      if (!picked.some((p) => gap(p, cell) < minGap) && !taken.some((p) => gap(p, cell) < Math.min(minGap, PIN_GAP))) picked.push(cell);
     }
     if (picked.length >= n) break;
   }
+  if (spaced) return picked;
+  for (let i = 0; picked.length < n; i++) picked.push(all[i % all.length]);
   return picked;
 }
 

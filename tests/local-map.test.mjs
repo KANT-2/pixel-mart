@@ -41,8 +41,8 @@ test("시드 지역 41개가 모두 지도 블록과 무게중심에 있다", ()
   }
 });
 
-test("핀 개수: 5명 미만 0개, 약 4~5명당 1개, 최대 6개", () => {
-  assert.deepEqual([null, 0, 4, 5, 9, 15, 26, 100].map(map.pinCount), [0, 0, 0, 1, 2, 3, 6, 6]);
+test("핀 개수: 5명 미만 0개, 그 이상은 인원만큼 최대 10개", () => {
+  assert.deepEqual([null, 0, 4, 5, 9, 10, 11, 100].map(map.pinCount), [0, 0, 0, 5, 9, 10, 10, 10]);
 });
 
 test("핀 위치는 시드로 재현되고 블록 안·서로 다른 칸이다", () => {
@@ -53,7 +53,7 @@ test("핀 위치는 시드로 재현되고 블록 안·서로 다른 칸이다",
   assert.equal(new Set(a.map(String)).size, 5);
   for (const cell of a) assert.ok(cells.some((c) => c[0] === cell[0] && c[1] === cell[1]));
   assert.deepEqual(map.pickPinCells(cells, 0, 1), []);
-  assert.equal(map.pickPinCells([[0, 0]], 3, 1).length, 1);
+  assert.deepEqual(map.pickPinCells([[0, 0]], 3, 1), [[0, 0], [0, 0], [0, 0]]); // 칸이 모자라도 인원만큼
 });
 
 test("이름표는 블록 안쪽 칸, 무게중심 가까이", () => {
@@ -77,4 +77,32 @@ test("고른 지역에 맞는 지도와 경로", () => {
   assert.equal(map.viewCodeFor("NOPE", regions, MAP_VIEWS), "");
   assert.deepEqual(map.viewTrail("41135", regions), ["41130", "41135"]);
   assert.deepEqual(map.viewTrail("", regions), []);
+});
+
+test("핀은 블록이 넓으면 서로 PIN_GAP칸 이상 떨어져 겹치지 않는다", () => {
+  const cells = Array.from({ length: 120 }, (_, i) => [i % 12, Math.floor(i / 12)]);
+  for (const seed of [1, 2, 3, 99]) {
+    const label = map.labelBox([6, 5]);
+    const spots = map.pickPinCells(cells, 10, seed, { avoid: [label] });
+    assert.equal(spots.length, 10);
+    for (let i = 0; i < spots.length; i++) for (let j = i + 1; j < spots.length; j++) {
+      const gap = Math.max(Math.abs(spots[i][0] - spots[j][0]), Math.abs(spots[i][1] - spots[j][1]));
+      assert.ok(gap >= map.PIN_GAP, `seed ${seed}: ${spots[i]} ${spots[j]}`);
+    }
+  }
+});
+
+test("spaced면 좁은 블록에서 겹치지 않는 만큼만 돌려준다", () => {
+  const narrow = Array.from({ length: 8 }, (_, i) => [i, 0]);
+  const spots = map.pickPinCells(narrow, 10, 1, { spaced: true });
+  assert.ok(spots.length > 0 && spots.length < 10);
+  for (let i = 0; i < spots.length; i++) for (let j = i + 1; j < spots.length; j++) assert.ok(Math.abs(spots[i][0] - spots[j][0]) >= map.PIN_GAP);
+});
+
+test("자리가 넉넉하면 이름표 영역에는 핀을 놓지 않는다", () => {
+  const cells = Array.from({ length: 200 }, (_, i) => [i % 20, Math.floor(i / 20)]);
+  const label = { x: 10.5, y: 5.5, halfW: 6, halfH: 1.2 };
+  const spots = map.pickPinCells(cells, 10, 3, { avoid: [label], spaced: true });
+  assert.ok(spots.length > 0);
+  for (const [x, y] of spots) assert.ok(Math.abs(x + 0.5 - label.x) >= label.halfW + 0.9 || Math.abs(y + 0.1 - label.y) >= label.halfH + 0.9, `${x},${y}`);
 });

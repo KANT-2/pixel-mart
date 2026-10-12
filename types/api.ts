@@ -157,7 +157,10 @@ export interface ApiMapAvatars {
   regionName: string;
   count: number | null;
   belowThreshold: boolean;
+  /** 구매 금액 상위 최대 10명 (0번이 1위) */
   avatars: (string | null)[];
+  /** 동의자가 적은 지역을 샘플 캐릭터로 채운 블록 */
+  isSample: boolean;
 }
 
 export interface ApiFandom {
@@ -169,6 +172,20 @@ export interface ApiFandom {
   count: number | null;
   belowThreshold: boolean;
   isSample: boolean;
+}
+
+/** 지역 구매 순위 한 줄 — 금액은 비공개, 닉네임은 공개 동의자만 */
+export interface ApiBuyerRank {
+  rank: number;
+  avatarUrl: string | null;
+  nickname: string | null;
+}
+
+export interface ApiBuyerRanking {
+  regionCode: string;
+  belowThreshold: boolean;
+  isSample: boolean;
+  items: ApiBuyerRank[];
 }
 
 export interface ApiFandomRank {

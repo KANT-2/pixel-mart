@@ -3,13 +3,14 @@
 import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
 import LocalSearch from "@/components/local/LocalSearch";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { LocalError, LocalSkeleton, localToolbar } from "@/components/local/LocalStates";
+import { MapNotes, SearchToggle } from "@/components/local/MobileToggles";
 import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
 import { formatPrice } from "@/utils/formatPrice";
@@ -61,20 +62,25 @@ export default function WishMap() {
     else go(selected === code ? viewCode : code);
   };
   const trail = viewTrail(viewCode, catalog);
+  const [searchOpen, setSearchOpen] = useState(false); // 모바일: 검색 줄은 눌러서 펼친다
   const place = selected ?? (viewCode || null);
 
   if (regions.error) return <LocalError message={regions.error} onRetry={() => void regions.refresh()} />;
   return <div className="space-y-3">
     {/* 1줄: 지도 위치 / 2줄: 오른쪽 검색 — 덕력지도와 같은 줄 구성 */}
-    <nav aria-label="지도 위치" className="flex min-w-0 flex-wrap items-center gap-1 font-pixel text-sm">
-      <button type="button" onClick={() => go("")} className="rounded px-1.5 py-1 text-mint hover:bg-panel">전체</button>
+    <div className="flex items-center justify-between gap-2">
+    <nav aria-label="지도 위치" className="flex min-w-0 select-none flex-wrap items-center gap-1 font-pixel text-sm caret-transparent">
+      <button type="button" onClick={() => go("")} aria-current={viewCode === "" ? "location" : undefined}
+        className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-mint">전체</button>
       {trail.map((code) => <span key={code} className="flex items-center gap-1">
         <span aria-hidden="true" className="text-dim">›</span>
         <button type="button" onClick={() => go(code)} aria-current={code === viewCode ? "location" : undefined}
-          className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-ink">{byCode.get(code)?.name ?? code}</button>
+          className="rounded px-1.5 py-1 text-sub hover:bg-panel aria-[current=location]:text-mint">{byCode.get(code)?.name ?? code}</button>
       </span>)}
     </nav>
-    <div className={`${localToolbar} min-h-11 justify-end`}>
+    <SearchToggle open={searchOpen} onToggle={() => setSearchOpen((value) => !value)} />
+    </div>
+    <div className={`${localToolbar} min-h-11 justify-end ${searchOpen ? "" : "max-sm:hidden"}`}>
       <LocalSearch key={`${nickname ?? ""}|${item ?? ""}`} regions={catalog} mode={nickname ? "nickname" : item ? "item" : "region"} value={nickname ?? item ?? ""}
         onRegion={(code) => go(code)} onNickname={(value) => go(focus, { nickname: value })} onItem={(value) => go(focus, { item: value })} />
     </div>
@@ -85,9 +91,9 @@ export default function WishMap() {
           <PixelMap view={view} blocks={blocks} selected={selected} seedKey="wish" onSelect={choose}
             label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
         )}
-        <p className="mt-2 text-xs leading-relaxed text-dim">
+        <MapNotes className="mt-2"><p className="text-xs leading-relaxed text-dim">
           <PixelIcon name="heart" className="mr-1 size-3.5" />하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;닉네임 공개&rsquo;를 켠 이웃만 보여요.
-        </p>
+        </p></MapNotes>
       </div>
       {nickname
         ? <WantPanel key={`n:${nickname}`} title={`'${nickname}' 플레이어`} kicker="PLAYER SEARCH" region={null} nickname={nickname} item={null} onClear={() => go(focus)} />

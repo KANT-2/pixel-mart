@@ -29,8 +29,8 @@ export default function InterestPicker({ selected, onChange, disabled = false, s
         {interestLabel(item)}<span aria-hidden="true" className="ml-2">×</span>
       </button></li>)}
     </ul>
-    {selected.length === 0 && <p className="text-sm text-dim">좋아하는 캐릭터나 스타일을 찾아 선택해 보세요.</p>}
-    <div className="grid gap-3 sm:grid-cols-[1fr_10rem]">
+    {selected.length === 0 && <p className="text-sm text-dim">좋아하는 작품을 찾아 선택해 보세요.</p>}
+    <div className={`grid gap-3 ${INTEREST_TYPES.length > 1 ? "sm:grid-cols-[1fr_10rem]" : ""}`}>
       <div className="min-w-0">
         <label htmlFor={`${id}-q`} className="text-sm font-semibold">취향 검색</label>
         <div className="mt-2 flex gap-1.5">
@@ -40,11 +40,11 @@ export default function InterestPicker({ selected, onChange, disabled = false, s
           <button type="button" disabled={disabled} onClick={() => void results.refresh()} className="btn-lime min-h-11 shrink-0 px-3 text-sm font-bold">찾기</button>
         </div>
       </div>
-      <label htmlFor={`${id}-type`} className="text-sm font-semibold">취향 종류
+      {INTEREST_TYPES.length > 1 && <label htmlFor={`${id}-type`} className="text-sm font-semibold">취향 종류
         <select id={`${id}-type`} aria-label="취향 종류" value={type} disabled={disabled} onChange={(event) => setType(event.target.value as InterestType | "")} className={`${localInput} mt-2`}>
           <option value="">전체</option>{INTEREST_TYPES.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
         </select>
-      </label>
+      </label>}
     </div>
     {error && <p role="alert" className="text-sm text-pink">{error}</p>}
     {results.error ? <LocalError message={results.error} onRetry={() => void results.refresh()} busy={disabled} />

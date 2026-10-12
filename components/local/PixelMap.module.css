@@ -1,11 +1,83 @@
+/* 지도는 끌어서 옮기는 영역 — 글자 선택·깜빡이는 커서(캐럿)가 생기지 않게 */
 .map {
   position: relative;
+  caret-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   width: 100%;
   overflow: hidden;
   border: 3px solid #0b0f1e;
   border-radius: 14px;
   background: #0f1a3a;
   box-shadow: 0 0 0 3px #2b2552, 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* 확대한 상태에서만 끌어서 옮기기 — 아니면 터치로 페이지를 스크롤할 수 있게 */
+.viewport[data-zoomed] {
+  cursor: grab;
+  touch-action: none;
+}
+
+.viewport[data-zoomed]:active {
+  cursor: grabbing;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+  transition: transform 120ms ease-out;
+}
+
+.viewport[data-zoomed]:active .canvas {
+  transition: none;
+}
+
+.zoomControls {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zoomButton {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #0b0f1e;
+  border-radius: 6px;
+  background: rgb(20 16 42 / 88%);
+  box-shadow: 2px 2px 0 #0b0f1e;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.zoomButton:hover:not(:disabled) {
+  border-color: #b6ff5c;
+  color: #b6ff5c;
+}
+
+.zoomButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.zoomButton:focus-visible {
+  outline: 3px solid #6ef2d6;
+  outline-offset: 2px;
 }
 
 .svg {
@@ -81,13 +153,28 @@
   color: #a7a3c2;
 }
 
+/* 캐릭터는 이름표 영역을 피해 놓으므로 이름표 아래 층 (이름표 글자가 가려지지 않게) */
 .pin {
   position: absolute;
   z-index: 2;
   display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
   transform: translate(-50%, -88%);
-  pointer-events: none;
   filter: drop-shadow(0 2px 0 rgb(0 0 0 / 55%));
+}
+
+.pin:hover {
+  z-index: 5;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 55%)) brightness(1.2);
+}
+
+.pin:focus-visible {
+  z-index: 5;
+  outline: 2px solid #6ef2d6;
+  outline-offset: 1px;
 }
 
 .pinBody {
@@ -127,8 +214,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pinBody,
+  .canvas,
   .wave,
   .selected {
     animation: none;
   }
 }
+

@@ -2,7 +2,7 @@
 
 import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocalSelection } from "@/components/local/useLocalSelection";
 import { useLocalResource } from "@/components/local/useLocalResource";
@@ -10,6 +10,7 @@ import LocalSearch from "@/components/local/LocalSearch";
 import TradeCard from "@/components/local/TradeCard";
 import Pagination from "@/components/Pagination";
 import { LocalError, LocalSkeleton, localButton, localToolbar } from "@/components/local/LocalStates";
+import { SearchToggle } from "@/components/local/MobileToggles";
 import { localApi } from "@/lib/local";
 import { changeTradeQuery, parseTradeQuery, tradeHref, tradeProximity, tradeQueryParams, TRADE_KINDS, type TradeQuery } from "@/utils/localTrades";
 import type { ApiRegion, TradeKind } from "@/types/api";
@@ -23,6 +24,7 @@ export default function TradesBoard() {
   const base = parsed.hasRegion ? parsed : { ...parsed, region: null, hasRegion: true };
   const query = base.kind === "want" ? { ...base, kind: undefined } : base;
   const selection = useLocalSelection(query);
+  const [searchOpen, setSearchOpen] = useState(false); // 모바일: 검색 줄은 눌러서 펼친다
   const { catalog, profile, selected, loading, invalid } = selection;
   if (catalog.error) return <LocalError message={catalog.error} onRetry={() => void catalog.refresh()} />;
   if (loading || !catalog.data) return <LocalSkeleton label="거래 게시판 준비 중" />;
@@ -34,8 +36,11 @@ export default function TradesBoard() {
     <section aria-label="게시판 필터" className="space-y-2">
       {/* 검색은 왼쪽, 글 종류는 오른쪽 */}
       <div className={`${localToolbar} justify-between`}>
+        <div className={`w-full min-w-0 sm:w-auto ${searchOpen ? "" : "max-sm:hidden"}`}>
         <LocalSearch key={`${query.nickname ?? ""}|${query.q ?? ""}`} regions={catalog.data} modes={["nickname", "item"]} mode={query.nickname ? "nickname" : "item"} value={query.nickname ?? query.q ?? ""}
           onRegion={(region) => change({ region })} onNickname={(nickname) => change({ nickname, q: undefined })} onItem={(q) => change({ q, nickname: undefined })} />
+        </div>
+        <SearchToggle open={searchOpen} onToggle={() => setSearchOpen((value) => !value)} />
         <div role="group" aria-label="글 종류 필터" className="segmented h-11 font-pixel text-xs">
           {[{ value: undefined, label: "ALL", name: "모든 글", icon: undefined }, ...TRADE_KINDS.filter((item) => item.value !== "want").map((item) => ({ value: item.value, label: TRADE_KIND_GAME[item.value].tag, name: item.label, icon: TRADE_KIND_GAME[item.value].icon }))].map((item) =>
             <button key={item.label} type="button" aria-pressed={query.kind === item.value} aria-label={item.name} title={item.name} onClick={() => change({ kind: item.value as TradeKind | undefined })}
@@ -50,7 +55,7 @@ export default function TradesBoard() {
         {selected && <button type="button" onClick={() => change({ region: null })} className="underline hover:text-ink">전체 지역 보기</button>}
         {query.nickname && <span>· 닉네임 &lsquo;{query.nickname}&rsquo; <button type="button" onClick={() => change({ nickname: undefined })} className="underline hover:text-ink">지우기</button></span>}
         {query.q && <span>· 아이템 &lsquo;{query.q}&rsquo; <button type="button" onClick={() => change({ q: undefined })} className="underline hover:text-ink">지우기</button></span>}
-        <span>· 글은 저장된 내 동네로 작성돼요.</span>
+        <span className="hidden sm:inline">· 글은 저장된 내 동네로 작성돼요.</span>
       </p>
     </section>
     <TradesResults key={tradeHref(effective)} query={effective} regions={catalog.data} ownRegion={profile.data?.region?.code ?? null} />
