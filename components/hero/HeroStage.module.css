@@ -36,32 +36,6 @@
   right: 5%;
 }
 
-/* 시안의 말풍선 */
-.tagline {
-  position: absolute;
-  top: 22%;
-  left: 7%;
-  z-index: 2;
-  padding: 1.6cqw 2cqw;
-  font-family: var(--font-pixel);
-  font-size: 2.3cqw;
-  line-height: 1.5;
-  color: var(--color-mint);
-  background: rgb(13 11 26 / 0.75);
-  border: 3px solid var(--color-mint);
-  pointer-events: none;
-}
-
-.tagline::after {
-  content: "";
-  position: absolute;
-  right: -9px;
-  bottom: 8px;
-  width: 9px;
-  height: 9px;
-  background: var(--color-mint);
-}
-
 /* 무대 아래 퀘스트 카드 — 유리 질감 */
 .quest {
   position: absolute;
