@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Keyboard, KeycapSpec
 from app.schemas.compat import CompatCheckOut, Status
+from app.services.search import LIKE_ESCAPE, escape_like, like_pattern
 
 RESULT_LABELS: dict[str, str] = {
     "compatible": "모두 장착 가능",
@@ -98,10 +99,12 @@ def check_compatibility(keyboard: Keyboard, spec: KeycapSpec) -> Verdict:
 async def list_keyboards(db: AsyncSession, maker: str | None, q: str | None) -> list[Keyboard]:
     stmt = select(Keyboard).order_by(Keyboard.maker, Keyboard.model)
     if maker:
-        stmt = stmt.where(Keyboard.maker.ilike(maker.strip()))
+        stmt = stmt.where(Keyboard.maker.ilike(escape_like(maker.strip()), escape=LIKE_ESCAPE))
     if q and q.strip():
-        keyword = f"%{q.strip()}%"
-        stmt = stmt.where(or_(Keyboard.maker.ilike(keyword), Keyboard.model.ilike(keyword)))
+        keyword = like_pattern(q.strip())
+        stmt = stmt.where(
+            or_(Keyboard.maker.ilike(keyword, escape=LIKE_ESCAPE), Keyboard.model.ilike(keyword, escape=LIKE_ESCAPE))
+        )
     return list(await db.scalars(stmt))
 
 

@@ -9,6 +9,7 @@ from app.models import Category, Product, User, Wishlist
 from app.schemas.common import Page
 from app.schemas.product import CategoryOut, ProductWithWishOut, RarityOut
 from app.services.rarity import BY_KEY, TIERS, price_condition
+from app.services.search import LIKE_ESCAPE, like_pattern
 
 router = APIRouter(tags=["products"])
 
@@ -92,8 +93,11 @@ async def list_products(
         if keys:
             filters.append(or_(*(price_condition(BY_KEY[k]) for k in keys)))
     if q:
-        keyword = f"%{q.strip()}%"
-        filters.append(or_(Product.name.ilike(keyword), Product.description.ilike(keyword)))
+        # %·_를 와일드카드가 아니라 글자로 찾는다 (#83)
+        keyword = like_pattern(q.strip())
+        filters.append(
+            or_(Product.name.ilike(keyword, escape=LIKE_ESCAPE), Product.description.ilike(keyword, escape=LIKE_ESCAPE))
+        )
     if min_price is not None:
         filters.append(Product.price >= min_price)
     if max_price is not None:

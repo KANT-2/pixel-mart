@@ -24,22 +24,41 @@
 | 협업 | Git · GitHub (GitHub Flow + Pull Request) · Notion |
 
 ## 실행 방법
-Node.js LTS(v22 이상)가 필요합니다.
+프론트(Next.js, :3000)와 백엔드(FastAPI, :8000)를 함께 띄웁니다. 브라우저는 3000만 보고, `/api/*`는 Next가 8000으로 넘겨 줍니다.
+
+**준비물**: Node.js 22+, Python 3.12+, Docker(PostgreSQL)
+
 ```bash
-git clone https://github.com/KANT-2/pixel-mart.git
-cd pixel-mart
+# 1) DB (저장소 루트)
+docker compose up -d db
+
+# 2) 백엔드 (backend/)
+cd backend
+python -m venv .venv && .venv\Scripts\activate   # macOS/Linux: source .venv/bin/activate
+pip install -r requirements-dev.txt
+copy .env.example .env                            # macOS/Linux: cp .env.example .env
+alembic upgrade head
+python -m scripts.seed                            # 상품·카테고리·지역·취향·키보드 (재실행 안전)
+python -m scripts.seed_demo                       # (선택) 시연용 데모 이웃·거래글·알림
+uvicorn app.main:app --reload --port 8000
+
+# 3) 프론트 (저장소 루트, 새 터미널)
 npm install
 npm run dev
 ```
-브라우저에서 http://localhost:3000 접속
+브라우저에서 http://localhost:3000 접속 · API 문서 http://localhost:8000/api/docs
+
+- 로그인: 개발 환경은 로그인 화면의 **개발용 이메일 로그인**(아무 이메일). 데모 이웃으로 보려면 `demo-coinmoa@demo.pixelmart.test` 처럼 `demo-<이름>@demo.pixelmart.test`
+- 백엔드가 꺼져 있어도 상품 목록·상세는 기본 상품 데이터로 보입니다(안내 문구 표시).
 
 | 명령어 | 설명 |
 | --- | --- |
-| `npm run dev` | 개발 서버 실행 |
+| `npm run dev` | 프론트 개발 서버 |
 | `npm run build` | 프로덕션 빌드 (타입 검사 포함) |
-| `npm run lint` | ESLint 검사 |
+| `npm run lint` · `npm test` | ESLint · 단위 테스트 |
+| `pytest` (backend/) | 백엔드 테스트 |
 
-처음 합류한 팀원은 [docs/SETUP.md](docs/SETUP.md)를 따라 환경을 맞춰 주세요.
+처음 합류한 팀원은 [docs/SETUP.md](docs/SETUP.md), 백엔드는 [docs/backend/README.md](docs/backend/README.md)를 따라 환경을 맞춰 주세요.
 
 ## 페이지 구성
 | 경로 | 페이지 | 주요 내용 | 상태 |
@@ -129,9 +148,25 @@ export interface Product {
 ## 화면 캡처
 | 메인 (데스크톱) | 메인 (모바일) |
 | --- | --- |
-| ![메인 데스크톱](docs/screenshots/main.png) | ![메인 모바일](docs/screenshots/main-mobile.png) |
+| ![메인 데스크톱](docs/screenshots/v2/main.png) | ![메인 모바일](docs/screenshots/v2/main-mobile.png) |
 
-> 상품 목록 · 상세 화면 캡처는 구현 후 추가합니다.
+| 전체 상품 (무한 스크롤) | 상품 상세 |
+| --- | --- |
+| ![전체 상품](docs/screenshots/v2/products.png) | ![상품 상세](docs/screenshots/v2/product-detail.png) |
+
+| 키캡 피팅룸 | 데스크 룩북 |
+| --- | --- |
+| ![키캡 피팅룸](docs/screenshots/v2/fitting.png) | ![데스크 룩북](docs/screenshots/v2/lookbook.png) |
+
+| PIXEL LOCAL 덕력지도 | 덕력지도 (모바일) |
+| --- | --- |
+| ![덕력지도](docs/screenshots/v2/local-map.png) | ![덕력지도 모바일](docs/screenshots/v2/local-map-mobile.png) |
+
+| 거래·교환 | 위시맵 (선물하기) |
+| --- | --- |
+| ![거래·교환](docs/screenshots/v2/trades.png) | ![위시맵](docs/screenshots/v2/wish-map.png) |
+
+> 캡처는 로그인하지 않은 상태, 1280px·390px 화면 기준입니다.
 
 ## 트러블슈팅
 | 문제 | 원인 | 해결 |

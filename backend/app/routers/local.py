@@ -31,6 +31,7 @@ from app.services import activity, badges, local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, Period, period_start, present, rollup
 from app.services.regions import RegionTree, load_tree
 from app.services.sample_avatars import sample_avatars, sample_nicknames
+from app.services.search import LIKE_ESCAPE, like_pattern
 from app.services.trade_rules import DEMO_EMAIL_DOMAIN
 
 router = APIRouter(tags=["local"])
@@ -60,7 +61,7 @@ async def list_interests(
     if type:
         stmt = stmt.where(Interest.type == type)
     if q:
-        stmt = stmt.where(Interest.name.ilike(f"%{q.strip()}%"))
+        stmt = stmt.where(Interest.name.ilike(like_pattern(q.strip()), escape=LIKE_ESCAPE))
     return (await db.scalars(stmt)).all()
 
 
