@@ -23,6 +23,7 @@ from app.schemas.product import ProductOut
 from app.services import activity, local_stats, notifications
 from app.services.local_stats import MIN_GROUP_SIZE, rollup
 from app.services.regions import RegionTree, load_tree
+from app.services.search import like_pattern
 from app.services.trade_rules import DEMO_EMAIL_DOMAIN, contains_private_info, normalize, same_item
 
 router = APIRouter(prefix="/local", tags=["local"])
@@ -55,11 +56,6 @@ def author_out(post: TradePost) -> TradeAuthorOut | None:
     if post.is_sample or not post.author.nickname_public:
         return None
     return TradeAuthorOut(nickname=post.author.nickname, avatar_url=post.author.avatar_url)
-
-
-def like_pattern(text: str) -> str:
-    escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-    return f"%{escaped}%"
 
 
 def subtree(tree: RegionTree, code: str) -> list[str]:
