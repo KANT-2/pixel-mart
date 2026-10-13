@@ -50,7 +50,8 @@
     max-height: 280px;
   }
 
-  .carousel [aria-hidden="true"] > img {
+  .carousel [aria-hidden="true"] > img,
+  .carousel .stageSlot img {
     max-height: none;
   }
 
@@ -83,12 +84,22 @@
 }
 
 @media (min-width: 1280px) {
+  /* 글자 왼쪽·무대 오른쪽 끝을 헤더 로고·장바구니 줄과 맞춘다 (화살표는 바깥 여백에) */
   .carousel > div > [aria-roledescription="슬라이드"] {
-    height: 370px;
+    height: 430px;
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* 배경 이미지가 깔린 슬라이드(데스크 룩북)는 글자가 가장자리에 붙지 않게 안쪽 여백 유지 */
+  .carousel > div > [aria-roledescription="슬라이드"]:has(> [aria-hidden="true"]) {
     padding-left: 40px;
     padding-right: 40px;
   }
+
+  .carousel > div > button[aria-label="이전 슬라이드"] { left: -56px; }
+  .carousel > div > button[aria-label="다음 슬라이드"] { right: -56px; }
 
   .carousel dl > div {
     padding: 8px 12px;

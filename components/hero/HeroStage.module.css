@@ -227,6 +227,9 @@
   .quest p:first-child {
     display: none;
   }
+  .quest p {
+    font-size: 0.75rem;
+  }
   .questIcon {
     width: 24px;
   }
