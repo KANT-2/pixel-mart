@@ -74,7 +74,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
   const neighborhood = state.wishes.length > 0;
   const title = slide === 0 ? "오늘의 퀘스트를 확인하세요." : slide === 1 ? neighborhood ? "이웃이 찾는 아이템, 내 취향에도 딱." : "일상에 아이템을 장착하세요." : "당신의 데스크가 다음 주인공.";
 
-  return <section aria-label="메인 추천 배너" aria-roledescription="캐러셀" className={`${styles.carousel} mx-auto w-full max-w-[2012px] px-12 py-6 md:px-14 md:py-10`}>
+  return <section aria-label="메인 추천 배너" aria-roledescription="캐러셀" className={`${styles.carousel} mx-auto w-full max-w-[75rem] px-12 py-6 md:px-14 md:py-10`}>
     <div tabIndex={0} className={`pixel-panel relative focus-visible:outline-2 focus-visible:outline-mint ${styles.unframed}`} onKeyDown={(event) => { if (slide === 3 || event.target instanceof HTMLSelectElement) return; if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}
       onTouchStart={(event) => { if (event.target instanceof Element && event.target.closest("a, button, select")) { start.current = null; return; } const touch = event.touches[0]; start.current = { x: touch.clientX, y: touch.clientY }; }}
       onTouchCancel={() => { start.current = null; }}
@@ -90,7 +90,8 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
               <Link href="/local" className="btn-pixel px-4 py-3 text-sm font-bold">월드맵 열기</Link>
             </div>
           </div>
-          <div className="min-w-0"><HeroStage /></div>
+          {/* 넓은 화면은 슬라이드 높이(370px)가 고정이라 4:3 무대가 잘리지 않게 폭을 맞춘다 */}
+          <div className="w-full min-w-0 xl:max-w-[25rem] xl:justify-self-center"><HeroStage /></div>
         </> : slide === 3 ? <div className="min-w-0 md:col-span-2"><WorldMapTeaser embedded /></div> : <>
         {slide === 1 && <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element -- 최적화된 정적 배경 WebP */}
