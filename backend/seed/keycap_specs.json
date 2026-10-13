@@ -1,0 +1,263 @@
+[
+  {
+    "productId": 1,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 2,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (3종 세트)"
+  },
+  {
+    "productId": 9,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 15,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "esc"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (ESC 1u)"
+  },
+  {
+    "productId": 21,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "6.25u"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정"
+  },
+  {
+    "productId": 27,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "arrows"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (방향키 4개)"
+  },
+  {
+    "productId": 33,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "accent4"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (포인트 4개)"
+  },
+  {
+    "productId": 39,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 45,
+    "profile": "metal",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ],
+    "note": "프로파일은 설명에 없어 metal(알루미늄)로 가정"
+  },
+  {
+    "productId": 51,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 57,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "esc"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (ESC 1u)"
+  },
+  {
+    "productId": 63,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "6.25u"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정"
+  },
+  {
+    "productId": 69,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "arrows"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (방향키 4개)"
+  },
+  {
+    "productId": 75,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "accent4"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (포인트 4개)"
+  },
+  {
+    "productId": 81,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 87,
+    "profile": "metal",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ],
+    "note": "프로파일은 설명에 없어 metal(알루미늄)로 가정"
+  },
+  {
+    "productId": 93,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 99,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "esc"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (ESC 1u)"
+  },
+  {
+    "productId": 105,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "6.25u"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정"
+  },
+  {
+    "productId": 111,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "arrows"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (방향키 4개)"
+  },
+  {
+    "productId": 117,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "accent4"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (포인트 4개)"
+  },
+  {
+    "productId": 123,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 129,
+    "profile": "metal",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ],
+    "note": "프로파일은 설명에 없어 metal(알루미늄)로 가정"
+  },
+  {
+    "productId": 135,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 141,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "esc"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (ESC 1u)"
+  },
+  {
+    "productId": 147,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "6.25u"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정"
+  },
+  {
+    "productId": 153,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "arrows"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (방향키 4개)"
+  },
+  {
+    "productId": 159,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "accent4"
+    ],
+    "note": "프로파일은 설명에 없어 cherry로 가정 (포인트 4개)"
+  },
+  {
+    "productId": 165,
+    "profile": "cherry",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ]
+  },
+  {
+    "productId": 171,
+    "profile": "metal",
+    "stem": "MX",
+    "keySizes": [
+      "1u"
+    ],
+    "note": "프로파일은 설명에 없어 metal(알루미늄)로 가정"
+  }
+]
