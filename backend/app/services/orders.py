@@ -26,6 +26,8 @@ def next_status(current: str) -> str:
 
 async def create_order_from_cart(db: AsyncSession, user: User, body: OrderCreate) -> Order:
     """장바구니 전체를 가상 주문으로 만들고 장바구니를 비운다 (한 번의 commit — 실패하면 전부 취소)"""
+    # 사용자 행을 잠가 같은 사람의 주문을 한 줄로 세운다 — 두 탭에서 동시에 눌러도 뒤의 요청은 빈 장바구니를 본다
+    await db.execute(select(User.id).where(User.id == user.id).with_for_update())
     cart = (
         await db.scalars(
             select(CartItem).where(CartItem.user_id == user.id).order_by(CartItem.added_at, CartItem.product_id)

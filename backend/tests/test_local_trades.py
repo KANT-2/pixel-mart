@@ -244,6 +244,7 @@ async def test_wish_map_samples_fill_gaps_and_real_data_wins(users, monkeypatch)
     assert [(r["product"]["id"], r["count"], r["isSample"]) for r in district] == expected
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_seeded_wish_samples_are_marked(client):
     # 시드 샘플: 판교에는 실제 집계 참여자의 찜이 없다
     rows = (await client.get("/api/local/wish-map", params={"region": "41135-01"})).json()
@@ -261,6 +262,7 @@ async def test_wish_map_excludes_test_accounts_and_validates(users):
     assert (await c.get("/api/local/wish-map")).status_code == 422
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_sample_posts_are_marked(client):
     listed = (await client.get("/api/local/trades", params={"region": "41135", "size": 60})).json()
     samples = [p for p in listed["items"] if p["isSample"]]

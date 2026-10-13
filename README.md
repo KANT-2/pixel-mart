@@ -56,7 +56,7 @@ npm run dev
 | `npm run dev` | 프론트 개발 서버 |
 | `npm run build` | 프로덕션 빌드 (타입 검사 포함) |
 | `npm run lint` · `npm test` | ESLint · 단위 테스트 |
-| `pytest` (backend/) | 백엔드 테스트 |
+| `pytest` (backend/) | 백엔드 테스트 — 개발 DB가 아닌 `<DB이름>_test` 사용 ([테스트 DB 준비](docs/backend/README.md#백엔드-테스트-db-개발시연-db와-분리)) |
 
 처음 합류한 팀원은 [docs/SETUP.md](docs/SETUP.md), 백엔드는 [docs/backend/README.md](docs/backend/README.md)를 따라 환경을 맞춰 주세요.
 

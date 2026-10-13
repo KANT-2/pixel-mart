@@ -187,3 +187,24 @@ async def test_cancel_by_requester_only(users):
     assert res["status"] == "cancelled"
     assert (await me.post(f"/api/local/trade-requests/{req['id']}/cancel")).status_code == 400
     assert (await owner.post(f"/api/local/trade-requests/{req['id']}/accept")).status_code == 400
+
+
+async def test_same_offer_cannot_complete_two_trades(users):
+    alice = await users("treq-alice@pixelmart.test")
+    bob = await users("treq-bob@pixelmart.test")
+    me = await users("treq-me@pixelmart.test")
+    to_alice = await have(alice, "슬라임 키링")
+    to_bob = await have(bob, "하트 키캡")
+    mine = await have(me, "코인 키링")
+    send = "/api/local/trade-requests"
+    first = (await me.post(send, json={"postId": to_alice["id"], "offerPostId": mine["id"]})).json()
+    second = (await me.post(send, json={"postId": to_bob["id"], "offerPostId": mine["id"]})).json()
+    my_coins = await coins(me)
+
+    assert (await alice.post(f"/api/local/trade-requests/{first['id']}/accept")).status_code == 200
+    # 같은 물건으로 보낸 다른 신청은 자동으로 거절돼 두 번째 수락은 막힌다 — 코인도 한 번만
+    res = await bob.post(f"/api/local/trade-requests/{second['id']}/accept")
+    assert res.status_code == 400
+    assert (await coins(me)) == my_coins + 1
+    bob_post = (await bob.get("/api/local/trade-requests", params={"box": "received"})).json()
+    assert [(r["id"], r["status"], r["post"]["status"]) for r in bob_post] == [(second["id"], "declined", "open")]

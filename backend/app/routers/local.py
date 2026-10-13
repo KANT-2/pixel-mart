@@ -1,7 +1,9 @@
 """PIXEL LOCAL ① 지역·취향 설정 (GPS 없이 시 › 구 › 동·생활권 직접 선택, 집계 참여·공개는 opt-in)"""
 
+import hashlib
 import random
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
@@ -376,9 +378,11 @@ async def _crowds(
     )
     if interest is not None:
         stmt = stmt.join(UserInterest, UserInterest.user_id == User.id).where(UserInterest.interest_id == interest)
-    by_block: dict[str, list[tuple[int, float, User]]] = {code: [] for code in blocks}
+    by_block: dict[str, list[tuple[int, str, User]]] = {code: [] for code in blocks}
+    # 같은 금액끼리는 날마다 섞되, 지도 핀(map-avatars)과 구매 순위(buyer-ranking)가 같은 순서가 되도록 고정 값으로
+    day = datetime.now(UTC).date().isoformat()
     for user, total in await db.execute(stmt):
-        tie = random.random()  # 같은 금액끼리는 매번 무작위 순서
+        tie = hashlib.sha256(f"{day}:{user.id}".encode()).hexdigest()
         for code in tree.ancestors(user.region_code):  # 하위 지역 사람도 상위 블록에 포함
             if code in by_block:
                 by_block[code].append((-total, tie, user))

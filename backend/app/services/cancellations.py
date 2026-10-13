@@ -1,10 +1,10 @@
 from collections.abc import Sequence
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import CancelRequest, Order, OrderStatusHistory, User
-from app.services.orders import get_order
 
 # 배송이 시작되기 전에만 취소를 신청할 수 있다
 CANCELLABLE = ("paid", "preparing")
@@ -39,14 +39,26 @@ def status_before_cancel(history: Sequence[str]) -> str:
     raise ValueError("취소 신청 이전의 상태 기록이 없습니다.")
 
 
+async def lock_order(db: AsyncSession, order_id: int) -> Order:
+    """주문 행을 잠그고 최신 상태로 다시 읽는다 — 동시에 온 신청·승인·거절이 차례로 처리되게"""
+    return await db.scalar(
+        select(Order).where(Order.id == order_id).with_for_update().execution_options(populate_existing=True)
+    )
+
+
 async def request_cancel(db: AsyncSession, order: Order, reason: str) -> CancelRequest:
     """신청서 저장 + 주문 상태 변경 + 타임라인 기록을 한 번의 commit으로 처리"""
+    order = await lock_order(db, order.id)
     check_cancellable(order.status)
     request = CancelRequest(order_id=order.id, reason=reason)
     order.status = "cancel_requested"
     db.add(request)
     db.add(OrderStatusHistory(order_id=order.id, status="cancel_requested"))
-    await db.commit()
+    try:
+        await db.commit()
+    except IntegrityError:  # 주문당 대기 중 신청은 하나 (DB 부분 유니크 인덱스)
+        await db.rollback()  # 롤백되면 주문 값이 만료되므로 다시 읽지 않는다
+        raise AlreadyCancelRequestedError("cancel_requested") from None
     return await _load_request(db, request.id)
 
 
@@ -62,10 +74,11 @@ async def get_user_cancel_request(db: AsyncSession, user: User, request_id: int)
 
 async def resolve_cancel(db: AsyncSession, request: CancelRequest, *, approve: bool) -> CancelRequest:
     """승인 → 주문 취소 완료 / 거절 → 신청 직전 상태로 복귀. 신청서·주문·타임라인을 한 번에 갱신"""
-    if request.status != "requested":
+    order = await lock_order(db, request.order_id)
+    request = await _load_request(db, request.id)  # 잠근 뒤 신청서도 최신 상태로
+    # 취소 흐름 중인 주문의 대기 신청만 처리 — 이미 취소된 주문이 거절로 되살아나지 않게
+    if request.status != "requested" or order.status != "cancel_requested":
         raise NotPendingError(request.status)
-
-    order = await get_order(db, request.order_id)
     if approve:
         request.status = "approved"
         new_status = "cancelled"

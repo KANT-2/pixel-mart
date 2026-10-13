@@ -4,7 +4,7 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 from app.deps import CurrentUser, DbSession
 from app.models import TradePost, TradeRequest
@@ -125,17 +125,33 @@ async def list_requests(user: CurrentUser, db: DbSession, box: Literal["received
 @router.post("/{request_id}/accept", response_model=TradeRequestOut, summary="받은 신청 수락 — 글을 거래 완료로")
 async def accept_request(request_id: int, user: CurrentUser, db: DbSession):
     req = await pending_for(db, request_id, owner_id=user.id)
+    # 양쪽 글을 잠그고 최신 상태로 다시 읽는다 — 같은 물건으로 보낸 두 신청이 동시에·차례로 수락돼도 한 번만 성사
+    post_ids = sorted({req.post_id, *([req.offer_post_id] if req.offer_post_id else [])})
+    await db.scalars(
+        select(TradePost)
+        .where(TradePost.id.in_(post_ids))
+        .order_by(TradePost.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    req = await pending_for(db, request_id, owner_id=user.id)
+    if req.post.status != "open":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "이미 거래가 끝난 글이에요.")
+    if req.offer_post is not None and req.offer_post.status != "open":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "신청자가 보낸 물건이 이미 다른 거래에 쓰였어요.")
     # 소원 성취 같은 거래 완료 뱃지도 알리려고 바꾸기 전 기록을 남겨 둔다
     before = {uid: await notifications.snapshot(db, uid) for uid in (user.id, req.requester_id)}
     now = datetime.now(UTC)
     req.status, req.decided_at = "accepted", now
     req.post.status = "done"
-    if req.offer_post is not None and req.offer_post.status == "open":
+    if req.offer_post is not None:
         req.offer_post.status = "done"
-    # 같은 글에 들어온 다른 신청은 자동으로 거절
+    # 거래가 끝난 글(받는 글·보낸 물건)이 걸린 다른 대기 신청은 자동으로 거절
     others = await db.scalars(
         select(TradeRequest).where(
-            TradeRequest.post_id == req.post_id, TradeRequest.id != req.id, TradeRequest.status == "pending"
+            or_(TradeRequest.post_id.in_(post_ids), TradeRequest.offer_post_id.in_(post_ids)),
+            TradeRequest.id != req.id,
+            TradeRequest.status == "pending",
         )
     )
     for other in others:

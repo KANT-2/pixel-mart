@@ -1,5 +1,7 @@
 """주문 API — 로컬 DB에 마이그레이션·시드 후 실행 (DB가 없으면 건너뜀)"""
 
+import asyncio
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import text
@@ -215,3 +217,12 @@ async def test_advance_is_404_when_not_local(client, monkeypatch):
     order = await place_order(client, "orders15@pixelmart.test")
     monkeypatch.setattr(settings, "env", "production")
     assert (await client.post(f"/api/dev/orders/{order['id']}/advance")).status_code == 404
+
+
+async def test_two_tabs_ordering_same_cart_make_one_order(client):
+    await login(client, "orders-tabs@pixelmart.test")
+    await client.post("/api/cart/items", json={"productId": 1, "quantity": 2})
+    first, second = await asyncio.gather(client.post("/api/orders", json=BODY), client.post("/api/orders", json=BODY))
+    # 뒤의 요청은 앞 주문이 비운 장바구니를 보므로 400
+    assert sorted([first.status_code, second.status_code]) == [201, 400]
+    assert (await client.get("/api/orders")).json()["total"] == 1

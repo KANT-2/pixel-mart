@@ -116,6 +116,26 @@ ruff check . && ruff format .
 pytest
 ```
 - 새 API에는 **테스트 최소 1개** (정상 1 + 실패 1 권장)
+
+### 백엔드 테스트 DB (개발·시연 DB와 분리)
+`pytest`는 `.env`의 개발 DB가 아니라 **이름 뒤에 `_test`가 붙은 DB**(예: `pixelmart_test`)를 씁니다. 주문 삭제·가격 변경 같은 테스트가 시연 데이터를 바꾸지 않게 하기 위해서예요. 다른 DB를 쓰려면 `TEST_DATABASE_URL`을 지정하세요. 테스트 DB가 없으면 DB가 필요한 테스트는 건너뜁니다(skip).
+
+처음 한 번만 만듭니다 (`backend/`에서, 포트는 `.env`와 같게 — docker compose면 5433):
+```bash
+docker compose exec db createdb -U pixelmart pixelmart_test   # 설치형 PostgreSQL이면: createdb -U pixelmart pixelmart_test
+
+# macOS/Linux
+DATABASE_URL=postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart_test alembic upgrade head
+DATABASE_URL=postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart_test python -m scripts.seed
+DATABASE_URL=postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart_test python -m scripts.seed_demo
+```
+```powershell
+# Windows PowerShell
+$env:DATABASE_URL="postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart_test"
+alembic upgrade head; python -m scripts.seed; python -m scripts.seed_demo
+Remove-Item Env:DATABASE_URL
+```
+마이그레이션이 추가되면 위 `alembic upgrade head`를 테스트 DB에도 한 번 더 실행합니다.
 - 비밀값(`.env`, 구글 키)은 **절대 커밋 금지** — `.env.example`에 빈 값으로만
 
 ### 브랜치 · PR

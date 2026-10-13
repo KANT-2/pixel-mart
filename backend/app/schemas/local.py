@@ -97,7 +97,7 @@ class MapAvatarsOut(CamelModel):
     count: int | None = Field(description="아바타 표시에 동의한 인원, 없으면 null")
     below_threshold: bool
     avatars: list[str | None] = Field(
-        description="최대 10개, 구매 금액이 큰 순(같으면 무작위) — 0번이 1위 — PNG data URL, null이면 기본 슬라임"
+        description="최대 10개, 구매 금액이 큰 순(같으면 하루 고정) — 0번이 1위 — PNG data URL, null이면 기본 슬라임"
     )
     is_sample: bool = Field(default=False, description="동의자가 적은 지역을 샘플 캐릭터로 채운 블록")
     cards: list[MapCardOut | None] = Field(

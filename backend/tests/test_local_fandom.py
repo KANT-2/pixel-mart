@@ -176,6 +176,7 @@ async def test_ranking_orders_by_count(client, isolated_regions, count_test_acco
     ]
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_sample_data_is_marked(client):
     # 시드 샘플: 판교 나루토 팬 12명 (실제 집계 참여자가 없는 칸)
     rows = (await client.get("/api/local/fandom", params={"region": "41135-01", "interest": 1})).json()

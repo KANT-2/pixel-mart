@@ -270,6 +270,7 @@ async def test_badge_notifies_only_once(users):
     assert [r[0] for r in rows] == ["badge:first_trade"]
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_sample_author_gets_nothing():
     try:
         async with SessionLocal() as db:

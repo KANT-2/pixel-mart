@@ -219,7 +219,7 @@ async def test_sample_characters_fill_quiet_regions(client):
 
 
 @pytest.mark.parametrize(("params", "status_code"), [({"region": "NOPE"}, 404), ({"interest": 99999}, 404)])
-async def test_validation(client, params, status_code):
+async def test_validation(client, require_db, params, status_code):
     assert (await client.get("/api/local/map-avatars", params=params)).status_code == status_code
 
 
@@ -285,5 +285,5 @@ async def test_buyer_ranking_sample_top_ten(client):
 
 
 @pytest.mark.parametrize(("params", "status_code"), [({"region": "NOPE"}, 404), ({}, 422)])
-async def test_buyer_ranking_validation(client, params, status_code):
+async def test_buyer_ranking_validation(client, require_db, params, status_code):
     assert (await client.get("/api/local/buyer-ranking", params=params)).status_code == status_code

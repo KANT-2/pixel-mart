@@ -1,8 +1,11 @@
 """취소 신청 API — 로컬 DB에 마이그레이션·시드 후 실행 (DB가 없으면 건너뜀)"""
 
+import asyncio
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
 from app.core.config import settings
 from app.core.db import engine
@@ -226,3 +229,39 @@ async def test_resolve_is_404_when_not_local(client, monkeypatch):
 async def _count_requests(order_id: int) -> int:
     async with engine.connect() as conn:
         return await conn.scalar(text("SELECT count(*) FROM cancel_requests WHERE order_id = :id"), {"id": order_id})
+
+
+# ---- 동시 요청·상태 되돌림 방지 ----
+async def test_concurrent_cancel_requests_make_only_one(client):
+    order_id = await place_order(client, "cancel16@pixelmart.test")
+    first, second = await asyncio.gather(request_cancel(client, order_id), request_cancel(client, order_id))
+    assert sorted([first.status_code, second.status_code]) == [201, 400]
+    assert await _count_requests(order_id) == 1
+
+
+async def test_db_allows_only_one_pending_request_per_order(client):
+    order_id = await place_order(client, "cancel17@pixelmart.test")
+    assert (await request_cancel(client, order_id)).status_code == 201
+    with pytest.raises(IntegrityError):
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("INSERT INTO cancel_requests (order_id, reason, status) VALUES (:id, '중복', 'requested')"),
+                {"id": order_id},
+            )
+
+
+async def test_cancelled_order_never_returns_to_paid(client):
+    order_id = await place_order(client, "cancel18@pixelmart.test")
+    request_id = (await request_cancel(client, order_id)).json()["id"]
+    assert (await client.post(f"/api/dev/cancel-requests/{request_id}/approve")).status_code == 200
+    # 승인된 뒤 남아 있던 대기 신청을 거절해도 취소된 주문은 그대로 (예전: cancelled → paid 로 복구됨)
+    async with engine.begin() as conn:
+        stale = await conn.scalar(
+            text(
+                "INSERT INTO cancel_requests (order_id, reason, status) VALUES (:id, '경합', 'requested') RETURNING id"
+            ),
+            {"id": order_id},
+        )
+    res = await client.post(f"/api/dev/cancel-requests/{stale}/reject")
+    assert res.status_code == 400
+    assert (await order_detail(client, order_id))["status"] == "cancelled"

@@ -49,8 +49,8 @@ def test_rate_limiter_window():
 
 # ---- API ----
 @pytest.fixture
-def upstream(monkeypatch):
-    """가짜 Cloudflare 응답을 정하는 함수를 돌려준다. 실제 요청 내용은 calls에 기록"""
+def upstream(monkeypatch, require_db):
+    """가짜 Cloudflare 응답을 정하는 함수를 돌려준다. 실제 요청 내용은 calls에 기록 (로그인에 DB 필요)"""
     calls: list[httpx.Request] = []
     state = {"handler": lambda request: httpx.Response(200, json={"result": {"image": PIXEL}, "success": True})}
 

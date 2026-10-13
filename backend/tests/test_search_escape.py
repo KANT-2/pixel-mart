@@ -10,6 +10,7 @@ def test_escape_like_escapes_wildcards_and_backslash():
     assert like_pattern("키캡") == "%키캡%"
 
 
+@pytest.mark.usefixtures("require_db")
 @pytest.mark.parametrize("q", ["%", "_", "%%", "\\"])
 async def test_product_search_treats_wildcards_as_text(client, q):
     res = await client.get("/api/products", params={"q": q, "size": 60})
@@ -18,12 +19,14 @@ async def test_product_search_treats_wildcards_as_text(client, q):
     assert res.json()["total"] == 0
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_normal_product_search_still_matches(client):
     res = await client.get("/api/products", params={"q": "키캡", "size": 60})
     assert res.status_code == 200
     assert res.json()["total"] > 0
 
 
+@pytest.mark.usefixtures("require_db")
 async def test_interest_and_keyboard_search_escape(client):
     interests = await client.get("/api/interests", params={"q": "%"})
     assert interests.status_code == 200 and interests.json() == []
