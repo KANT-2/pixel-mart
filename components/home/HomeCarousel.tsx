@@ -154,13 +154,13 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
               </Link>)}</div>
               {themeProducts.failed && <p role="status" className="mt-3 text-xs text-sub">일부 상품을 불러오지 못했어요. 테마 상품 보기에서 다시 확인해 주세요.</p>}
             </>}
-            <p className="mt-3 text-xs text-sub">AI 상품 배치 예시 · 실제 크기와 형태는 상세 정보 참고</p>
+            <p className="mt-3 text-xs text-sub">AI 연출 이미지 · 실제 크기와 형태는 상세 정보 참고</p>
             {neighborhood && <ul className="mt-3 space-y-1 text-xs">{state.wishes.map((item) => <li key={item.product.id}><Link href={`/products/${item.product.id}`} className="text-sub hover:text-mint">동네 인기 찜 · {item.product.name} · {item.count}명 →</Link></li>)}</ul>}
           </div> : <div>
             {/* 생성 이미지는 실제 상품의 정확한 크기·형태를 보장하지 않습니다. */}
             {/* eslint-disable-next-line @next/next/no-img-element -- 정적 룩북 파일 */}
-            <img src={slide === 1 ? theme.image : "/images/lookbook/retro.webp"} alt={slide === 1 ? `${theme.name} 상품을 배치한 데스크 예시` : "토너먼트 분위기를 보여주는 레트로 데스크 예시"} className="aspect-video w-full rounded-lg object-cover" />
-            <p className="mt-2 text-xs text-dim">생성 이미지 · 상품 배치 예시</p>
+            <img src={slide === 1 ? theme.image : "/images/lookbook/retro.webp"} alt={slide === 1 ? `${theme.name} 상품으로 꾸민 데스크` : "토너먼트 분위기의 레트로 데스크"} className="aspect-video w-full rounded-lg object-cover" />
+            <p className="mt-2 text-xs text-dim">AI 연출 이미지</p>
             {slide === 1 && neighborhood && <ul className="mt-3 space-y-1 text-sm">{state.wishes.map((item) => <li key={item.product.id}><Link href={`/products/${item.product.id}`} className="text-sub hover:text-mint">{item.product.name} · {item.count}명 찜 →</Link></li>)}</ul>}
             {slide === 1 && state.error && <p className="mt-2 text-xs text-sub">동네 정보 일부를 확인하지 못해 데스크 추천을 보여드려요.</p>}
           </div>}

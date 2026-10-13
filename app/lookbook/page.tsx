@@ -15,8 +15,8 @@ async function ThemeProducts({ searchParams }: PageProps<"/lookbook">) {
     </nav>
     <h2 className="mb-4 text-xl font-bold">{selected.name} 데스크</h2>
     {/* eslint-disable-next-line @next/next/no-img-element -- 최적화된 정적 WebP 룩북 이미지 */}
-    <img src={selected.image} alt={`${selected.name} 테마 상품을 배치한 데스크 예시`} width={1440} height={810} className="aspect-video w-full rounded-lg object-cover" />
-    <p className="my-3 text-sm text-sub">AI로 제작한 상품 배치 예시입니다. 실제 제품의 크기·형태는 상품 상세 정보를 확인해 주세요.</p>
+    <img src={selected.image} alt={`${selected.name} 테마 상품으로 꾸민 데스크`} width={1440} height={810} className="aspect-video w-full rounded-lg object-cover" />
+    <p className="my-3 text-sm text-sub">AI로 연출한 데스크 이미지예요. 실제 제품의 크기·형태는 상품 상세 정보를 확인해 주세요.</p>
     <h3 className="my-6 text-xl font-bold">이 테마의 상품</h3>
     {results.some((result) => result.fallback) && <ProductFallbackNotice />}
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">{results.map((result, index) => result.data ? <ProductCard key={result.data.id} product={result.data} /> : <p key={selected.productIds[index]} className="pixel-panel p-4 text-sub">현재 이 상품은 판매 목록에서 확인할 수 없어요.</p>)}</div>

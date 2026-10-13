@@ -13,7 +13,6 @@ export default function QuestionsPanel({ productId }: QuestionsPanelProps) {
   const { user, loading } = useAuth();
   return <div className="space-y-6">
     <h2 className="text-xl font-bold">상품 Q&A</h2>
-    {questions.mode === "demo" && <p className="rounded-xl border border-violet/30 bg-panel p-5 text-sm leading-relaxed text-sub">{questions.notice}</p>}
     {loading ? <FeedbackSkeleton label="질문 공개 범위 확인 중" /> : <AccountQuestions key={`${productId}:${user?.id ?? "guest"}`} productId={productId} viewer={user} />}
   </div>;
 }
