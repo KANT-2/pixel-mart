@@ -26,6 +26,8 @@
 | 신뢰 | 활동 점수 → 하트(×N)·레벨(LV.1~10)·코인, 뱃지 19종, 헤더 알림 |
 | 개인정보 | 동네는 직접 선택(GPS 좌표 저장 안 함), 공개 설정 5종 모두 기본 OFF, 거래글 연락처 입력 차단 |
 
+> 범위: 실제 결제와 데스크 꾸미기·출품·토너먼트는 이번 구현·평가에서 제외합니다. 데스크 테마 룩북과 키캡 피팅룸은 포함합니다. 피팅룸 배치 규칙과 백엔드 호환성 판정은 별도이며, 실제 장착 치수 검증을 대신하지 않습니다.
+
 ## 기술 스택
 | 구분 | 사용 기술 |
 | --- | --- |
@@ -40,28 +42,46 @@
 ## 실행 방법
 프론트(Next.js, :3000)와 백엔드(FastAPI, :8000)를 함께 띄웁니다. 브라우저는 3000만 보고, `/api/*`는 Next가 8000으로 넘겨 줍니다.
 
-**준비물**: Node.js 22+, Python 3.12+, Docker(PostgreSQL)
+**준비물**: Node.js 22+, Python 3.12+, Docker Desktop 또는 설치형 PostgreSQL.
+처음 내려받는 경우 `git clone https://github.com/KANT-2/pixel-mart.git` 후 저장소 루트에서 시작합니다.
+아래는 **Windows PowerShell + Docker** 기준입니다. 설치형 DB와 macOS/Linux 절차는 [백엔드 실행 가이드](docs/backend/README.md)를 참고하세요.
 
-```bash
-# 1) DB (저장소 루트)
+```powershell
+# 1) DB (저장소 루트, Docker Desktop 실행 후)
 docker compose up -d db
 
 # 2) 백엔드 (backend/)
 cd backend
-python -m venv .venv && .venv\Scripts\activate   # macOS/Linux: source .venv/bin/activate
-pip install -r requirements-dev.txt
-copy .env.example .env                            # macOS/Linux: cp .env.example .env
-alembic upgrade head
-python -m scripts.seed                            # 상품·카테고리·지역·취향·키보드 (재실행 안전)
-python -m scripts.seed_demo                       # (선택) 시연용 데모 이웃·거래글·알림
-python -m scripts.seed_showcase 내이메일@gmail.com  # (선택, 발표용) 리뷰·문의·주문 + 내 계정에 선물·교환 신청·교환 진행 중 (한 번 로그인한 계정)
-uvicorn app.main:app --reload --port 8000
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+# 최초 한 번만 복사합니다. 기존 .env가 있으면 덮어쓰지 않습니다.
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+```
 
-# 3) 프론트 (저장소 루트, 새 터미널)
-npm install
+**다음 명령 전에 `backend/.env`의 `DATABASE_URL`을 확인합니다.** Docker는 **5433**, 설치형은 **5432**입니다.
+Docker를 사용할 때의 값:
+
+```dotenv
+DATABASE_URL=postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart
+```
+
+```powershell
+# backend/에서 계속 실행
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m scripts.seed       # 상품·지역·취향·키보드 등
+.\.venv\Scripts\python.exe -m scripts.seed_demo  # 선택: 시연용 데모 이웃
+.\.venv\Scripts\python.exe -m scripts.seed_showcase 내이메일@gmail.com  # 선택: 한 번 로그인한 계정에 발표용 데이터 생성
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+```
+
+**3) 프론트 — 새 터미널을 열고 저장소 루트에서:**
+
+```powershell
+npm ci
 npm run dev
 ```
-브라우저에서 http://localhost:3000 접속 · API 문서 http://localhost:8000/api/docs
+브라우저에서 http://localhost:3000 접속 · API 문서 http://localhost:3000/api/docs
+DB 연결은 http://localhost:3000/api/health/db 로 확인합니다. 상품 폴백 화면이 보이는 것만으로는 백엔드 연동을 확인할 수 없습니다.
 
 - 로그인: 개발 환경은 로그인 화면의 **개발용 이메일 로그인**(아무 이메일). 데모 이웃으로 보려면 `demo-coinmoa@demo.pixelmart.test` 처럼 `demo-<이름>@demo.pixelmart.test`
 - 백엔드가 꺼져 있어도 상품 목록·상세는 기본 상품 데이터로 보입니다(안내 문구 표시).
@@ -71,7 +91,8 @@ npm run dev
 | `npm run dev` | 프론트 개발 서버 |
 | `npm run build` | 프로덕션 빌드 (타입 검사 포함) |
 | `npm run lint` · `npm test` | ESLint · 단위 테스트 |
-| `pytest` (backend/) | 백엔드 테스트 |
+| `npx tsc --noEmit` | TypeScript 검사 |
+| `pytest` (backend/, 별도 테스트 DB 준비 후) | 백엔드 테스트 — 현재 설정된 DB 데이터를 변경하므로 [테스트 실행 안내](docs/SETUP.md) 먼저 확인 |
 
 처음 합류한 팀원은 [docs/SETUP.md](docs/SETUP.md), 백엔드는 [docs/backend/README.md](docs/backend/README.md)를 따라 환경을 맞춰 주세요.
 
@@ -176,6 +197,6 @@ pixel-mart/
 ## 트러블슈팅
 | 문제 | 원인 | 해결 |
 | --- | --- | --- |
-| 상세 페이지 `params` 사용법이 강의와 다름 | Next.js 15부터 `params`가 Promise로 변경 | `const { id } = await params`로 사용 |
+| 동적 상세 페이지의 `params` 처리 | `params`는 Promise이며, Cache Components 환경에서는 동적 값을 읽는 위치도 고려해야 함 | 페이지는 `params`를 자식에 전달하고, `<Suspense>` 내부의 `ProductDetail`에서 `await params`로 읽음. `generateStaticParams`와 `notFound()`로 정적 경로·없는 상품도 처리 |
 | 모바일에서 로고 · 메뉴가 두 줄로 꺾임 | 헤더 가로 공간 부족 | `whitespace-nowrap`, 모바일 여백 축소 |
 | ESLint가 `<img>` 사용을 경고 | Next.js는 `next/image`를 권장 | 과제 권장에 따라 `<img>` 유지, 사유를 단 주석으로 처리 |
