@@ -6,6 +6,7 @@
 - 닉네임 공개(opt-in)를 켠 상태라 위시맵에서 닉네임으로 찾을 수 있다
 - 받은 선물은 개발용 로그인으로 그 이메일에 로그인해 선물함에서 받기·거절할 수 있다
 - 덕력지도 캐릭터·이웃 카드도 켜고, 활동 기록(거래·선물 완료)을 넣어 하트 3개를 넘긴 "+N" 이웃도 보이게 한다
+- 알림이 하나도 없는 데모 이웃에게는 예시 알림(점수·하트·뱃지)을 넣어 알림 종이 비어 보이지 않게 한다
 """
 
 import asyncio
@@ -13,12 +14,13 @@ import json
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import SessionLocal, engine
-from app.models import ActivityPoint, Interest, Product, TradePost, User, UserInterest
-from app.services.activity import RULES
+from app.models import ActivityPoint, Interest, Notification, Product, TradePost, User, UserInterest
+from app.services import badges, notifications
+from app.services.activity import RULES, level_number, level_title
 from app.services.sample_avatars import sample_avatars
 from app.services.trade_rules import DEMO_EMAIL_DOMAIN
 
@@ -43,6 +45,7 @@ async def seed_demo(db: AsyncSession) -> str:
         user.avatar_url = user.avatar_url or sample_avatars(f"demo:{u['key']}", 1)[0]
         await db.flush()
         await _reset_interests_and_activity(db, user.id, u["interestIds"], **u["activity"])
+        await _example_notifications(db, user)
         # 선물·교환으로 닫힌 글은 그대로 두고, 진행 중인 글이 없는 상품만 다시 올린다
         for kind in ("want", "have"):
             open_items = set(
@@ -91,6 +94,37 @@ async def _reset_interests_and_activity(
         for i, (kind, ref_id) in enumerate(reversed(history))
     )
     await db.flush()
+
+
+async def _example_notifications(db: AsyncSession, user: User) -> None:
+    """알림이 없을 때만 지금 기록에 맞는 예시 알림 (실제 알림과 같은 ref_key라 나중에 겹치지 않는다)"""
+    if await db.scalar(select(func.count()).where(Notification.user_id == user.id)):
+        return
+    stats = (await badges.stats_for(db, [user]))[user.id]
+    rule = RULES["trade_done"]
+    await notifications.notify(
+        db, user.id, "points", f"활동 점수 +{rule.points}", rule.label, notifications.QUESTS_HREF, "pt:trade_done:demo"
+    )
+    if stats.hearts:
+        await notifications.notify(
+            db,
+            user.id,
+            "heart_up",
+            f"하트가 늘었어요 ♥×{stats.hearts}",
+            f"LV.{level_number(stats.hearts)} {level_title(stats.hearts)}",
+            notifications.QUESTS_HREF,
+            f"heart:{stats.hearts}",
+        )
+    if badge := badges.representative(badges.earned(stats)):
+        await notifications.notify(
+            db,
+            user.id,
+            "badge",
+            f"뱃지 획득! {badge.name}",
+            badge.description,
+            notifications.BADGES_HREF,
+            f"badge:{badge.code}",
+        )
 
 
 async def main() -> None:

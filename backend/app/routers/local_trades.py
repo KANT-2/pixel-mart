@@ -20,7 +20,7 @@ from app.schemas.local import (
     WishWantsOut,
 )
 from app.schemas.product import ProductOut
-from app.services import activity, local_stats
+from app.services import activity, local_stats, notifications
 from app.services.local_stats import MIN_GROUP_SIZE, rollup
 from app.services.regions import RegionTree, load_tree
 from app.services.trade_rules import DEMO_EMAIL_DOMAIN, contains_private_info, normalize, same_item
@@ -192,9 +192,11 @@ async def update_trade_status(post_id: int, body: TradeStatusIn, user: CurrentUs
     post = await db.get(TradePost, post_id)
     if post is None or post.user_id != user.id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "거래글을 찾을 수 없습니다.")
+    before = await notifications.snapshot(db, user.id) if body.status == "done" else None
     post.status = body.status
     if body.status == "done":
         await activity.award(db, user.id, "trade_done", post.id)  # 같은 글은 한 번만, 하루 상한
+        await notifications.notify_progress(db, user.id, before)  # 소원 성취 등 거래 완료 뱃지
     await db.commit()
     return post_out(post, await load_tree(db), user.id)
 

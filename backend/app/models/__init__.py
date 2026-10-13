@@ -6,6 +6,7 @@ from app.models.compat import Keyboard, KeycapSpec
 from app.models.faq import Faq
 from app.models.gift import Gift
 from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest, WishSample
+from app.models.notification import Notification
 from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
 from app.models.question import ProductQuestion
@@ -25,6 +26,7 @@ __all__ = [
     "Interest",
     "Keyboard",
     "KeycapSpec",
+    "Notification",
     "Order",
     "OrderItem",
     "OrderStatusHistory",

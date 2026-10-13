@@ -10,7 +10,7 @@ from app.deps import CurrentUser, DbSession
 from app.models import TradePost, TradeRequest
 from app.routers.local_trades import post_out
 from app.schemas.local import TradeAuthorOut, TradeRequestIn, TradeRequestOut
-from app.services import activity
+from app.services import activity, notifications
 from app.services.regions import RegionTree, load_tree
 
 router = APIRouter(prefix="/local/trade-requests", tags=["local"])
@@ -60,6 +60,17 @@ async def respond(db: DbSession, req: TradeRequest, viewer_id: int) -> TradeRequ
     return request_out(await load_request(db, req.id), await load_tree(db), viewer_id)
 
 
+async def _notify_decided(db: DbSession, req: TradeRequest) -> None:
+    """신청한 사람에게 수락·거절 결과 알림"""
+    if req.status == "accepted":
+        title, body = "교환 신청이 수락됐어요", f"{req.post.item_name} 교환 신청이 수락됐어요."
+    else:
+        title, body = "교환 신청이 거절됐어요", f"{req.post.item_name} 교환은 이번엔 어렵대요."
+    await notifications.notify(
+        db, req.requester_id, f"trade_{req.status}", title, body, notifications.TRADES_HREF, f"tr:{req.id}:{req.status}"
+    )
+
+
 @router.post(
     "", response_model=TradeRequestOut, status_code=status.HTTP_201_CREATED, summary="이웃의 거래글에 교환 신청"
 )
@@ -88,6 +99,15 @@ async def create_request(body: TradeRequestIn, user: CurrentUser, db: DbSession)
     req = TradeRequest(post_id=post.id, requester_id=user.id, offer_post_id=body.offer_post_id)
     db.add(req)
     await db.flush()
+    await notifications.notify(
+        db,
+        post.user_id,
+        "trade_request",
+        "새 교환 신청이 왔어요",
+        f"{post.item_name}에 교환 신청이 도착했어요.",
+        notifications.TRADES_HREF,
+        f"tr:{req.id}",
+    )
     return await respond(db, req, user.id)
 
 
@@ -105,6 +125,8 @@ async def list_requests(user: CurrentUser, db: DbSession, box: Literal["received
 @router.post("/{request_id}/accept", response_model=TradeRequestOut, summary="받은 신청 수락 — 글을 거래 완료로")
 async def accept_request(request_id: int, user: CurrentUser, db: DbSession):
     req = await pending_for(db, request_id, owner_id=user.id)
+    # 소원 성취 같은 거래 완료 뱃지도 알리려고 바꾸기 전 기록을 남겨 둔다
+    before = {uid: await notifications.snapshot(db, uid) for uid in (user.id, req.requester_id)}
     now = datetime.now(UTC)
     req.status, req.decided_at = "accepted", now
     req.post.status = "done"
@@ -118,8 +140,11 @@ async def accept_request(request_id: int, user: CurrentUser, db: DbSession):
     )
     for other in others:
         other.status, other.decided_at = "declined", now
+        await _notify_decided(db, other)
     for user_id in (user.id, req.requester_id):
         await activity.award(db, user_id, "trade_done", req.post_id)
+        await notifications.notify_progress(db, user_id, before[user_id])
+    await _notify_decided(db, req)
     return await respond(db, req, user.id)
 
 
@@ -127,6 +152,7 @@ async def accept_request(request_id: int, user: CurrentUser, db: DbSession):
 async def decline_request(request_id: int, user: CurrentUser, db: DbSession):
     req = await pending_for(db, request_id, owner_id=user.id)
     req.status, req.decided_at = "declined", datetime.now(UTC)
+    await _notify_decided(db, req)
     return await respond(db, req, user.id)
 
 

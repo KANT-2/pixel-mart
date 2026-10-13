@@ -345,3 +345,15 @@ export interface ApiSignupPending { email: string; googleName: string; }
 
 /** AI 픽셀 아바타 설정 — 동의 문구의 제공자 이름, 보내기 전 사진 긴 변 */
 export interface ApiAiAvatarStatus { enabled: boolean; provider: "cloudflare" | null; providerName: string | null; maxPhotoSide: number; }
+
+/** 알림 — 교환 신청·주문·선물·활동 점수·하트·뱃지 */
+export interface ApiNotification {
+  id: number;
+  kind: string;
+  title: string;
+  body: string;
+  /** 누르면 이동할 사이트 안 경로 */
+  href: string | null;
+  createdAt: string;
+  read: boolean;
+}
