@@ -1,7 +1,7 @@
 """add keyboards keycap specs
 
 Revision ID: 7e7e48347fe0
-Revises: 2ea2d17eab9e
+Revises: 9886907036c6 (main에 늦게 합쳐져 trade_requests 뒤로 옮김)
 Create Date: 2026-10-12 14:11:36.482262
 """
 
@@ -12,7 +12,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "7e7e48347fe0"
-down_revision: str | None = "2ea2d17eab9e"
+down_revision: str | None = "9886907036c6"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
