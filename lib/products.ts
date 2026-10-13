@@ -4,7 +4,7 @@ import { products } from "@/data/products";
 import { ApiError, serverFetch } from "@/lib/api";
 import type { ApiCategory, ApiProduct, Page } from "@/types/api";
 import { RARITY_KEYS, rarityOf, type Rarity } from "@/utils/gameItem";
-import { normalizeProductQuery, productQueryParams, type ProductQuery } from "@/utils/productQuery";
+import { normalizeProductQuery, productApiParams, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
 export const PAGE_SIZE = 12;
 
@@ -32,12 +32,7 @@ export async function getProducts(options: Partial<ProductQuery> & { size?: numb
   const requested = query.page;
   const requestedSize = options.size ?? PAGE_SIZE;
   const size = Number.isInteger(requestedSize) && requestedSize >= 1 && requestedSize <= 60 ? requestedSize : PAGE_SIZE;
-  const params = productQueryParams(query);
-  params.delete("new");
-  if (query.new) params.set("isNew", "true");
-  params.set("page", String(requested));
-  params.set("size", String(size));
-  params.set("sort", query.sort);
+  const params = productApiParams(query, requested, size);
   try {
     let data = await serverFetch<Page<ApiProduct>>(`/products?${params}`);
     if (requested > data.totalPages) {

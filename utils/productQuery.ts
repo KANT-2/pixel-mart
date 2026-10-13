@@ -83,6 +83,18 @@ export function productQueryParams(query: Partial<ProductQuery>): URLSearchParam
   return params;
 }
 
+/** 백엔드 /api/products 쿼리 — 화면 URL의 new=1은 isNew=true, 페이지·개수·정렬은 항상 붙인다 */
+export function productApiParams(query: Partial<ProductQuery>, page: number, size: number): URLSearchParams {
+  const normalized = normalizeProductQuery(queryInput(query));
+  const params = productQueryParams({ ...normalized, page: 1 });
+  params.delete("new");
+  if (normalized.new) params.set("isNew", "true");
+  params.set("page", String(page));
+  params.set("size", String(size));
+  params.set("sort", normalized.sort);
+  return params;
+}
+
 export function productHref(query: Partial<ProductQuery>): string {
   const params = productQueryParams(query).toString();
   return params ? `/products?${params}` : "/products";
