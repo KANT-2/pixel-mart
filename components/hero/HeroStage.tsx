@@ -39,9 +39,8 @@ export default function HeroStage({ wide = false }: HeroStageProps) {
       <SpriteLayer name="star" x={30} y={20} width={2.5} className={styles.star} delay="0s" />
       <SpriteLayer name="star" x={68.75} y={11.667} width={2.5} className={styles.star} delay="0.8s" />
       <SpriteLayer name="star" x={86.25} y={31.667} width={2.5} className={styles.star} delay="1.6s" />
-      <SpriteLayer name="heart" x={11} y={6} width={5.625} />
-      <SpriteLayer name="heart" x={17.5} y={6} width={5.625} />
-      <SpriteLayer name="heart" x={24} y={6} width={5.625} className={styles.emptyHeart} />
+      {/* 하트는 이웃 카드처럼 아이콘 하나 + "×N" */}
+      <SpriteLayer name="heart" x={5} y={6} width={5.625} />
       <SpriteLayer name="coin" x={77} y={6} width={5} className={styles.coin} />
       <HeroHud />
       <SpriteLayer name="sword" x={64.625} y={49.667} width={7} />
