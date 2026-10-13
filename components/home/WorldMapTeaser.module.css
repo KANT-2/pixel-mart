@@ -19,8 +19,11 @@
     position: absolute;
     top: 50%;
     right: 0;
-    width: 76%;
+    width: 88%;
     transform: translateY(-50%);
+    /* 지도 왼쪽 가장자리를 바다색 배경에 부드럽게 녹여 경계선이 보이지 않게 */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 22%);
+    mask-image: linear-gradient(to right, transparent, #000 22%);
     border: 0;
     border-radius: 0;
   }
