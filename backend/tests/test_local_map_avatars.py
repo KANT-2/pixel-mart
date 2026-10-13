@@ -204,9 +204,18 @@ async def test_sample_characters_fill_quiet_regions(client):
         pytest.skip("덕력지도 샘플이 없거나 실제 동의자가 충분합니다 (python -m scripts.seed)")
     for r in samples:
         assert r["count"] >= 5 and len(r["avatars"]) == min(r["count"], 10)
-        assert all(a.startswith("data:image/png;base64,") for a in r["avatars"])
+        # 실제 이웃이 섞이면 아바타가 없는 사람(null = 기본 슬라임)도 있다
+        assert all(a is None or a.startswith("data:image/png;base64,") for a in r["avatars"])
     again = (await client.get("/api/local/map-avatars")).json()
-    assert [r["avatars"] for r in again if r["isSample"]] == [r["avatars"] for r in samples]  # 늘 같은 구성
+
+    def fakes(rows):  # 샘플 캐릭터 부분만 (실제 이웃은 같은 금액이면 순서가 무작위)
+        return [
+            [a for a, c in zip(r["avatars"], r["cards"], strict=True) if c and c["isSample"]]
+            for r in rows
+            if r["isSample"]
+        ]
+
+    assert fakes(again) == fakes(samples)  # 샘플 캐릭터는 늘 같은 구성
 
 
 @pytest.mark.parametrize(("params", "status_code"), [({"region": "NOPE"}, 404), ({"interest": 99999}, 404)])

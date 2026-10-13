@@ -86,6 +86,7 @@ async def users(monkeypatch):
     async with engine.begin() as conn:
         await conn.execute(text(f"DELETE FROM activity_points WHERE user_id IN ({USERS})"))
         await conn.execute(text(f"DELETE FROM trade_posts WHERE user_id IN ({USERS})"))
+        await conn.execute(text("DELETE FROM fandom_samples WHERE region_code LIKE 'ACT%'"))
         await conn.execute(
             text("UPDATE users SET region_code = NULL, map_avatar_opt_in = false WHERE region_code LIKE 'ACT%'")
         )
@@ -161,6 +162,8 @@ async def test_cards_only_for_opted_in_and_without_identity(users):
         "interests": ["나루토"],
         "wantCount": 1,
         "isMe": True,
+        "isPublic": True,
+        "isSample": False,
     }
     other = next(c for c in cards if not c["isMe"])
     assert other["nickname"] is None and other["interests"] == [] and other["wantCount"] == 0  # 닉네임·취향 비공개
@@ -176,4 +179,28 @@ async def test_sample_blocks_have_sample_cards(client):
     sample = next((r for r in rows if r["isSample"]), None)
     if sample is None:
         pytest.skip("덕력지도 샘플이 없거나 실제 동의자가 충분합니다")
-    assert len(sample["cards"]) == len(sample["avatars"]) and all(c and not c["isMe"] for c in sample["cards"])
+    assert len(sample["cards"]) == len(sample["avatars"])
+    fake = [c for c in sample["cards"] if c and c["isSample"]]
+    assert fake and all(not c["isMe"] for c in fake)  # 실제 이웃이 섞여 있어도 샘플 캐릭터는 카드가 있다
+
+
+async def test_my_card_is_shown_to_me_even_when_not_public(users):
+    me = await users("act-private@pixelmart.test")  # 카드 공개 안 함
+    other = await users("act-other@pixelmart.test")
+    mine = [c for c in (await me.get("/api/local/map-avatars", params={"region": "ACT1"})).json()[0]["cards"] if c]
+    assert [(c["isMe"], c["isPublic"]) for c in mine] == [(True, False)]  # 나에게만 내 카드
+    theirs = (await other.get("/api/local/map-avatars", params={"region": "ACT1"})).json()[0]["cards"]
+    assert [c["isMe"] for c in theirs if c] == [True]  # 다른 이웃에게는 내 카드가 안 보이고, 그 이웃 자기 카드만
+
+
+async def test_few_real_neighbors_are_mixed_with_sample_characters(users):
+    async with engine.begin() as conn:
+        await conn.execute(
+            text("INSERT INTO fandom_samples (region_code, interest_id, count) VALUES (:r, :i, 8)"),
+            {"r": ZONE, "i": WORK},
+        )
+    viewer = await users("act-mix@pixelmart.test", card=True)
+    zone = (await viewer.get("/api/local/map-avatars", params={"region": "ACT1"})).json()[0]
+    assert zone["count"] == 8 and len(zone["avatars"]) == 8 and zone["isSample"] is True
+    assert zone["cards"][0]["isMe"] is True and zone["cards"][0]["isSample"] is False  # 실제 이웃이 맨 앞
+    assert all(c["isSample"] for c in zone["cards"][1:])  # 남는 자리는 샘플 캐릭터

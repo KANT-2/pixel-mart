@@ -165,6 +165,10 @@ export interface ApiMapCard {
   interests: string[];
   wantCount: number;
   isMe: boolean;
+  /** 이웃에게도 보이는 카드인지 (내 카드는 공개 전에도 나에게만 보임) */
+  isPublic?: boolean;
+  /** 샘플 캐릭터의 카드 */
+  isSample?: boolean;
 }
 
 /** 내 활동 점수 — 나에게만 정확한 값 */

@@ -58,6 +58,10 @@ class MapCardOut(CamelModel):
     interests: list[str] = Field(description="취향 공개 동의자의 취향 이름 (최대 3개)")
     want_count: int = Field(description="진행 중인 WANT 글 수 (닉네임 공개일 때만, 아니면 0)")
     is_me: bool = Field(description="보고 있는 내 캐릭터")
+    is_public: bool = Field(
+        default=True, description="이웃에게도 보이는 카드인지 — 내 카드는 공개를 안 켰어도 나에게만 보여 준다"
+    )
+    is_sample: bool = Field(default=False, description="샘플 캐릭터의 카드 (시연용 값)")
 
 
 class MapAvatarsOut(CamelModel):
