@@ -117,9 +117,11 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
           <p className="mt-4 min-h-14 text-sm leading-relaxed text-sub">{slide === 0 ? "도착한 선물과 매칭, 진행 중인 거래를 한눈에 확인하세요." : slide === 1 ? neighborhood ? "공개 기준을 충족한 우리 동네의 인기 찜 상품을 살펴보세요." : "키캡·장패드·소품으로 나만의 데스크를 꾸며보세요." : "취향으로 꾸민 데스크를 만나는 토너먼트를 준비하고 있어요."}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link className="btn-lime px-4 py-3 text-sm font-bold" href={slide === 0 ? user ? "/local/trades/mine" : "/login" : slide === 1 ? `/lookbook?theme=${theme.slug}` : "/lookbook"}>{slide === 0 ? user ? "내 거래 보기 →" : "로그인하고 퀘스트 보기 →" : slide === 1 ? `${theme.name} 테마 상품 보기 →` : "데스크 테마 둘러보기 →"}</Link>
-            {slide !== 2 && <Link className="btn-pixel px-4 py-3 text-sm font-bold" href={slide === 0 ? "/mypage/gifts" : `/local/wish-map${state.region ? `?region=${encodeURIComponent(state.region)}` : ""}`}>{slide === 0 ? "선물함 보기 →" : "이웃 요청 보기 →"}</Link>}
+            {slide === 0 && <Link className="btn-pixel px-4 py-3 text-sm font-bold" href="/mypage/gifts">선물함 보기 →</Link>}
+            {/* 룩북은 두 번째 버튼 자리에서 바로 테마를 바꾼다 */}
+            {slide === 1 && <><label htmlFor="hero-theme" className="sr-only">데스크 테마</label>
+              <select id="hero-theme" value={themeIndex} onChange={(event) => setThemeIndex(Number(event.target.value))} className="btn-pixel min-h-11 cursor-pointer px-4 py-2 text-sm font-bold text-ink [&>option]:bg-panel">{deskThemes.map((item, index) => <option key={item.slug} value={index}>{item.name} 테마</option>)}</select></>}
           </div>
-          {slide === 1 && <div className="mt-4"><label htmlFor="hero-theme" className="mr-2 text-sm text-sub">데스크 테마</label><select id="hero-theme" value={themeIndex} onChange={(event) => setThemeIndex(Number(event.target.value))} className="rounded border border-line bg-panel p-2 text-sm">{deskThemes.map((item, index) => <option key={item.slug} value={index}>{item.name}</option>)}</select></div>}
           {slide === 2 && <p className="mt-4 text-xs text-dim">준비 중 · 투표와 알림 신청은 아직 제공하지 않아요.</p>}
         </div>
         <div className="min-w-0">
