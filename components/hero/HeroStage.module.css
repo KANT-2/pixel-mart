@@ -83,7 +83,8 @@
 }
 
 .hudHeart {
-  left: 5%;
+  left: 11.5%;
+  color: var(--color-pink);
 }
 
 .hudCoin {
@@ -199,10 +200,6 @@
 
 .coin {
   animation: spin 1.2s steps(2) infinite;
-}
-
-.emptyHeart {
-  opacity: 0.3;
 }
 
 .jump {

@@ -93,16 +93,12 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
       <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-2 md:gap-8 md:px-10 md:py-10 lg:gap-12">
         {slide === 4 ? <>
           <div className="min-w-0">
-            {/* 무대는 유저의 정체성 자리 — 아바타를 만들면 슬라임 대신 내 캐릭터가, 콜라보 시즌엔 그 세계관 무대가 선다 */}
-            <p className="mb-4 font-pixel text-xs tracking-widest text-mint">PLAYER IDENTITY</p>
-            <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">{user?.avatarUrl
-              ? <>오늘의 주인공,<br /><span className="break-all text-mint">{user.nickname}</span></>
-              : <>이 무대의 주인공은<br /><span className="text-mint">당신의 캐릭터.</span></>}</h1>
-            <p className="mt-4 text-sm leading-relaxed text-sub">픽셀 아바타를 만들면 슬라임 대신 내가 무대에 서요.<br />콜라보 시즌엔 무대도 그 세계관으로 갈아입어요.</p>
+            <p className="mb-4 font-pixel text-xs tracking-widest text-mint">GOOD ITEMS, BETTER DAYS</p>
+            <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">일상에 아이템을<br /><span className="text-mint">장착하세요.</span></h1>
+            <p className="mt-4 text-sm leading-relaxed text-sub">좋아하는 게임이 있는 하루는,<br />언제나 조금 더 특별하니까.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              {/* 비로그인이면 아바타 안내 화면을 거치지 않고 바로 로그인 → 끝나면 아바타 만들기로 */}
-              <Link href={user?.avatarUrl ? "/products" : user ? "/mypage/avatar" : "/login?next=/mypage/avatar"} className="btn-lime px-4 py-3 text-sm font-bold">{user?.avatarUrl ? "▶ 오늘의 장비 고르기" : "▶ 내 픽셀 아바타 만들기"}</Link>
-              <Link href={user?.avatarUrl ? "/mypage/avatar" : "/products"} className="btn-pixel px-4 py-3 text-sm font-bold">{user?.avatarUrl ? "아바타 꾸미기" : "아이템 둘러보기"}</Link>
+              <Link href="/products" className="btn-lime px-4 py-3 text-sm font-bold">▶ 아이템 둘러보기</Link>
+              <Link href="/local" className="btn-pixel px-4 py-3 text-sm font-bold">월드맵 열기</Link>
             </div>
           </div>
           {/* 넓은 화면은 슬라이드 높이가 고정이라 4:3 무대가 잘리지 않게 폭을 맞추고, 오른쪽 끝을 헤더·상품 목록과 맞춘다 */}
@@ -180,7 +176,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
           <button type="button" aria-label="이전 슬라이드" onClick={() => move(-1)} className={`${styles.arrow} grid size-10 place-items-center text-2xl text-sub hover:text-mint focus-visible:outline-2 focus-visible:outline-mint`}>‹</button>
           <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className={`${styles.arrow} grid size-10 place-items-center text-2xl text-sub hover:text-mint focus-visible:outline-2 focus-visible:outline-mint`}>›</button>
         </div>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 4 ? "이 무대의 주인공은 당신의 캐릭터." : slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 4 ? "일상에 아이템을 장착하세요." : slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
       </div>
       </>}
     </div>
