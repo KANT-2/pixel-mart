@@ -7,6 +7,7 @@ import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { loadMapBlocks } from "@/lib/fandomMapData";
 import { MAP_VIEWS } from "@/lib/localMapData";
+import styles from "./WorldMapTeaser.module.css";
 
 const NAMES: Record<string, string> = { "11": "서울", "28": "인천", "41110": "수원", "41130": "성남", "41460": "용인" };
 
@@ -39,7 +40,9 @@ export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps
         <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 py-2 text-sm font-bold">동네 교환글</Link>
       </div>
     </div>
+    <div className={embedded ? styles.mapBg : "min-w-0"}>
     <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" hideLabels pinScale={1.2} heat landmarks
-      onSelect={open} onPinSelect={(code) => open(code)} />
+        onSelect={open} onPinSelect={(code) => open(code)} />
+    </div>
   </div>;
 }

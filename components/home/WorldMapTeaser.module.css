@@ -1,0 +1,29 @@
+/* 메인 배너: 지도를 배너 오른쪽 전체로 넓히고, 글자 쪽으로 갈수록 배경에 녹아들게 */
+@media (min-width: 768px) {
+  .mapBg {
+    position: absolute;
+    inset: 0 0 52px auto;
+    z-index: -1;
+    width: 64%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 42%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 42%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+  }
+
+  /* 지도 비율은 그대로 두고 세로 가운데를 보여 준다 — 테두리 없이 */
+  .mapBg > [role="group"] {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* 미리보기에서는 확대 버튼 없이 — 누르면 덕력지도로 */
+  .mapBg button[aria-label^="지도"] {
+    display: none;
+  }
+}
