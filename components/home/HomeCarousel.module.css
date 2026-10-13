@@ -256,3 +256,32 @@
   }
 
 }
+
+/* 배너 버튼 — 세 배너 모두 두 버튼의 높이·글자·테두리·입체감(아래 4px)을 같게, 윗선·아랫선이 맞도록 */
+.carousel :is(h1, h2) ~ :global(.flex) {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.carousel :is(h1, h2) ~ :global(.flex) :is(a, button):is(:global(.btn-lime), :global(.btn-pixel)) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-width: 2px;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.carousel :is(h1, h2) ~ :global(.flex) :is(a, button):global(.btn-lime) {
+  box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.16), inset 3px 3px 0 rgb(255 255 255 / 0.4), 0 4px 0 #4f7d1c;
+}
+
+.carousel :is(h1, h2) ~ :global(.flex) :is(a, button):global(.btn-pixel) {
+  box-shadow: inset -3px -3px 0 rgb(0 0 0 / 0.2), inset 3px 3px 0 rgb(255 255 255 / 0.06), 0 4px 0 #0b0f1e;
+}
