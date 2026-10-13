@@ -294,7 +294,8 @@ export interface ApiTradePost {
   author?: { nickname: string; avatarUrl: string | null } | null;
 }
 
-export type TradeRequestStatus = "pending" | "accepted" | "declined" | "cancelled";
+/** pending 신청 → accepted 교환 진행 중 → completed 두 사람 모두 받음 (또는 declined·cancelled) */
+export type TradeRequestStatus = "pending" | "accepted" | "declined" | "cancelled" | "completed";
 
 /** 유저 간 교환 신청 — post는 받는 사람의 글, offerPost는 신청한 사람이 함께 보낸 내 글 */
 export interface ApiTradeRequest {
@@ -302,6 +303,9 @@ export interface ApiTradeRequest {
   status: TradeRequestStatus;
   createdAt: string;
   decidedAt: string | null;
+  /** 교환 진행 중 내가 / 상대가 물건을 받았다고 눌렀는지 */
+  receivedByMe: boolean;
+  receivedByThem: boolean;
   post: ApiTradePost;
   offerPost: ApiTradePost | null;
   /** 내가 보낸 신청이면 true */

@@ -238,16 +238,23 @@ class WishMapOut(CamelModel):
 
 class TradeRequestIn(CamelModel):
     post_id: int = Field(description="교환을 신청할 이웃의 거래글")
-    offer_post_id: int | None = Field(default=None, description="함께 보낼 내 진행 중 글 (선택)")
+    offer_post_id: int | None = Field(
+        default=None,
+        description="교환할 내 물건 — 내 진행 중인 교환글(HAVE). 이웃의 HAVE·WANT 글에는 필수, 판매(SELL) 글에는 선택",
+    )
 
 
 class TradeRequestOut(CamelModel):
     """교환 신청 — 신청한 사람 정보는 닉네임 공개 동의자만 (id·이메일·연락처 없음)"""
 
     id: int
-    status: Literal["pending", "accepted", "declined", "cancelled"]
+    status: Literal["pending", "accepted", "declined", "cancelled", "completed"] = Field(
+        description="pending 신청 → accepted 교환 진행 중 → completed 두 사람 모두 받음 (또는 declined·cancelled)"
+    )
     created_at: datetime
     decided_at: datetime | None
+    received_by_me: bool = Field(default=False, description="교환 진행 중 내가 물건을 받았다고 눌렀는지")
+    received_by_them: bool = Field(default=False, description="상대가 물건을 받았다고 눌렀는지")
     post: TradePostOut
     offer_post: TradePostOut | None
     is_mine: bool = Field(description="내가 보낸 신청")

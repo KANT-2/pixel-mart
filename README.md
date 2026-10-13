@@ -40,6 +40,7 @@ copy .env.example .env                            # macOS/Linux: cp .env.example
 alembic upgrade head
 python -m scripts.seed                            # 상품·카테고리·지역·취향·키보드 (재실행 안전)
 python -m scripts.seed_demo                       # (선택) 시연용 데모 이웃·거래글·알림
+python -m scripts.seed_showcase 내이메일@gmail.com  # (선택, 발표용) 리뷰·문의·주문 + 내 계정에 선물·교환 신청·교환 진행 중 (한 번 로그인한 계정)
 uvicorn app.main:app --reload --port 8000
 
 # 3) 프론트 (저장소 루트, 새 터미널)

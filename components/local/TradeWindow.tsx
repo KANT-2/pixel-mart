@@ -36,8 +36,8 @@ export default function TradeWindow({ match, me }: TradeWindowProps) {
     <div className="border-t-2 border-frame bg-night/60 p-3 sm:p-4">
       <p className="mb-2 font-pixel text-[10px] tracking-widest text-dim">▶ ITEM INFO · {picked === "want" ? "내가 구하는 아이템" : "이웃의 아이템"}</p>
       <TradeCard post={item} />
-      {/* 이웃의 아이템에 내 WISH를 함께 붙여 신청 */}
-      <TradeRequestButton post={match.offer} offerPostId={match.want.id} className="sm:max-w-xs" />
+      {/* 교환 창에서 내 교환글(HAVE) 물건을 골라 신청 */}
+      <TradeRequestButton post={match.offer} className="sm:max-w-xs" />
       <p className="mt-2 text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WISH 글에서 보낼 수 있어요.</p>
     </div>
   </section>;
@@ -59,6 +59,10 @@ interface TraderPanelProps {
   item: TraderItem | null;
   active: boolean;
   onPick: () => void;
+  /** 여러 물건 중 고르기 — 주면 item 대신 칸마다 하나씩 올리고, 고른 칸만 방향 표시 */
+  items?: TraderItem[];
+  selected?: number | null;
+  onPickIndex?: (index: number) => void;
   priceLabel?: string;
   priceText: string;
   /** 이 칸의 아이템이 떠나는지(out: 보냄) 들어오는지(in: 받음) — 선물·교환에서 방향 표시 */
@@ -71,10 +75,8 @@ const FLOW = {
 } as const;
 
 /** 교환 창 한쪽 — 캐릭터, 이름, 아이템 칸 6개, 가격 줄 */
-export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, onPick, priceLabel = "희망가", priceText, flow }: TraderPanelProps) {
-  const direction = flow && item ? FLOW[flow] : null;
-  const rarity = rarityOf(item?.price);
-  const itemName = item?.name ?? "빈 칸";
+export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, onPick, items, selected = null, onPickIndex, priceLabel = "희망가", priceText, flow }: TraderPanelProps) {
+  const list = items ?? (item ? [item] : []);
   return <div className="flex min-w-0 flex-col rounded-md border-2 border-frame bg-panel">
     {/* 캐릭터 자리 — 이웃은 정책상 누구인지 보이지 않게 익명 슬라임 */}
     <div className="relative grid h-24 place-items-end justify-center overflow-hidden rounded-t bg-[linear-gradient(#17123a,#2a1f5c)] pb-1 sm:h-28">
@@ -92,16 +94,22 @@ export function TraderPanel({ name, subtitle, avatar, anonymous, item, active, o
       <p className="truncate text-[10px] text-dim">{subtitle}</p>
     </div>
     <div className="grid grid-cols-[repeat(3,minmax(0,4.5rem))] justify-center gap-1 px-2" aria-label={`${name}의 아이템 칸`}>
-      {Array.from({ length: SLOTS }, (_, index) => index === 0
-        ? <button key={index} type="button" onClick={onPick} aria-pressed={active} aria-label={`${itemName}${direction ? ` (${direction.badge})` : ""} 정보 보기`} title={itemName}
-          className={`item-slot relative grid aspect-square place-items-center overflow-hidden ${active ? "ring-2 ring-lime" : ""} ${direction?.slot ?? ""}`} style={item ? { ["--rarity" as string]: rarity.color } : undefined}>
-          {item ? (
+      {Array.from({ length: SLOTS }, (_, index) => {
+        const slot = list[index];
+        if (!slot && index > 0) return <span key={index} aria-hidden="true" className="aspect-square rounded border-2 border-frame bg-night" />;
+        const on = items ? selected === index : active;
+        const direction = flow && slot && (items ? on : true) ? FLOW[flow] : null;
+        const itemName = slot?.name ?? "빈 칸";
+        return <button key={index} type="button" onClick={() => (items && onPickIndex ? onPickIndex(index) : onPick())} aria-pressed={on}
+          aria-label={`${itemName}${direction ? ` (${direction.badge})` : ""} ${items ? "고르기" : "정보 보기"}`} title={itemName}
+          className={`item-slot relative grid aspect-square place-items-center overflow-hidden ${on ? "ring-2 ring-lime" : ""} ${direction?.slot ?? ""}`} style={slot ? { ["--rarity" as string]: rarityOf(slot.price).color } : undefined}>
+          {slot ? (
             // eslint-disable-next-line @next/next/no-img-element -- 상품 이미지 또는 보물상자
-            <img src={item.imageUrl ?? "/images/hero-chest.svg"} alt="" className={item.imageUrl ? "size-full object-cover" : "size-3/5 [image-rendering:pixelated]"} />
+            <img src={slot.imageUrl ?? "/images/hero-chest.svg"} alt="" className={slot.imageUrl ? "size-full object-cover" : "size-3/5 [image-rendering:pixelated]"} />
           ) : <span aria-hidden="true" className="font-pixel text-lg text-dim">+</span>}
           {direction && <span className={`absolute inset-x-0 bottom-0 py-0.5 text-center text-[10px] font-extrabold leading-none ${direction.tone} ${flow === "in" ? "motion-safe:animate-[pulse_1.2s_steps(2)_infinite]" : ""}`}>{direction.badge}</span>}
-        </button>
-        : <span key={index} aria-hidden="true" className="aspect-square rounded border-2 border-frame bg-night" />)}
+        </button>;
+      })}
     </div>
     <p className="mt-auto flex items-center justify-between gap-1 border-t-2 border-frame px-2 py-1.5 text-xs">
       <span className="flex items-center gap-1 text-dim">
