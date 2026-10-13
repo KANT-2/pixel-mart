@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Gift, Order, OrderItem, OrderStatusHistory, Product, TradePost, User
 from app.schemas.order import OrderCreate
-from app.services import activity
+from app.services import activity, notifications
 from app.services.trade_rules import contains_private_info
 
 
@@ -54,6 +54,25 @@ async def send_gift(
         message=message,
     )
     db.add(gift)
+    await db.flush()
+    await notifications.notify(
+        db,
+        gift.recipient_id,
+        "gift_received",
+        "선물이 도착했어요",
+        f"이웃이 보낸 {product.name} 선물이 도착했어요. 선물함에서 받아 주세요.",
+        notifications.GIFTS_HREF,
+        f"gift:{gift.id}",
+    )
+    await notifications.notify(
+        db,
+        sender.id,
+        "gift_sent",
+        "선물을 보냈어요",
+        f"{product.name} 선물을 보냈어요. 이웃이 받으면 알려 드릴게요.",
+        notifications.GIFTS_HREF,
+        f"gift:{gift.id}",
+    )
     await db.commit()
     return await get_gift(db, gift.id)
 
@@ -80,6 +99,8 @@ async def _received(db: AsyncSession, user: User, gift_id: int) -> Gift:
 async def accept_gift(db: AsyncSession, user: User, gift_id: int, body: OrderCreate) -> Gift:
     """받는 사람이 직접 입력한 주소로 그 사람의 주문을 만든다 (보낸 사람에게는 주소가 보이지 않음)"""
     gift = await _received(db, user, gift_id)
+    # 첫 장착·소원 성취 같은 뱃지를 알리려고 바꾸기 전 기록
+    before = await notifications.snapshot(db, user.id)
     order = Order(
         user_id=user.id,
         status="paid",
@@ -96,6 +117,8 @@ async def accept_gift(db: AsyncSession, user: User, gift_id: int, body: OrderCre
     gift.responded_at = datetime.now(UTC)
     # 선물 보내기 완료 — 받는 사람이 받았을 때 보낸 사람에게 (거절된 선물은 적립 안 함)
     await activity.award(db, gift.sender_id, "gift_sent", gift.id)
+    await _notify_sender(db, gift)
+    await notifications.notify_progress(db, user.id, before)
     await db.commit()
     return await get_gift(db, gift.id)
 
@@ -104,5 +127,23 @@ async def decline_gift(db: AsyncSession, user: User, gift_id: int) -> Gift:
     gift = await _received(db, user, gift_id)
     gift.status = "declined"  # 보낸 사람에게는 데모 환불로 보인다
     gift.responded_at = datetime.now(UTC)
+    await _notify_sender(db, gift)
     await db.commit()
     return await get_gift(db, gift.id)
+
+
+async def _notify_sender(db: AsyncSession, gift: Gift) -> None:
+    """보낸 사람에게 받기·거절 결과 알림 (금액·주소는 넣지 않는다)"""
+    if gift.status == "accepted":
+        title, body = "이웃이 선물을 받았어요", f"{gift.product.name} 선물이 잘 도착했어요."
+    else:
+        title, body = "이웃이 선물을 거절했어요", f"{gift.product.name} 선물은 돌려받았어요."
+    await notifications.notify(
+        db,
+        gift.sender_id,
+        f"gift_{gift.status}",
+        title,
+        body,
+        notifications.GIFTS_HREF,
+        f"gift:{gift.id}:{gift.status}",
+    )

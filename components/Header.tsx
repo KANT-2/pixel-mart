@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import CartButton from "@/components/CartButton";
 import HeaderShortcuts from "@/components/HeaderShortcuts";
+import NotificationBell from "@/components/NotificationBell";
 import UserMenu from "@/components/UserMenu";
 import HeaderNav, { HeaderNavFallback } from "@/components/HeaderNav";
 
@@ -22,6 +23,7 @@ export default function Header() {
         <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
           <HeaderShortcuts />
           <CartButton />
+          <NotificationBell />
           <UserMenu compact />
         </div>
       </div>

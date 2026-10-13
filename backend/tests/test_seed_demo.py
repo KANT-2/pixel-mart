@@ -58,3 +58,17 @@ async def test_demo_neighbors_show_on_map_with_extra_hearts(client, demo):
     cards = {c["nickname"]: c for b in blocks for c in b["cards"] if c and not c["isSample"]}
     assert cards["픽셀곰"]["hearts"] == 9 and cards["픽셀곰"]["lv"] == 4  # 295점
     assert cards["도트냥"]["hearts"] == 2 and cards["도트냥"]["coinBand"] == "1회+"
+
+
+async def test_demo_neighbors_have_example_notifications(demo):
+    # 알림 종이 비어 보이지 않게 2~3개, 다시 실행해도 늘지 않는다
+    async with engine.connect() as conn:
+        rows = (
+            await conn.execute(
+                text(
+                    "SELECT n.kind FROM notifications n JOIN users u ON u.id = n.user_id "
+                    "WHERE u.email = 'demo-pixelbear@demo.pixelmart.test'"
+                )
+            )
+        ).all()
+    assert sorted(r[0] for r in rows) == ["badge", "heart_up", "points"]

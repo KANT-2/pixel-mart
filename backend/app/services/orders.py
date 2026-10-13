@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import CartItem, Order, OrderItem, OrderStatusHistory, User
 from app.schemas.order import OrderCreate
+from app.services import notifications
 
 # 배송이 진행되는 순서 (취소 흐름은 따로 다룬다)
 DELIVERY_FLOW = ("paid", "preparing", "shipping", "delivered")
@@ -44,8 +45,20 @@ async def create_order_from_cart(db: AsyncSession, user: User, body: OrderCreate
         items=items,
         history=[OrderStatusHistory(status="paid")],  # 타임라인의 첫 줄
     )
+    before = await notifications.snapshot(db, user.id)
     db.add(order)
     await db.execute(delete(CartItem).where(CartItem.user_id == user.id))
+    await db.flush()
+    await notifications.notify(
+        db,
+        user.id,
+        "order_placed",
+        "주문이 완료됐어요",
+        f"주문번호 {order.id} · 상품 {sum(i.quantity for i in items)}개",
+        f"/mypage/orders/{order.id}",
+        f"order:{order.id}",
+    )
+    await notifications.notify_progress(db, user.id, before)  # 첫 장착·컬렉터·유니크 헌터
     await db.commit()
 
     # id·created_at 같은 DB가 채운 값을 읽어 온다

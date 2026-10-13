@@ -14,6 +14,7 @@ from app.routers import (
     health,
     local,
     local_trades,
+    notifications,
     orders,
     products,
     questions,
@@ -71,5 +72,6 @@ for router in (
     questions.router,
     questions.dev_router,
     compat.router,
+    notifications.router,
 ):
     app.include_router(router, prefix="/api")

@@ -92,3 +92,12 @@
 | GET | /api/gifts?box=received\|sent 🔒 | 받은/보낸 선물함 (최신순, 닉네임·주소 없음, `orderId`는 받은 사람만) | ✅ |
 | POST | /api/gifts/{id}/accept 🔒 | 받은 선물 받기 `{recipientName, address}` → 받는 사람의 주문 생성(배송 흐름), 남의 선물 404, 이미 처리 400 | ✅ |
 | POST | /api/gifts/{id}/decline 🔒 | 받은 선물 거절 → 보낸 사람에게 "거절 · 환불(데모)" | ✅ |
+
+## 알림 (앱 안 알림 종)
+| 메서드 | 경로 | 설명 | 상태 |
+| --- | --- | --- | --- |
+| GET | /api/notifications?limit= 🔒 | 내 알림 최신순 `{items: [{id, kind, title, body, href, createdAt, read}], unread}` — `limit` 1~50(기본 30, 범위 밖 422), `href`는 프론트 내부 경로(없으면 null), `unread`는 안 읽은 전체 수 | ✅ |
+| GET | /api/notifications/unread-count 🔒 | 안 읽은 알림 수 `{unread}` (약 30초마다 폴링용) | ✅ |
+| POST | /api/notifications/read 🔒 | 읽음 처리 `{ids: [int] \| null}` — ids가 null·생략이면 안 읽은 알림 전부, 남의 알림 id는 무시 → `{unread}` | ✅ |
+
+`kind` 와 이동 경로: `trade_request`·`trade_accepted`·`trade_declined` → `/local/trades/mine#trade-requests` · `order_placed` → `/mypage/orders/{id}` (일반 주문만, 선물로 생긴 주문은 제외) · `gift_received`·`gift_sent`·`gift_accepted`·`gift_declined` → `/mypage/gifts` · `points`·`heart_up` → `/mypage/quests` · `badge` → `/mypage`. 같은 일(`kind` + 내부 키)은 한 번만 쌓이고(뱃지는 평생 한 번), 금액·연락처는 넣지 않는다. 샘플 작성자에게는 보내지 않고 데모 이웃에게는 보낸다. `python -m scripts.seed_demo`는 알림이 없는 데모 이웃에게 예시 알림 2~3개를 넣는다.

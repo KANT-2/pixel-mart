@@ -90,8 +90,13 @@ async def award(db: AsyncSession, user_id: int, kind: str, ref_id: int = 0, now:
         )
         if today >= rule.daily_cap:
             return False
+    # 알림 서비스가 뱃지(→ 이 모듈)를 쓰므로 순환 import를 피해 여기서 불러온다
+    from app.services import notifications
+
+    before = await notifications.snapshot(db, user_id)
     db.add(ActivityPoint(user_id=user_id, kind=kind, ref_id=ref_id, points=rule.points))
     await db.flush()
+    await notifications.points_awarded(db, user_id, kind, ref_id, before)
     return True
 
 
