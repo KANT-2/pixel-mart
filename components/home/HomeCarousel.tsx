@@ -82,9 +82,9 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
       <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-[0.85fr_1.15fr] md:gap-8 md:px-10 md:py-10 lg:gap-12">
         {slide === 4 ? <>
           <div className="min-w-0">
-            <p className="mb-4 font-pixel text-xs tracking-widest text-mint">GOOD ITEMS, BETTER DAYS</p>
-            <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">일상에 아이템을<br /><span className="text-mint">장착하세요.</span></h1>
-            <p className="mt-4 text-sm leading-relaxed text-sub">좋아하는 게임이 있는 하루는,<br />언제나 조금 더 특별하니까.</p>
+            <p className="mb-4 font-pixel text-xs tracking-widest text-mint">PIXEL ART GAMING SHOP</p>
+            <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">게이머의 책상을<br /><span className="text-mint">픽셀로 채우세요.</span></h1>
+            <p className="mt-4 text-sm leading-relaxed text-sub">키캡·장패드·무드등, 8비트 감성 데스크 소품과<br />같은 취향의 동네 이웃을 한 곳에서.</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/products" className="btn-lime px-4 py-3 text-sm font-bold">▶ 아이템 둘러보기</Link>
               <Link href="/local" className="btn-pixel px-4 py-3 text-sm font-bold">월드맵 열기</Link>
@@ -156,7 +156,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
       <button type="button" aria-label="다음 슬라이드" onClick={() => move(1)} className={`${styles.arrow} absolute -right-11 top-1/2 z-10 flex size-11 -translate-y-1/2 items-center justify-center bg-transparent text-3xl text-ink hover:text-mint focus-visible:outline-2 focus-visible:outline-mint md:-right-12`}>›</button>
       <div className={`${styles.controls} flex h-14 items-center justify-center border-t border-line px-5`}>
         <div className="flex" role="group" aria-label="슬라이드 선택">{slideOrder.map((id, index) => <button type="button" key={id} aria-label={`${index + 1}번 ${labels[id]}`} aria-current={slide === id ? "true" : undefined} onClick={() => change(id)} className="flex size-11 items-center justify-center rounded focus-visible:outline-2 focus-visible:outline-mint"><span aria-hidden="true" className={`size-3 rounded-full ${slide === id ? "bg-mint" : "bg-panel-2 border border-line"}`} /></button>)}</div>
-        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 4 ? "일상에 아이템을 장착하세요." : slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
+        <span aria-live="polite" aria-atomic="true" className="sr-only">{slideOrder.indexOf(slide) + 1}/{slideOrder.length} {slide === 4 ? "게이머의 책상을 픽셀로 채우세요." : slide === 3 ? "우리 동네에도 같은 덕후가 있을까?" : title}</span>
       </div>
       </>}
     </div>
