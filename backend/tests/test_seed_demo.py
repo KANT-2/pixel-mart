@@ -47,8 +47,13 @@ async def test_demo_neighbors_have_posts_to_request(client, demo):
     haves = (await client.get("/api/local/trades", params={"nickname": "슬라임킹", "kind": "have"})).json()["items"]
     assert len(haves) == 2 and all(h["product"] and h["condition"] and h["isDemo"] for h in haves)
 
+    # 교환은 내 교환글(HAVE)의 물건으로 신청한다
     await client.post("/api/auth/dev-login", json={"email": "demo-gifter@pixelmart.test", "nickname": "선물러테스트"})
-    res = await client.post("/api/local/trade-requests", json={"postId": haves[0]["id"]})
+    await client.put("/api/users/me/local", json={"regionCode": "41135-02", "interestIds": []})
+    item = await client.post("/api/local/trades", json={"kind": "have", "itemName": "코인 키링", "condition": "used"})
+    assert item.status_code == 201, item.text
+    body = {"postId": haves[0]["id"], "offerPostId": item.json()["id"]}
+    res = await client.post("/api/local/trade-requests", json=body)
     assert res.status_code == 201, res.text
 
 

@@ -53,7 +53,7 @@ function AccountTrades({ created }: AccountTradesProps) {
     {created && <p role="status" className="rounded-xl border border-mint/30 bg-panel p-4 text-sm text-mint">글을 등록했어요. 내 글과 매칭을 확인해 보세요.</p>}
     {notice && <p role="status" className="text-sm text-mint">{notice}</p>}
     {error && <p role="alert" className="text-sm text-pink">{error}</p>}
-    {result.error ? <LocalError message={result.error} onRetry={() => void result.refresh()} busy={pending !== null} /> : result.loading ? <LocalSkeleton label="내 글과 매칭 불러오는 중" /> : result.data && <>
+    {result.error ? <LocalError message={result.error} onRetry={() => void result.refresh()} busy={pending !== null} /> : result.loading && !result.data ? <LocalSkeleton label="내 글과 매칭 불러오는 중" /> : result.data && <>
       {/* 처리할 일(받은 신청)이 먼저 보이게 맨 위에 */}
       <TradeRequestInbox onChanged={() => void result.refresh()} />
       <section aria-labelledby="my-trades-title"><h2 id="my-trades-title" className="mb-5 text-xl font-bold">내 글 · {result.data.posts.length}개</h2>

@@ -139,8 +139,14 @@ async def test_trade_request_and_accept(users):
     post = (
         await owner.post("/api/local/trades", json={"kind": "have", "itemName": "슬라임 키링", "condition": "used"})
     ).json()
-    mine = (await me.post("/api/local/trade-requests", json={"postId": post["id"]})).json()
-    await rival.post("/api/local/trade-requests", json={"postId": post["id"]})
+
+    async def item(c, name):
+        return (await c.post("/api/local/trades", json={"kind": "have", "itemName": name, "condition": "used"})).json()
+
+    my_item, rival_item = await item(me, "코인 키링"), await item(rival, "던전 키링")
+    body = {"postId": post["id"], "offerPostId": my_item["id"]}
+    mine = (await me.post("/api/local/trade-requests", json=body)).json()
+    await rival.post("/api/local/trade-requests", json={"postId": post["id"], "offerPostId": rival_item["id"]})
 
     got = await inbox(owner)
     assert kinds(got) == ["trade_request", "trade_request"]
@@ -151,13 +157,19 @@ async def test_trade_request_and_accept(users):
 
     assert (await owner.post(f"/api/local/trade-requests/{mine['id']}/accept")).status_code == 200
     mine_box = await inbox(me)
-    assert "trade_accepted" in kinds(mine_box) and "points" in kinds(mine_box)
+    # 수락은 교환 진행 시작 — 점수는 두 사람이 모두 받았을 때
+    assert "trade_accepted" in kinds(mine_box) and "points" not in kinds(mine_box)
     accepted = next(n for n in mine_box if n["kind"] == "trade_accepted")
     assert accepted["href"] == "/local/trades/mine#trade-requests"
     # 같은 글의 다른 신청은 자동 거절 알림
     assert "trade_declined" in kinds(await inbox(rival))
-    # 거래 완료 점수·첫 거래 뱃지는 두 사람 모두
+    # 한 사람이 받았다고 하면 상대에게 알림, 둘 다 받으면 완료
+    await me.post(f"/api/local/trade-requests/{mine['id']}/received")
+    assert "trade_received" in kinds(await inbox(owner))
+    await owner.post(f"/api/local/trade-requests/{mine['id']}/received")
+    # 거래 완료 점수·첫 거래 뱃지·교환 완료 알림은 두 사람 모두
     for c in (owner, me):
+        assert "trade_completed" in kinds(await inbox(c))
         box = await inbox(c)
         points = next(n for n in box if n["kind"] == "points")
         assert (points["title"], points["body"], points["href"]) == (
@@ -174,7 +186,10 @@ async def test_decline_notifies_requester(users):
     post = (
         await owner.post("/api/local/trades", json={"kind": "have", "itemName": "던전 키링", "condition": "used"})
     ).json()
-    req = (await me.post("/api/local/trade-requests", json={"postId": post["id"]})).json()
+    item_body = {"kind": "have", "itemName": "코인 키링", "condition": "used"}
+    my_item = (await me.post("/api/local/trades", json=item_body)).json()
+    body = {"postId": post["id"], "offerPostId": my_item["id"]}
+    req = (await me.post("/api/local/trade-requests", json=body)).json()
     await owner.post(f"/api/local/trade-requests/{req['id']}/decline")
     assert kinds(await inbox(me)) == ["trade_declined"]
 

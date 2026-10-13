@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { ExchangeDialog, TradeComposer, TradeProgress } from "@/components/local/TradeExchange";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { useAuth } from "@/components/AuthProvider";
-import { ApiError } from "@/lib/api";
 import { localApi } from "@/lib/local";
 import type { ApiTradePost, ApiTradeRequest } from "@/types/api";
 
@@ -33,42 +33,33 @@ export function SentRequestsProvider({ children }: { children: ReactNode }) {
 
 interface TradeRequestButtonProps {
   post: ApiTradePost;
-  /** 함께 보낼 내 글 (교환 창에서 내 WISH) */
-  offerPostId?: number | null;
   className?: string;
 }
 
-/** 이웃 글에 교환 신청 / 신청 취소 — 채팅·연락처 없이 신청과 수락만 */
-export default function TradeRequestButton({ post, offerPostId = null, className = "" }: TradeRequestButtonProps) {
+/** 이웃 글의 교환 버튼 — 누르면 교환 창이 열려 내 교환글 물건을 골라 신청, 이미 신청했으면 진행 상황을 본다 */
+export default function TradeRequestButton({ post, className = "" }: TradeRequestButtonProps) {
   const { user } = useAuth();
   const sent = useContext(SentContext);
+  const [open, setOpen] = useState(false);
   const [mine, setMine] = useState<ApiTradeRequest | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const request = mine ?? sent?.byPost.get(post.id) ?? null;
-  const pending = request?.status === "pending";
+  const close = useCallback(() => setOpen(false), []);
 
   if (post.isMine || post.isSample || post.status !== "open") return null;
-  if (!user) return <Link href="/login?next=/local/trades" className={`btn-pixel inline-flex h-10 items-center justify-center px-4 text-sm font-bold ${className}`}>로그인하고 교환 신청</Link>;
+  if (!user) return <Link href="/login?next=/local/trades" className={`btn-pixel mt-3 inline-flex h-10 w-full items-center justify-center px-4 text-sm font-bold ${className}`}>로그인하고 교환 신청</Link>;
 
-  async function act() {
-    if (busy) return;
-    setBusy(true); setError(null);
-    try {
-      const next = pending && request ? await localApi.answerRequest(request.id, "cancel") : await localApi.requestTrade(post.id, offerPostId);
-      setMine(next);
-      await sent?.refresh();
-    } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : "교환 신청을 보내지 못했어요. 다시 시도해 주세요.");
-    } finally { setBusy(false); }
-  }
-
+  const changed = (next: ApiTradeRequest) => { setMine(next); void sent?.refresh(); };
+  const pending = request?.status === "pending";
   return <div className={`mt-3 ${className}`}>
-    <button type="button" onClick={() => void act()} disabled={busy} aria-pressed={pending}
-      className={`${pending ? "btn-pixel text-sub" : "btn-lime text-lime-ink"} inline-flex h-10 w-full items-center justify-center gap-1.5 px-4 text-sm font-bold disabled:opacity-50`}>
-      {busy ? "보내는 중…" : pending ? "신청함 · 취소하기" : "⇄ 교환 신청"}
+    <button type="button" onClick={() => setOpen(true)} aria-haspopup="dialog"
+      className={`${pending ? "btn-pixel text-ink" : "btn-lime text-lime-ink"} inline-flex h-10 w-full items-center justify-center gap-1.5 px-4 text-sm font-bold`}>
+      {pending ? "⇄ 교환 창 보기 · 신청 완료" : post.kind === "sell" ? "⇄ 교환·구매 신청" : "⇄ 교환하기"}
     </button>
-    {pending && !error && <p role="status" className="mt-1.5 text-[11px] text-mint">상대가 수락하면 두 글 모두 거래 완료로 바뀌어요.</p>}
-    {error && <p role="alert" className="mt-1.5 text-xs text-pink">{error}</p>}
+    {pending && <p role="status" className="mt-1.5 text-[11px] text-mint">교환 신청을 보냈어요. 상대가 수락하면 교환이 시작돼요.</p>}
+    {open && <ExchangeDialog title={post.itemName} onClose={close}>
+      {request && request.status !== "cancelled" && request.status !== "declined"
+        ? <TradeProgress request={request} onChanged={changed} />
+        : <TradeComposer target={post} onSent={changed} />}
+    </ExchangeDialog>}
   </div>;
 }

@@ -43,7 +43,7 @@ export const localApi = {
   /** 교환 신청 — 받은 신청(내 글에 온 것) / 보낸 신청 */
   tradeRequests: (box: "received" | "sent", signal?: AbortSignal) => api.get<ApiTradeRequest[]>(`/local/trade-requests?${query({ box })}`, options(signal)),
   requestTrade: (postId: number, offerPostId: number | null, signal?: AbortSignal) => api.post<ApiTradeRequest>("/local/trade-requests", { postId, offerPostId }, options(signal)),
-  answerRequest: (id: number, action: "accept" | "decline" | "cancel", signal?: AbortSignal) => api.post<ApiTradeRequest>(`/local/trade-requests/${id}/${action}`, undefined, options(signal)),
+  answerRequest: (id: number, action: "accept" | "decline" | "cancel" | "received", signal?: AbortSignal) => api.post<ApiTradeRequest>(`/local/trade-requests/${id}/${action}`, undefined, options(signal)),
   matches: (signal?: AbortSignal) => api.get<ApiTradeMatch[]>("/local/trades/matches", options(signal)),
   wishMap: (region: string, signal?: AbortSignal) => api.get<ApiWishMapItem[]>(`/local/wish-map?${query({ region, limit: 10 })}`, options(signal)),
   searchProducts: (q: string, signal?: AbortSignal, page = 1, size = 24) => api.get<Page<ApiProduct>>(`/products?${query({ q: [...q.trim()].slice(0, 50).join(""), page, size })}`, options(signal)),
