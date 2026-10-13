@@ -63,3 +63,12 @@ test("별도 경로의 쿼리를 상품 필터로 해석하거나 변경하지 �
   const rendered = links(Pagination({ currentPage: 1, totalPages: 2, basePath: "/mypage/wishlist", query: "view=saved&page=8&page=9" }));
   assert.deepEqual(rendered.map((link) => link.href), ["/mypage/wishlist?view=saved", "/mypage/wishlist?view=saved&page=2", "/mypage/wishlist?view=saved&page=2"]);
 });
+
+test("현재 페이지 앞뒤 5칸과 처음·끝을 보여 준다", () => {
+  const pages = (currentPage) => links(Pagination({ currentPage, totalPages: 15 }))
+    .filter((link) => !link["aria-label"]).map((link) => Number(new URL(link.href, "http://localhost").searchParams.get("page") ?? 1));
+  assert.deepEqual(pages(1), [1, 2, 3, 4, 5, 15]);
+  assert.deepEqual(pages(8), [1, 6, 7, 8, 9, 10, 15]);
+  assert.deepEqual(pages(4), [1, 2, 3, 4, 5, 6, 15]);
+  assert.deepEqual(pages(15), [1, 11, 12, 13, 14, 15]);
+});
