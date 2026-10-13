@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import InterestFilter from "@/components/local/InterestFilter";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalProfile, useRegions } from "@/components/local/LocalProvider";
@@ -67,6 +67,12 @@ export default function FandomMapScreen() {
   // 모바일: 검색 줄은 눌러서 펼치고, 지역 정보는 동네·캐릭터를 눌렀을 때 아래 시트로
   const [searchOpen, setSearchOpen] = useState(false);
   const [sheet, setSheet] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  // 펼치면 정보 윗부분이 화면에 들어오도록 조금만 스크롤 (지도는 위에 그대로)
+  useEffect(() => {
+    if (!sheet || window.matchMedia("(min-width: 640px)").matches) return;
+    sheetRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [sheet, pinned]);
   const pickPin = (code: string, index: number) => {
     const block = mapBlocks.find((item) => item.code === code);
     const data = blocks.data?.find((item) => item.code === code);
@@ -141,12 +147,11 @@ export default function FandomMapScreen() {
           </ul></MapNotes>
         </div>
       </div>
-      {/* 모바일: 지역을 고르기 전 안내 카드는 숨기고, 동네·캐릭터를 누르면 아래에서 올라오는 시트 */}
+      {/* 모바일: 지역을 고르기 전 안내 카드는 숨기고, 동네·캐릭터를 누르면 지도 아래에 펼친다 (지도를 가리지 않게) */}
       {panelCode && !sheet && <button type="button" onClick={() => setSheet(true)} className={`${localButton} w-full sm:hidden`}>
         {byCode.get(panelCode)?.name} 정보·구매 순위 보기
       </button>}
-      <div className={sheet ? "fixed inset-x-0 bottom-0 z-40 max-h-[65dvh] overflow-y-auto rounded-t-2xl border-t-2 border-line bg-night p-3 shadow-2xl sm:static sm:z-auto sm:max-h-none sm:overflow-visible sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none" : "hidden sm:block"}
-        role={sheet ? "dialog" : undefined} aria-label={sheet ? "지역 정보" : undefined}>
+      <div ref={sheetRef} className={sheet ? "scroll-mt-20" : "hidden sm:block"} aria-label={sheet ? "지역 정보" : undefined}>
         {sheet && <div className="mb-2 flex justify-end sm:hidden">
           <button type="button" onClick={() => setSheet(false)} className="btn-pixel min-h-9 px-3 text-xs font-bold" aria-label="지역 정보 닫기">닫기 ✕</button>
         </div>}
