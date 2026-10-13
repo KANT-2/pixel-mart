@@ -57,4 +57,4 @@ async def test_demo_neighbors_show_on_map_with_extra_hearts(client, demo):
     blocks = (await client.get("/api/local/map-avatars", params={"region": "41135"})).json()
     cards = {c["nickname"]: c for b in blocks for c in b["cards"] if c and not c["isSample"]}
     assert cards["픽셀곰"]["hearts"] == 9 and cards["픽셀곰"]["lv"] == 4  # 295점
-    assert cards["도트냥"]["hearts"] == 2 and cards["도트냥"]["coinBand"] == "교환 1회+"
+    assert cards["도트냥"]["hearts"] == 2 and cards["도트냥"]["coinBand"] == "1회+"

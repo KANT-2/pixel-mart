@@ -59,18 +59,18 @@ def test_levels_and_coin_bands():
     ]
     assert [activity.coin_band(n) for n in (0, 1, 4, 5, 9, 10, 29, 30, 49, 50, 99, 100, 500)] == [
         None,
-        "교환 1회+",
-        "교환 1회+",
-        "교환 5회+",
-        "교환 5회+",
-        "교환 10회+",
-        "교환 10회+",
-        "교환 30회+",
-        "교환 30회+",
-        "교환 50회+",
-        "교환 50회+",
-        "교환 100회+",
-        "교환 100회+",
+        "1회+",
+        "1회+",
+        "5회+",
+        "5회+",
+        "10회+",
+        "10회+",
+        "30회+",
+        "30회+",
+        "50회+",
+        "50회+",
+        "100회+",
+        "100회+",
     ]
 
 
@@ -167,7 +167,7 @@ async def test_trade_done_once_per_post_and_daily_cap(users):
         await me.patch(f"/api/local/trades/{post_id}", json={"status": "done"})
     mine = await score(me)
     assert mine["coins"] == 3  # 하루 최대 3건
-    assert mine["score"] == 5 + 20 * 3 and mine["hearts"] == 2 and mine["coinBand"] == "교환 1회+"
+    assert mine["score"] == 5 + 20 * 3 and mine["hearts"] == 2 and mine["coinBand"] == "1회+"
 
 
 async def test_cards_only_for_opted_in_and_without_identity(users):

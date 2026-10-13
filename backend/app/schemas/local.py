@@ -77,7 +77,7 @@ class MapCardOut(CamelModel):
     hearts: int = Field(ge=0, le=99, description='지역 커뮤니티 참여도 0~99 (화면은 하트 3개 + "+N")')
     lv: int = Field(ge=1, le=10, description="레벨 1~10 — 하트 1·4·9·16…개마다 1씩 (하트보다 천천히 오른다)")
     level: str = Field(examples=["단골 이웃"])
-    coin_band: str | None = Field(description="완료한 교환·거래 구간 (예: '교환 5회+'), 없으면 null")
+    coin_band: str | None = Field(description="완료한 교환·거래 구간 (예: '5회+'), 없으면 null")
     interests: list[str] = Field(description="취향 공개 동의자의 취향 이름 (최대 3개)")
     want_count: int = Field(description="진행 중인 WANT 글 수 (닉네임 공개일 때만, 아니면 0)")
     is_me: bool = Field(description="보고 있는 내 캐릭터")
