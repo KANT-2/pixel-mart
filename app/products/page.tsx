@@ -4,12 +4,11 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import ProductFilterBar from "@/components/ProductFilterBar";
 import { products } from "@/data/products";
-import Pagination from "@/components/Pagination";
-import ProductCard from "@/components/ProductCard";
+import ProductInfiniteGrid from "@/components/products/ProductInfiniteGrid";
 import ProductFilters from "@/components/ProductFilters";
 import { getCategories, getProducts, PAGE_SIZE, getRarityCounts } from "@/lib/products";
 import { ProductFallbackNotice, ProductSkeleton } from "@/components/products/ProductStates";
-import { normalizeProductQuery, productHref, productQueryParams, type ProductQuery } from "@/utils/productQuery";
+import { normalizeProductQuery, productApiParams, productHref, productQueryParams, type ProductQuery } from "@/utils/productQuery";
 
 export const metadata: Metadata = { title: "전체 상품 | PIXEL MART" };
 
@@ -49,9 +48,12 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
   const categoryResult = await getCategories();
   const query = normalizeProductQuery(productQueryParams(requestedQuery), categoryResult.data.map((item) => item.slug));
   const category = categoryResult.data.find((item) => item.slug === query.category);
-  const [result, rarityCounts] = await Promise.all([getProducts(query), getRarityCounts(query.category)]);
-  const { items, page, totalPages, total } = result.data;
-  const currentQuery = { ...query, page };
+  // 페이지 번호 없이 첫 페이지만 서버에서 그리고, 나머지는 내려가며 이어서 불러온다 (예전 ?page= 링크는 첫 페이지로 정리)
+  const [result, rarityCounts] = await Promise.all([getProducts({ ...query, page: 1 }), getRarityCounts(query.category)]);
+  const { items, totalPages, total } = result.data;
+  const currentQuery = { ...query, page: 1 };
+  const apiQuery = productApiParams(currentQuery, 1, PAGE_SIZE);
+  apiQuery.delete("page");
   const canonical = productQueryParams(currentQuery);
   // 공유된 잘못된 URL도 화면과 같은 조건으로 정리합니다. 키 순서는 비교하지 않습니다.
   if (Object.keys(raw).length !== canonical.size || Object.entries(raw).some(([key, value]) => value !== canonical.get(key))) {
@@ -64,7 +66,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
         <p className="stage-kicker mb-2 font-pixel text-xs tracking-widest text-mint">{category ? category.slug.toUpperCase() : "ALL ITEMS"}</p>
         <h1 className="text-3xl font-extrabold">{category ? category.name : "전체 상품"}</h1>
         <p className="mt-2 break-words text-sm text-sub" aria-live="polite">
-          {query.q ? `‘${query.q}’ 검색 결과 ${total}개` : `총 ${total}개`} · {page} / {totalPages} 페이지
+          {query.q ? `‘${query.q}’ 검색 결과 ${total}개` : `총 ${total}개`}
         </p>
       </header>
 
@@ -94,12 +96,9 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
           <Link href="/products" className="mt-6 inline-block btn-lime px-6 py-3 font-bold text-lime-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-violet">필터 초기화</Link>
         </section>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {items.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
+        // 조건이 바뀌면 처음부터 다시 쌓는다
+        <ProductInfiniteGrid key={canonical.toString()} initial={items} totalPages={result.fallback ? 1 : totalPages} size={PAGE_SIZE} apiQuery={apiQuery.toString()} />
       )}
-
-      <Pagination currentPage={page} totalPages={totalPages} query={canonical.toString()} />
     </>
   );
 }
