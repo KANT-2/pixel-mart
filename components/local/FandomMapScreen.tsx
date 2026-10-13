@@ -151,7 +151,8 @@ export default function FandomMapScreen() {
       {panelCode && !sheet && <button type="button" onClick={() => setSheet(true)} className={`${localButton} w-full sm:hidden`}>
         {byCode.get(panelCode)?.name} 정보·구매 순위 보기
       </button>}
-      <div ref={sheetRef} className={sheet ? "scroll-mt-20" : "hidden sm:block"} aria-label={sheet ? "지역 정보" : undefined}>
+      {/* 넓은 화면: 오른쪽 정보 패널 윗선을 지도 윗선에 맞춘다 (지도 위 제목 줄 높이만큼) */}
+      <div ref={sheetRef} className={`${sheet ? "scroll-mt-20" : "hidden sm:block"} lg:mt-8`} aria-label={sheet ? "지역 정보" : undefined}>
         {sheet && <div className="mb-2 flex justify-end sm:hidden">
           <button type="button" onClick={() => setSheet(false)} className="btn-pixel min-h-9 px-3 text-xs font-bold" aria-label="지역 정보 닫기">닫기 ✕</button>
         </div>}
