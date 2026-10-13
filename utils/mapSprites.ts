@@ -187,7 +187,7 @@ const CHARACTER_FILES = [
   "person-1", "person-2", "person-3",
 ];
 
-// 장르 같은 일반 이름의 작품만 어울리는 캐릭터로, 실제 작품 이름은 무작위 (공식 캐릭터를 흉내 내지 않게)
+// 장르 이름 태그만 어울리는 캐릭터로, 실제 작품은 무작위 (공식 캐릭터를 흉내 내지 않게)
 const ICON_BY_NAME: Record<string, string> = {
   "레트로 RPG": "person-1", "픽셀 게임": "slime-1", "던전 크롤러": "ghost-1",
 };

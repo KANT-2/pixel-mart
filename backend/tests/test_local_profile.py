@@ -62,9 +62,13 @@ async def test_regions_by_level(client, db_ready):
 async def test_interests_types_and_search(client, db_ready):
     # 취향은 작품만 남겼다 (캐릭터·스타일·상품 종류 없음)
     works = (await client.get("/api/interests", params={"type": "work"})).json()
-    assert [i["name"] for i in works] == ["나루토", "레트로 RPG", "픽셀 게임", "던전 크롤러"]
+    # 애니·게임 장르별 5개씩 50개 + 장르 이름 태그 3개, 장르 순서대로
+    first_genre = ["나루토", "원피스", "귀멸의 칼날", "주술회전", "드래곤볼"]
+    assert len(works) == 53 and [i["name"] for i in works[:5]] == first_genre
     assert (await client.get("/api/interests", params={"type": "character"})).json() == []
-    assert [i["name"] for i in (await client.get("/api/interests", params={"q": "RPG"})).json()] == ["레트로 RPG"]
+    found = (await client.get("/api/interests", params={"q": "드래곤"})).json()
+    assert [i["name"] for i in found] == ["드래곤볼", "드래곤 퀘스트"]
+    assert [i["name"] for i in works[-3:]] == ["레트로 RPG", "픽셀 게임", "던전 크롤러"]
     assert (await client.get("/api/interests", params={"type": "genre"})).status_code == 422
 
 
