@@ -4,10 +4,12 @@
     position: absolute;
     inset: 0 0 52px auto;
     z-index: -1;
-    width: 64%;
+    width: 84%;
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 42%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 42%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
+    /* 지도는 예전 크기 그대로 오른쪽에 두고, 왼쪽은 지도 바다색으로 이어서 글자 쪽까지 녹인다 */
+    background: #0f1a3a;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 50%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 50%), linear-gradient(to bottom, transparent, #000 12%, #000 86%, transparent);
     -webkit-mask-composite: source-in;
     mask-composite: intersect;
   }
@@ -16,7 +18,8 @@
   .mapBg > [role="group"] {
     position: absolute;
     top: 50%;
-    left: 0;
+    right: 0;
+    width: 76%;
     transform: translateY(-50%);
     border: 0;
     border-radius: 0;

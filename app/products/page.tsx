@@ -97,7 +97,7 @@ async function ProductResults({ query: requestedQuery, raw }: ProductResultsProp
         </section>
       ) : (
         // 조건이 바뀌면 처음부터 다시 쌓는다
-        <ProductInfiniteGrid key={canonical.toString()} initial={items} totalPages={result.fallback ? 1 : totalPages} size={PAGE_SIZE} apiQuery={apiQuery.toString()} />
+        <ProductInfiniteGrid key={`grid:${canonical}`} initial={items} totalPages={result.fallback ? 1 : totalPages} size={PAGE_SIZE} apiQuery={apiQuery.toString()} />
       )}
     </>
   );
