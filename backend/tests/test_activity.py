@@ -195,6 +195,15 @@ async def test_cards_only_for_opted_in_and_without_identity(users):
         "isMe": True,
         "isPublic": True,
         "isSample": False,
+        # 가입·동네 등록·첫 WANT 3개 중 가장 받기 어려운 첫 WANT가 대표
+        "badge": {
+            "code": "first_want",
+            "icon": "💌",
+            "image": "/images/badges/first_want.png",
+            "name": "첫 WANT",
+            "description": "갖고 싶은 아이템 WANT 글 첫 등록",
+        },
+        "badgeCount": 3,
     }
     other = next(c for c in cards if not c["isMe"])
     assert other["nickname"] is None and other["interests"] == [] and other["wantCount"] == 0  # 닉네임·취향 비공개

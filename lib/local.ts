@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import type { ApiBuyerRanking, ApiMyActivity, ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiMapAvatars, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
+import type { ApiBadgeBook, ApiBuyerRanking, ApiMyActivity, ApiFandom, ApiFandomRank, ApiInterest, ApiLocalProfile, ApiMapAvatars, ApiRegion, FandomPeriod, InterestType, LocalProfileInput } from "@/types/api";
 import type { ApiProduct, ApiTradePost, ApiTradeMatch, ApiTradeRequest, ApiWishMapItem, ApiWishWants, Page, TradeInput } from "@/types/api";
 import type { TradeQuery } from "@/utils/localTrades";
 
@@ -25,6 +25,7 @@ export const localApi = {
     api.get<ApiMapAvatars[]>(`/local/map-avatars?${query({ region: region || undefined, interest })}`, options(signal)),
   /** 내 활동 점수 (하트·코인) — 나에게만 정확한 값 */
   myActivity: (signal?: AbortSignal) => api.get<ApiMyActivity>("/users/me/activity", options(signal)),
+  myBadges: (signal?: AbortSignal) => api.get<ApiBadgeBook>("/users/me/badges", options(signal)),
   /** 지역 구매 순위 TOP 10 (금액 비공개) */
   buyerRanking: (region: string, interest?: number, signal?: AbortSignal) =>
     api.get<ApiBuyerRanking>(`/local/buyer-ranking?${query({ region, interest })}`, options(signal)),

@@ -3,17 +3,18 @@ import PixelIcon from "@/components/PixelIcon";
 import Link from "next/link";
 import AvatarShortcut from "@/components/avatar/AvatarShortcut";
 import NicknameEditor from "@/components/profile/NicknameEditor";
+import BadgeBook from "@/components/profile/BadgeBook";
 
 export const metadata: Metadata = { title: "마이페이지 | PIXEL MART" };
 
-// TODO(#47): 프로필·뱃지와 로그인 사용자 전용 화면 연결
 export default function MyPage() {
   return <section className="mx-auto max-w-xl px-4 py-20 text-center">
     <p className="stage-kicker mb-3 font-pixel text-mint">MY PLAYER</p>
     <h1 className="mb-4 text-3xl font-extrabold">마이페이지</h1>
-    <p className="mb-8 text-sub">프로필과 뱃지를 모아 볼 공간을 준비 중이에요.</p>
+    <p className="mb-8 text-sub">내 프로필과 활동 뱃지를 모아 보세요.</p>
     <NicknameEditor />
     <AvatarShortcut />
+    <BadgeBook />
     <Link href="/local/settings" className="mb-6 flex items-center gap-4 pixel-panel p-5 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-mint">
       <span aria-hidden="true" className="grid size-16 shrink-0 place-items-center rounded-lg bg-panel-2 font-pixel text-mint">LOC</span>
       <span><span className="block font-bold">내 동네·취향 설정 →</span><span className="mt-1 block text-sm text-sub">우리 동네의 취향을 발견하고 집계 참여 여부를 설정하세요.</span></span>
