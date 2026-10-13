@@ -94,12 +94,18 @@
     overflow: visible;
   }
 
+  /* 2·3번 배너(룩북 h1, 월드맵 h2 — font-pixel은 전역 클래스라 :global) 제목은 같은 크기 */
   .carousel h1,
-  /* 월드맵 배너 제목(h2)도 같은 크기 — font-pixel은 전역 클래스라 :global */
   .carousel h2:global(.font-pixel) {
+    font-size: clamp(26px, 2.4vw, 36px);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+
+  /* 첫 배너(내 캐릭터)만 크게 */
+  .carousel [aria-roledescription="슬라이드"]:has(.stageSlot) h1 {
     font-size: clamp(30px, 3.4vw, 48px);
     line-height: 1.2;
-    letter-spacing: -0.01em;
   }
 
   .carousel h1 + p {

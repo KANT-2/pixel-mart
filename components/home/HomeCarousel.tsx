@@ -115,7 +115,8 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
         </div>}
         <div className="min-w-0">
           <p className="mb-4 font-pixel text-xs tracking-widest text-mint">{slide === 0 ? "PIXEL QUEST" : slide === 1 ? "DESK LOOKBOOK" : "COMING SOON"}</p>
-          <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">{title}</h1>
+          {/* 월드맵 배너처럼 두 줄로 — 쉼표나 "을/를 " 뒤에서 줄바꿈 */}
+          <h1 className="font-pixel text-3xl font-bold leading-tight text-ink md:text-4xl">{splitTitle(title)}</h1>
           <p className="mt-4 min-h-14 text-sm leading-relaxed text-sub">{slide === 0 ? "도착한 선물과 매칭, 진행 중인 거래를 한눈에 확인하세요." : slide === 1 ? neighborhood ? "공개 기준을 충족한 우리 동네의 인기 찜 상품을 살펴보세요." : "키캡·장패드·소품으로 나만의 데스크를 꾸며보세요." : "취향으로 꾸민 데스크를 만나는 토너먼트를 준비하고 있어요."}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link className="btn-lime px-4 py-3 text-sm font-bold" href={slide === 0 ? user ? "/local/trades/mine" : "/login" : slide === 1 ? `/lookbook?theme=${theme.slug}` : "/lookbook"}>{slide === 0 ? user ? "내 거래 보기 →" : "로그인하고 퀘스트 보기 →" : slide === 1 ? `${theme.name} 테마 상품 보기 →` : "데스크 테마 둘러보기 →"}</Link>
@@ -184,4 +185,11 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
       </>}
     </div>
   </section>;
+}
+
+/** 배너 제목을 두 줄로 — 쉼표가 있으면 그 뒤, 없으면 가운데 띄어쓰기에서 */
+function splitTitle(title: string) {
+  const at = title.includes(", ") ? title.indexOf(", ") + 1 : title.lastIndexOf(" ", Math.ceil(title.length / 2) + 2);
+  if (at <= 0) return title;
+  return <>{title.slice(0, at).trim()}<br />{title.slice(at).trim()}</>;
 }
