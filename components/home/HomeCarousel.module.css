@@ -95,7 +95,8 @@
   }
 
   .carousel h1,
-  .carousel h2.font-pixel {
+  /* 월드맵 배너 제목(h2)도 같은 크기 — font-pixel은 전역 클래스라 :global */
+  .carousel h2:global(.font-pixel) {
     font-size: clamp(30px, 3.4vw, 48px);
     line-height: 1.2;
     letter-spacing: -0.01em;
@@ -147,15 +148,10 @@
   /* 글자 왼쪽·무대 오른쪽 끝을 헤더 로고·장바구니 줄과 맞춘다 (화살표는 바깥 여백에) */
   .carousel > div > [aria-roledescription="슬라이드"] {
     height: 430px;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  /* 배경 이미지가 깔린 슬라이드(데스크 룩북)는 글자가 가장자리에 붙지 않게 안쪽 여백 유지 */
-  .carousel > div > [aria-roledescription="슬라이드"]:has(> [aria-hidden="true"]) {
-    padding-left: 40px;
-    padding-right: 40px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* 세 배너 글자가 같은 자리에서 시작하게 (그림은 모두 배경으로 깔려 여백과 상관없음) */
+    padding-left: 48px;
+    padding-right: 48px;
   }
 
 
