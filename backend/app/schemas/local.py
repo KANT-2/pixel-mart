@@ -48,6 +48,28 @@ class LocalProfileOut(CamelModel):
     map_card_public: bool
 
 
+class BadgeOut(CamelModel):
+    """활동 뱃지 (기록으로 계산 — 받은 날짜는 없음)"""
+
+    code: str = Field(examples=["santa"])
+    icon: str = Field(examples=["🎁"], description="글자 아이콘 (그림을 못 불러올 때)")
+    image: str = Field(examples=["/images/badges/santa.png"], description="16×16 픽셀 아이콘 경로")
+    name: str = Field(examples=["동네 산타"])
+    description: str = Field(examples=["이웃에게 선물 3번 전달"])
+
+
+class BadgeBookItemOut(BadgeOut):
+    earned: bool
+
+
+class BadgeBookOut(CamelModel):
+    """내 뱃지 도감 — 전체 뱃지와 받은 여부"""
+
+    earned_count: int
+    total: int
+    items: list[BadgeBookItemOut]
+
+
 class MapCardOut(CamelModel):
     """지도에서 캐릭터를 눌렀을 때의 이웃 카드 — 카드 공개 동의자만. 사용자 id·정확한 점수·금액·위치는 없다"""
 
@@ -63,6 +85,8 @@ class MapCardOut(CamelModel):
         default=True, description="이웃에게도 보이는 카드인지 — 내 카드는 공개를 안 켰어도 나에게만 보여 준다"
     )
     is_sample: bool = Field(default=False, description="샘플 캐릭터의 카드 (시연용 값)")
+    badge: BadgeOut | None = Field(default=None, description="대표 뱃지 — 받은 뱃지 중 가장 받기 어려운 것")
+    badge_count: int = Field(default=0, description="받은 뱃지 수")
 
 
 class MapAvatarsOut(CamelModel):

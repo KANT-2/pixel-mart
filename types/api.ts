@@ -153,6 +153,24 @@ export interface LocalProfileInput {
   mapCardPublic?: boolean;
 }
 
+/** 활동 뱃지 — 기록으로 계산 (받은 날짜는 없음) */
+export interface ApiBadge {
+  code: string;
+  /** 글자 아이콘 (그림을 못 불러올 때) */
+  icon: string;
+  /** 16×16 픽셀 아이콘 경로 (public/images/badges) */
+  image: string;
+  name: string;
+  description: string;
+}
+
+/** 내 뱃지 도감 */
+export interface ApiBadgeBook {
+  earnedCount: number;
+  total: number;
+  items: (ApiBadge & { earned: boolean })[];
+}
+
 /** 지도 캐릭터의 이웃 카드 — 카드 공개 동의자만 (사용자 id·정확한 점수·금액·위치 없음) */
 export interface ApiMapCard {
   /** 닉네임 공개 동의자만 */
@@ -171,6 +189,10 @@ export interface ApiMapCard {
   isPublic?: boolean;
   /** 샘플 캐릭터의 카드 */
   isSample?: boolean;
+  /** 대표 뱃지 — 받은 뱃지 중 가장 받기 어려운 것 */
+  badge?: ApiBadge | null;
+  /** 받은 뱃지 수 */
+  badgeCount?: number;
 }
 
 /** 내 활동 점수 — 나에게만 정확한 값 */

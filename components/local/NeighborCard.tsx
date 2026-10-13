@@ -6,7 +6,7 @@ import PixelAvatar from "@/components/avatar/PixelAvatar";
 import PixelIcon from "@/components/PixelIcon";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { localApi } from "@/lib/local";
-import type { ApiMapCard, ApiMyActivity } from "@/types/api";
+import type { ApiBadge, ApiMapCard, ApiMyActivity } from "@/types/api";
 
 
 interface NeighborCardProps {
@@ -41,11 +41,11 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
       </div>
     </div>
     {card ? <>
-      <ul className="mt-3 grid grid-cols-3 gap-1.5 text-center text-[11px]">
-        <Tile icon={<PixelIcon name="star" className="size-4" />} label="뱃지" value="준비 중" />
+      <ul className="mt-3 grid grid-cols-2 gap-1.5 text-center text-[11px]">
         <Tile icon={<PixelIcon name="coin" className="size-4" />} label="교환·거래" value={card.coinBand ?? "아직 없음"} />
         <Tile icon={<PixelIcon name="heart" className="size-4" />} label="취향" value={card.interests.length ? card.interests.join("·") : "비공개"} />
       </ul>
+      <BadgeRow badge={card.badge ?? null} count={card.badgeCount ?? 0} />
       {card.isMe ? <>
         <MyProgress />
         {card.isPublic === false && <p className="mt-2 text-xs leading-relaxed text-sub">
@@ -67,6 +67,18 @@ function Hearts({ count }: { count: number }) {
     <PixelIcon name="heart" className={`size-5 ${count ? "" : "opacity-25 grayscale"}`} />
     <span aria-hidden="true" className={`font-pixel text-sm ${count ? "text-pink" : "text-dim"}`}>×{count}</span>
   </span>;
+}
+
+/** 대표 뱃지 한 줄 — 받은 것 중 가장 받기 어려운 뱃지와 받은 수 */
+function BadgeRow({ badge, count }: { badge: ApiBadge | null; count: number }) {
+  return <div className="mt-1.5 flex items-center gap-2.5 rounded-lg border border-line bg-panel px-2.5 py-2 text-left">
+    {badge ? <PixelAvatar src={badge.image} className="size-7 shrink-0" /> : <PixelIcon name="star" className="size-5 shrink-0 opacity-40" />}
+    <span className="min-w-0 flex-1">
+      <span className="block text-[11px] text-dim">대표 뱃지</span>
+      <span className="block truncate text-xs font-bold text-ink" title={badge?.description}>{badge ? badge.name : "아직 없음"}</span>
+    </span>
+    {count > 1 && <span className="shrink-0 text-[11px] text-sub">외 <strong className="text-lime">{count - 1}</strong>개</span>}
+  </div>;
 }
 
 function Tile({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

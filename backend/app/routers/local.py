@@ -11,6 +11,9 @@ from app.deps import CurrentUser, DbSession, OptionalUser
 from app.models import ActivityPoint, FandomSample, Interest, Order, Region, TradePost, User, UserInterest
 from app.schemas.local import (
     ActivityLogOut,
+    BadgeBookItemOut,
+    BadgeBookOut,
+    BadgeOut,
     BuyerRankingOut,
     BuyerRankOut,
     FandomOut,
@@ -24,7 +27,7 @@ from app.schemas.local import (
     MyActivityOut,
     RegionOut,
 )
-from app.services import activity, local_stats
+from app.services import activity, badges, local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, Period, period_start, present, rollup
 from app.services.regions import RegionTree, load_tree
 from app.services.sample_avatars import sample_avatars, sample_nicknames
@@ -267,9 +270,11 @@ async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dic
             )
         ).all()
     )
+    stats = await badges.stats_for(db, users)
     cards = {}
     for u in users:
         score, coins = points.get(u.id, (0, 0))
+        got = badges.earned(stats[u.id])
         hearts = activity.hearts_for(score)
         cards[u.id] = MapCardOut(
             nickname=u.nickname if u.nickname_public else None,
@@ -282,8 +287,16 @@ async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dic
             want_count=wants.get(u.id, 0) if u.nickname_public else 0,
             is_me=u.id == viewer_id,
             is_public=u.map_card_public,
+            badge=_badge_out(badges.representative(got)),
+            badge_count=len(got),
         )
     return cards
+
+
+def _badge_out(badge: badges.Badge | None) -> BadgeOut | None:
+    if badge is None:
+        return None
+    return BadgeOut(code=badge.code, icon=badge.icon, image=badge.image, name=badge.name, description=badge.description)
 
 
 def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[MapCardOut]:
@@ -300,6 +313,24 @@ def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[
             *["gift_sent"] * gifts,
         ]
         hearts = activity.hearts_for(sum(activity.RULES[kind].points for kind in kinds))
+        # 뱃지도 지어낸 기록으로 실제 기준에 맞춰 계산
+        orders = rng.choice((0, 1, 2, 3, 5, 8))
+        got = badges.earned(
+            badges.Stats(
+                profile=True,
+                map_debut=True,
+                orders=orders,
+                unique=orders > 0 and rng.random() < 0.3,
+                categories=min(orders, rng.randint(1, 5)),
+                reviews=rng.randint(0, orders),
+                first_want="first_want" in kinds,
+                trades=trades,
+                gifts=gifts,
+                wish_done=rng.random() < 0.3,
+                hearts=hearts,
+                top_buyer=not cards and orders > 0,  # 블록의 1위만 (지난주 구매 1위)
+            )
+        )
         cards.append(
             MapCardOut(
                 nickname=nickname,
@@ -311,6 +342,8 @@ def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[
                 want_count=0,
                 is_me=False,
                 is_sample=True,
+                badge=_badge_out(badges.representative(got)),
+                badge_count=len(got),
             )
         )
     return cards
@@ -437,6 +470,18 @@ async def buyer_ranking(
         is_sample=crowd.is_sample and enough,
         items=items if enough else [],
     )
+
+
+@router.get("/users/me/badges", response_model=BadgeBookOut, summary="내 뱃지 도감 — 전체 뱃지와 받은 여부")
+async def my_badges(user: CurrentUser, db: DbSession):
+    got = {b.code for b in badges.earned((await badges.stats_for(db, [user]))[user.id])}
+    items = [
+        BadgeBookItemOut(
+            code=b.code, icon=b.icon, image=b.image, name=b.name, description=b.description, earned=b.code in got
+        )
+        for b in badges.BADGES
+    ]
+    return BadgeBookOut(earned_count=len(got), total=len(items), items=items)
 
 
 @router.get("/users/me/activity", response_model=MyActivityOut, summary="내 활동 점수 — 하트·코인 (나에게만 정확한 값)")
