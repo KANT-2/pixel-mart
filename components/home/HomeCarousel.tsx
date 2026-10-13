@@ -99,7 +99,8 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
               : <>이 무대의 주인공은<br /><span className="text-mint">당신의 캐릭터.</span></>}</h1>
             <p className="mt-4 text-sm leading-relaxed text-sub">픽셀 아바타를 만들면 슬라임 대신 내가 무대에 서요.<br />콜라보 시즌엔 무대도 그 세계관으로 갈아입어요.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href={user?.avatarUrl ? "/products" : "/mypage/avatar"} className="btn-lime px-4 py-3 text-sm font-bold">{user?.avatarUrl ? "▶ 오늘의 장비 고르기" : "▶ 내 픽셀 아바타 만들기"}</Link>
+              {/* 비로그인이면 아바타 안내 화면을 거치지 않고 바로 로그인 → 끝나면 아바타 만들기로 */}
+              <Link href={user?.avatarUrl ? "/products" : user ? "/mypage/avatar" : "/login?next=/mypage/avatar"} className="btn-lime px-4 py-3 text-sm font-bold">{user?.avatarUrl ? "▶ 오늘의 장비 고르기" : "▶ 내 픽셀 아바타 만들기"}</Link>
               <Link href={user?.avatarUrl ? "/mypage/avatar" : "/products"} className="btn-pixel px-4 py-3 text-sm font-bold">{user?.avatarUrl ? "아바타 꾸미기" : "아이템 둘러보기"}</Link>
             </div>
           </div>
