@@ -16,7 +16,7 @@ from app.services import local_stats
 from app.services.local_stats import period_start, present, rollup
 from app.services.regions import build_tree
 
-GHOST, MIMIC = 3, 4  # 작품: 픽셀 게임, 던전 크롤러
+GHOST, MIMIC = 3, 4  # 작품: 귀멸의 칼날, 주술회전
 TEST_REGIONS = [
     ("TST", "sido", None, "테스트시"),
     ("TST1", "sigungu", "TST", "테스트구"),
@@ -160,7 +160,7 @@ async def test_ranking_orders_by_count(client, isolated_regions, count_test_acco
         {
             "rank": 1,
             "interestId": GHOST,
-            "interest": "픽셀 게임",
+            "interest": "귀멸의 칼날",
             "interestType": "work",
             "count": 7,
             "isSample": False,
@@ -168,7 +168,7 @@ async def test_ranking_orders_by_count(client, isolated_regions, count_test_acco
         {
             "rank": 2,
             "interestId": MIMIC,
-            "interest": "던전 크롤러",
+            "interest": "주술회전",
             "interestType": "work",
             "count": 3,  # 5명 미만도 순위에 들어간다
             "isSample": False,

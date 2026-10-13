@@ -63,5 +63,7 @@ test("취향 아이콘 파일이 모두 있다", () => {
     const src = sprites.interestIcon({ id, name: `취향${id}` });
     assert.ok(existsSync(new URL(`../public${src}`, import.meta.url)), src);
   }
-  assert.equal(sprites.interestIcon({ id: 3, name: "픽셀 게임" }), "/images/characters/slime-1.png");
+  // 같은 취향은 이름과 상관없이 항상 같은 아이콘
+  assert.equal(sprites.interestIcon({ id: 3, name: "가" }), sprites.interestIcon({ id: 3, name: "가" }));
+  assert.equal(sprites.interestIcon({ id: 52, name: "픽셀 게임" }), "/images/characters/slime-1.png"); // 장르 태그는 어울리는 캐릭터
 });
