@@ -40,10 +40,14 @@
 ## 실행 방법
 프론트(Next.js, :3000)와 백엔드(FastAPI, :8000)를 함께 띄웁니다. 브라우저는 3000만 보고, `/api/*`는 Next가 8000으로 넘겨 줍니다.
 
-**준비물**: Node.js 22+, Python 3.12+, Docker(PostgreSQL)
+**준비물**: Node.js 22+, Python 3.12+, Docker(PostgreSQL) 또는 설치형 PostgreSQL
 
 ```bash
-# 1) DB (저장소 루트)
+# 0) 내려받기
+git clone https://github.com/KANT-2/pixel-mart.git
+cd pixel-mart
+
+# 1) DB (저장소 루트) — docker compose는 5433 포트로 열립니다
 docker compose up -d db
 
 # 2) 백엔드 (backend/)
@@ -51,6 +55,7 @@ cd backend
 python -m venv .venv && .venv\Scripts\activate   # macOS/Linux: source .venv/bin/activate
 pip install -r requirements-dev.txt
 copy .env.example .env                            # macOS/Linux: cp .env.example .env
+#   → docker compose를 썼다면 .env의 DATABASE_URL 포트를 5432 → 5433으로 바꿉니다
 alembic upgrade head
 python -m scripts.seed                            # 상품·카테고리·지역·취향·키보드 (재실행 안전)
 python -m scripts.seed_demo                       # (선택) 시연용 데모 이웃·거래글·알림
@@ -63,7 +68,7 @@ npm run dev
 브라우저에서 http://localhost:3000 접속 · API 문서 http://localhost:8000/api/docs
 
 - 로그인: 개발 환경은 로그인 화면의 **개발용 이메일 로그인**(아무 이메일). 데모 이웃으로 보려면 `demo-coinmoa@demo.pixelmart.test` 처럼 `demo-<이름>@demo.pixelmart.test`
-- 백엔드가 꺼져 있어도 상품 목록·상세는 기본 상품 데이터로 보입니다(안내 문구 표시).
+- **프론트만 빠르게 보기**: `git clone` → `npm install` → `npm run dev`. 백엔드가 꺼져 있어도 메인·상품 목록·상세는 `data/products.ts` 기본 상품 데이터로 보입니다(안내 문구 표시). 로그인·장바구니·PIXEL LOCAL은 백엔드가 필요합니다.
 
 | 명령어 | 설명 |
 | --- | --- |
@@ -106,6 +111,25 @@ flowchart LR
 ```
 화면 구조·컴포넌트 트리·흐름 5개 상세는 **[docs/UI_STRUCTURE.md](docs/UI_STRUCTURE.md)** 에 있습니다.
 
+## 발제 요구사항 대응
+1차 발제(React/Next.js 쇼핑몰 UI)의 **필수 범위는 백엔드 없이도 그대로 동작**하고, 2차에서 그 위에 백엔드와 PIXEL LOCAL을 **확장**했습니다.
+
+| 구분 | 요구사항 | 구현 위치 |
+| --- | --- | --- |
+| 필수 | 기획·범위 정의 | Use Case(디지털/IT 기기 샵 → 게이밍 데스크 소품), [docs/PLANNING.md](docs/PLANNING.md), 팀 노션 |
+| 필수 | 개발 환경 | Next.js 16 App Router · TypeScript · Tailwind CSS 4 (`package.json`) |
+| 필수 | 상품 타입·Mock 데이터 6개 이상 | [types/product.ts](types/product.ts)(발제 `Product` 규격 그대로) · [data/products.ts](data/products.ts)(180개, 이미지는 `public/images/`에 직접 생성) |
+| 필수 | 공통 컴포넌트 | [Header](components/Header.tsx) · [Footer](components/Footer.tsx) · [ProductCard](components/ProductCard.tsx)(props: `product`) — `app/layout.tsx`에서 모든 페이지에 배치 |
+| 필수 | 목록 `.map()` 렌더링 | 메인 추천 [app/page.tsx](app/page.tsx) · 전체 상품 [ProductInfiniteGrid](components/products/ProductInfiniteGrid.tsx) |
+| 필수 | 상세 동적 라우트 | [app/products/[id]/page.tsx](app/products/%5Bid%5D/page.tsx) — `params`(Promise)로 id를 읽고 `generateStaticParams`로 미리 생성 |
+| 필수 | `<Link>` 네비게이션 | 카드·메뉴·버튼 모두 `next/link` (예외: 구글 로그인 API 리다이렉트 `<a>` 1곳) |
+| 필수 | Tailwind 스타일링 | Grid/Flex, `aspect-square object-cover`, hover, `@theme` 색·폰트 토큰 |
+| 필수 | 예외 방어·저장소 관리 | 없는 상품 → `notFound()` + "상품을 찾을 수 없습니다"([캡처](#화면-캡처)), 없는 경로·오류 → GAME OVER 화면 · `.gitignore`로 `node_modules`·`.next`·`.env` 제외 |
+| 필수 | 문서화·시연 | 이 README(실행 방법·컴포넌트 트리·캡처) · `npm run build` 통과 |
+| 도전 A | 반응형 | 375px부터 가로 스크롤 없음. 상품 그리드 모바일 2열 → `md` 3열 → `lg` 4열(쇼핑몰 모바일 관행에 맞춰 1열 대신 2열) |
+| 도전 B | 장바구니 상태 | 상세의 "장바구니 담기" → 헤더 카트 뱃지 수량 증가 (`CartProvider` 전역 상태) |
+| 확장 | 발제 제외 범위를 넘어선 기능 | 로그인·DB·서버 장바구니·가상 주문(결제 없음)·PIXEL LOCAL — FastAPI + PostgreSQL. 백엔드가 꺼져도 필수 화면은 Mock 데이터로 폴백 |
+
 ## 폴더 구조
 ```
 pixel-mart/
@@ -122,6 +146,22 @@ pixel-mart/
 └─ docs/                     # 기획·정책·설계 문서 (아래 표)
 ```
 
+### 컴포넌트 계층 (요약)
+```
+RootLayout (app/layout.tsx)
+└─ AuthProvider › CartProvider › WishlistProvider   # 로그인·장바구니·찜 전역 상태
+   ├─ Header ─ HeaderNav · HeaderShortcuts · CartButton(수량 뱃지) · NotificationBell · UserMenu
+   ├─ main
+   │  ├─ / ─ HomeCarousel(HeroStage · WorldMapTeaser · ThemePicker) · ProductCard × 4
+   │  ├─ /products ─ ProductFilters › ProductFilterBar · ProductInfiniteGrid › ProductCard × N
+   │  ├─ /products/[id] ─ AddToCartButton · WishButton · ProductDetailTabs(리뷰·문의) · ProductCard × 4 · RecentlyViewed
+   │  │                  └─ (없는 id) not-found.tsx › GameOverScreen
+   │  ├─ /products/[id]/fitting ─ KeycapFittingRoom
+   │  └─ /local ─ FandomMapScreen › PixelMap · NeighborCard · 구매 순위 패널
+   └─ Footer
+```
+페이지별 전체 트리는 [docs/UI_STRUCTURE.md](docs/UI_STRUCTURE.md#2-2-페이지별-컴포넌트-트리-대표)에 있습니다.
+
 ## 문서
 | 문서 | 내용 |
 | --- | --- |
@@ -137,9 +177,9 @@ pixel-mart/
 | 이름 | 역할 | 담당 |
 | --- | --- | --- |
 | 채희주 ([@kixxuya](https://github.com/kixxuya)) | 프론트엔드 | 화면 전체, 디자인 시스템, 메인·상품·PIXEL LOCAL UI |
-| [@skshdwkdvkfl55-art](https://github.com/skshdwkdvkfl55-art) | BE-A 플랫폼·커머스 | 구글 로그인, 장바구니, 찜, 아바타, PIXEL LOCAL(덕력지도·거래) |
-| [@totoriri605-oss](https://github.com/totoriri605-oss) | BE-B 주문·CS | FAQ, 가상 주문·배송, 취소, 리뷰, 상품 Q&A, 키캡 호환성 |
-| [@kyrdufmal-summer](https://github.com/kyrdufmal-summer) | BE-C → 기획·정책 | PIXEL LOCAL 서비스 정의·운영 정책·개인정보 기준 정리(이슈 #151~), 현재 구현·화면 구조 문서화 |
+| 안중섭 ([@skshdwkdvkfl55-art](https://github.com/skshdwkdvkfl55-art)) | BE-A 플랫폼·커머스 | 구글 로그인, 장바구니, 찜, 아바타, PIXEL LOCAL(덕력지도·거래·뱃지) |
+| 황정민 ([@totoriri605-oss](https://github.com/totoriri605-oss)) | BE-B 주문·CS | FAQ, 가상 주문·배송, 취소, 리뷰, 상품 Q&A, 키캡 호환성, 메인 캐러셀 |
+| 여름 ([@kyrdufmal-summer](https://github.com/kyrdufmal-summer)) | BE-C → 기획·정책·QA | PIXEL LOCAL 서비스 정의·운영 정책·개인정보 기준 정리(이슈 #151~), 현재 구현·화면 구조 문서화 |
 
 > 작업 단위는 GitHub 이슈(라벨 `FE` · `BE-A` · `BE-B` · `BE-C` · `policy`)로 관리합니다.
 
@@ -170,6 +210,10 @@ pixel-mart/
 | --- | --- |
 | ![거래·교환](docs/screenshots/v2/trades.png) | ![위시맵](docs/screenshots/v2/wish-map.png) |
 
+| 없는 상품 (`/products/999`) |
+| --- |
+| ![상품을 찾을 수 없습니다](docs/screenshots/v2/not-found.png) |
+
 > 캡처는 로그인하지 않은 상태, 1280px·390px 화면 기준입니다.
 
 ## 트러블슈팅
@@ -178,3 +222,8 @@ pixel-mart/
 | 상세 페이지 `params` 사용법이 강의와 다름 | Next.js 15부터 `params`가 Promise로 변경 | `const { id } = await params`로 사용 |
 | 모바일에서 로고 · 메뉴가 두 줄로 꺾임 | 헤더 가로 공간 부족 | `whitespace-nowrap`, 모바일 여백 축소 |
 | ESLint가 `<img>` 사용을 경고 | Next.js는 `next/image`를 권장 | 과제 권장에 따라 `<img>` 유지, 사유를 단 주석으로 처리 |
+| 페이지 이동이 즉시 일어나지 않고 빌드 경고 | Next 16 Cache Components에서 `params`·`searchParams`를 `<Suspense>` 밖에서 기다림 | 페이지는 Promise를 넘기기만 하고, 읽는 자식 컴포넌트를 `<Suspense>` 안에 둠 |
+| 백엔드가 꺼지면 쇼핑몰 전체가 빈 화면 | 상품을 API에서만 가져옴 | API 실패 시 `data/products.ts`로 폴백 + 안내 문구 |
+| 로그아웃·계정 전환 후 이전 사람의 이웃 카드가 잠깐 보임 | 덕력지도 60초 캐시가 사용자를 구분하지 않음 | 보는 사람이 바뀌면 캐시를 비우고 다시 불러옴 |
+| 같은 물건으로 두 교환이 성사·코인 중복 지급, 취소된 주문이 결제 완료로 복구, 두 탭 동시 주문 | 상태를 읽고 바꾸는 사이에 다른 요청이 끼어듦 | 행 잠금(`SELECT … FOR UPDATE`) 후 상태 재검사, 주문당 대기 취소 신청 1개 DB 부분 유니크 인덱스, 회귀 테스트 추가 |
+| 테스트가 시연용 DB의 주문·가격을 바꿈 | pytest가 개발 DB를 그대로 사용 | `<DB이름>_test` 전용 DB 사용, DB가 없으면 실패 대신 건너뜀 |
