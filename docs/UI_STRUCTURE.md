@@ -208,7 +208,7 @@ page (서버) ─ LocalPageHeader ─ Suspense ─ FandomMapScreen (클라)
 **내 거래**
 ```
 page (서버) ─ Suspense ─ MyTrades (클라)
-  ├ TradeRequestInbox (받은/보낸 신청, 수락·거절·취소)
+  ├ TradeRequestInbox (받은/보낸 신청 → 교환 창 TradeExchange에서 수락·거절·취소·받았어요)
   ├ TradeCard + TradeStatusButtons ×N
   └ SentRequestsProvider ─ TradeWindow ─ TraderPanel ×2 · TradeCard · TradeRequestButton
 ```
@@ -294,9 +294,10 @@ flowchart TB
   B --> D["캐릭터 클릭 → 이웃 카드<br/>하트·LV·교환 횟수·뱃지"]
   D -->|"WANT n개 보기 · 선물하기"| W["위시맵 '닉네임' 플레이어"]
   C -->|"이 동네 교환글 보기"| T["거래·교환 게시판"]
-  T -->|"⇄ 교환 신청"| R["신청 → 작성자에게 알림"]
-  R --> I["작성자: 내 거래 '교환 신청'<br/>받은 신청"]
-  I -->|"수락"| OK["두 글 거래 완료<br/>양쪽 +20점 · 하트·뱃지 알림"]
+  T -->|"⇄ 교환하기 (내 교환글 물건 고르기)"| R["신청 → 작성자에게 알림"]
+  R --> I["작성자: 내 거래 '교환 신청'<br/>받은 신청 · 교환 창"]
+  I -->|"수락"| P["교환 진행 중<br/>두 글 마감"]
+  P -->|"두 사람 모두 '받았어요'"| OK["교환 완료<br/>양쪽 +20점 · 하트·뱃지 알림"]
   I -->|"거절"| NO["신청자에게 거절 알림"]
 ```
 
@@ -317,7 +318,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  A["동네·취향 저장 +5<br/>첫 WANT +10<br/>교환 수락 +20(양쪽)<br/>선물 성사 +10"] --> B["활동 점수"]
+  A["동네·취향 저장 +5<br/>첫 WANT +10<br/>교환 완료 +20(양쪽)<br/>선물 성사 +10"] --> B["활동 점수"]
   B --> C["하트 30·65·90점 → 이후 30점마다<br/>LV.1~10"]
   B --> D["뱃지 19종 (기록으로 계산)"]
   C & D --> E["🔔 알림 '하트가 늘었어요' · '뱃지 획득!'"]
