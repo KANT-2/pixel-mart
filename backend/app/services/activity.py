@@ -6,6 +6,7 @@
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from math import isqrt
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,8 +46,13 @@ def hearts_for(score: int) -> int:
     return min(MAX_HEARTS, len(HEART_STEPS) + (score - HEART_STEPS[-1]) // EXTRA_HEART_EVERY)
 
 
+def level_number(hearts: int) -> int:
+    """레벨은 하트보다 천천히 — 하트 1·4·9·16…(제곱수)마다 1씩, 하트 99개면 LV.10"""
+    return 1 + isqrt(max(0, hearts))
+
+
 def level_title(hearts: int) -> str:
-    return LEVEL_TITLES[min(hearts, len(LEVEL_TITLES) - 1)]
+    return LEVEL_TITLES[min(level_number(hearts), len(LEVEL_TITLES)) - 1]
 
 
 def next_heart_at(score: int) -> int | None:

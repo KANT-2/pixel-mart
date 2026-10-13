@@ -274,6 +274,7 @@ async def _cards(db: DbSession, users: list[User], viewer_id: int | None) -> dic
         cards[u.id] = MapCardOut(
             nickname=u.nickname if u.nickname_public else None,
             hearts=hearts,
+            lv=activity.level_number(hearts),
             level=activity.level_title(hearts),
             coin_band=activity.coin_band(coins),
             interests=picked.get(u.id, [])[:3],
@@ -303,6 +304,7 @@ def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[
             MapCardOut(
                 nickname=nickname,
                 hearts=hearts,
+                lv=activity.level_number(hearts),
                 level=activity.level_title(hearts),
                 coin_band=activity.coin_band(trades),
                 interests=rng.sample(interests, min(len(interests), rng.randint(1, 2))) if interests else [],
@@ -450,6 +452,7 @@ async def my_activity(user: CurrentUser, db: DbSession):
     return MyActivityOut(
         score=score,
         hearts=hearts,
+        lv=activity.level_number(hearts),
         level=activity.level_title(hearts),
         next_heart_at=activity.next_heart_at(score),
         coins=coins,
