@@ -28,10 +28,11 @@ export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps
       sample: row?.sample ?? false, ranked: row?.ranked ?? false, hint: "이웃" };
   });
   const open = (code: string) => router.push(`/local?region=${encodeURIComponent(code)}`);
-  return <div className={`${embedded ? "" : "pixel-panel p-5 md:p-8"} grid items-center gap-6 overflow-hidden md:grid-cols-[1fr_1.3fr]`}>
+  // 메인 배너 안에서는 다른 배너와 같은 격자(글자 · 30rem 그림)와 같은 제목 글꼴
+  return <div className={`${embedded ? "md:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] md:gap-14" : "pixel-panel p-5 md:grid-cols-[1fr_1.3fr] md:p-8"} grid items-center gap-6 overflow-hidden`}>
     <div>
-      <p className="mb-3 font-pixel text-xs tracking-widest text-mint">▶ WORLD MAP · PIXEL LOCAL</p>
-      <h2 className="text-2xl font-extrabold md:text-3xl">우리 동네에도<br />같은 덕후가 있을까?</h2>
+      <p className="mb-4 font-pixel text-xs tracking-widest text-mint">WORLD MAP · PIXEL LOCAL</p>
+      <h2 className={embedded ? "font-pixel text-3xl font-bold leading-tight md:text-4xl" : "text-2xl font-extrabold md:text-3xl"}>우리 동네에도<br /><span className={embedded ? "text-mint" : ""}>같은 덕후가 있을까?</span></h2>
       <p className="mt-3 text-sm leading-relaxed text-sub">픽셀 지도에서 동네를 탐험하고, 같은 취향 이웃의 아바타와 교환글을 만나 보세요.</p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link href="/local" className="btn-lime inline-flex min-h-11 items-center px-5 py-2 text-sm font-extrabold">월드맵 열기</Link>
