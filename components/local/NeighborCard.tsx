@@ -8,8 +8,6 @@ import { useLocalResource } from "@/components/local/useLocalResource";
 import { localApi } from "@/lib/local";
 import type { ApiMapCard, ApiMyActivity } from "@/types/api";
 
-// 하트 아이콘은 3개까지, 그 뒤는 "+N" 숫자로 (최대 99개)
-const HEART_ICONS = 3;
 
 interface NeighborCardProps {
   avatar: string | null;
@@ -30,7 +28,7 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
     {onClose && <button type="button" onClick={onClose} aria-label="이웃 카드 닫기" className="absolute right-2 top-2 rounded px-1.5 text-sm text-dim hover:text-ink">✕</button>}
     {card ? <div className="flex items-center justify-between gap-2 pr-6">
       <Hearts count={card.hearts} />
-      <span className="rounded border border-lime/40 px-1.5 py-0.5 font-pixel text-[11px] text-lime">LV.{card.hearts} {card.level}</span>
+      <span className="shrink-0 whitespace-nowrap rounded border border-lime/40 px-1.5 py-0.5 font-pixel text-[11px] text-lime">LV.{card.lv} {card.level}</span>
     </div> : null}
     <div className={`flex items-center gap-3 ${card ? "mt-3" : "pr-6"}`}>
       <span className="grid size-14 shrink-0 place-items-center rounded-lg bg-panel-2">
@@ -65,11 +63,11 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
   </section>;
 }
 
+/** 하트는 최대 99개라 아이콘 하나 + "×N" 숫자로 */
 function Hearts({ count }: { count: number }) {
-  const extra = count - HEART_ICONS;
-  return <span role="img" aria-label={`하트 ${count}개`} className="flex items-center gap-1">
-    {Array.from({ length: HEART_ICONS }, (_, i) => <PixelIcon key={i} name="heart" className={`size-5 ${i < count ? "" : "opacity-25 grayscale"}`} />)}
-    {extra > 0 && <span aria-hidden="true" className="ml-0.5 font-pixel text-sm text-pink">+{extra}</span>}
+  return <span role="img" aria-label={`하트 ${count}개`} className="flex shrink-0 items-center gap-1">
+    <PixelIcon name="heart" className={`size-5 ${count ? "" : "opacity-25 grayscale"}`} />
+    <span aria-hidden="true" className={`font-pixel text-sm ${count ? "text-pink" : "text-dim"}`}>×{count}</span>
   </span>;
 }
 

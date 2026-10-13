@@ -46,11 +46,14 @@ def test_hearts_from_score(score, hearts, next_at):
 
 
 def test_levels_and_coin_bands():
-    assert [activity.level_title(h) for h in (0, 1, 2, 3, 12, 99)] == [
+    # 레벨은 하트 1·4·9·16…개(제곱수)마다 1씩 — 하트 99개도 LV.10
+    hearts = (0, 1, 3, 4, 8, 9, 15, 16, 81, 99)
+    assert [activity.level_number(h) for h in hearts] == [1, 2, 2, 3, 3, 4, 4, 5, 10, 10]
+    assert [activity.level_title(h) for h in (0, 1, 3, 4, 9, 99)] == [
         "새내기 이웃",
         "동네 이웃",
+        "동네 이웃",
         "친한 이웃",
-        "단골 이웃",
         "단골 이웃",
         "단골 이웃",
     ]
@@ -184,6 +187,7 @@ async def test_cards_only_for_opted_in_and_without_identity(users):
     assert mine == {
         "nickname": "act-card",
         "hearts": 0,
+        "lv": 1,
         "level": "새내기 이웃",
         "coinBand": None,
         "interests": ["나루토"],
