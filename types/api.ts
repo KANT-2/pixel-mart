@@ -269,6 +269,22 @@ export interface ApiTradePost {
   author?: { nickname: string; avatarUrl: string | null } | null;
 }
 
+export type TradeRequestStatus = "pending" | "accepted" | "declined" | "cancelled";
+
+/** 유저 간 교환 신청 — post는 받는 사람의 글, offerPost는 신청한 사람이 함께 보낸 내 글 */
+export interface ApiTradeRequest {
+  id: number;
+  status: TradeRequestStatus;
+  createdAt: string;
+  decidedAt: string | null;
+  post: ApiTradePost;
+  offerPost: ApiTradePost | null;
+  /** 내가 보낸 신청이면 true */
+  isMine: boolean;
+  /** 신청한 사람 — 닉네임 공개 동의자만 */
+  requester: { nickname: string; avatarUrl: string | null } | null;
+}
+
 export interface ApiTradeMatch {
   want: ApiTradePost;
   offer: ApiTradePost;

@@ -1,4 +1,5 @@
-"""시연용 데모 이웃 — 위시맵 WANT 글(사이트 상품 연결)과 선물하기를 실제로 해 볼 수 있게 (여러 번 실행해도 같은 결과)
+"""시연용 데모 이웃 — 위시맵 WANT 글·교환할 HAVE 글(사이트 상품 연결)로 선물하기·교환 신청을 실제로 해 볼 수 있게
+(여러 번 실행해도 같은 결과)
 
 실행 (backend 폴더에서):  python -m scripts.seed_demo
 - 이메일은 `demo-<key>@demo.pixelmart.test` — `.test`라 덕력지도·위시맵 집계에서는 빠지고, 화면에는 "데모 이웃"으로 표시
@@ -27,7 +28,7 @@ SEED_FILE = Path(__file__).resolve().parent.parent / "seed" / "demo_users.json"
 async def seed_demo(db: AsyncSession) -> str:
     users = json.loads(SEED_FILE.read_text(encoding="utf-8"))
     products = {p.id: p for p in await db.scalars(select(Product))}
-    created = 0
+    created = {"want": 0, "have": 0}
     for u in users:
         email = f"demo-{u['key']}{DEMO_EMAIL_DOMAIN}"
         user = await db.scalar(select(User).where(User.email == email))
@@ -42,31 +43,33 @@ async def seed_demo(db: AsyncSession) -> str:
         user.avatar_url = user.avatar_url or sample_avatars(f"demo:{u['key']}", 1)[0]
         await db.flush()
         await _reset_interests_and_activity(db, user.id, u["interestIds"], **u["activity"])
-        open_items = set(
-            await db.scalars(
-                select(TradePost.product_id).where(
-                    TradePost.user_id == user.id, TradePost.kind == "want", TradePost.status == "open"
+        # 선물·교환으로 닫힌 글은 그대로 두고, 진행 중인 글이 없는 상품만 다시 올린다
+        for kind in ("want", "have"):
+            open_items = set(
+                await db.scalars(
+                    select(TradePost.product_id).where(
+                        TradePost.user_id == user.id, TradePost.kind == kind, TradePost.status == "open"
+                    )
                 )
             )
-        )
-        # 선물로 닫힌 글은 그대로 두고, 진행 중인 글이 없는 상품만 다시 올린다
-        for product_id, content in u["wants"]:
-            if product_id in open_items:
-                continue
-            db.add(
-                TradePost(
-                    user_id=user.id,
-                    region_code=u["regionCode"],
-                    kind="want",
-                    product_id=product_id,
-                    item_name=products[product_id].name,
-                    trade_method="delivery",
-                    content=content,
+            for product_id, content in u[f"{kind}s"]:
+                if product_id in open_items:
+                    continue
+                db.add(
+                    TradePost(
+                        user_id=user.id,
+                        region_code=u["regionCode"],
+                        kind=kind,
+                        product_id=product_id,
+                        item_name=products[product_id].name,
+                        condition="like_new" if kind == "have" else None,
+                        trade_method="delivery",
+                        content=content,
+                    )
                 )
-            )
-            created += 1
+                created[kind] += 1
     await db.commit()
-    return f"데모 이웃 {len(users)}명, 새 WANT 글 {created}개"
+    return f"데모 이웃 {len(users)}명, 새 WANT 글 {created['want']}개, 새 HAVE 글 {created['have']}개"
 
 
 async def _reset_interests_and_activity(

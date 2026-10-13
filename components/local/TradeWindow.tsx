@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import TradeCard from "@/components/local/TradeCard";
+import TradeRequestButton from "@/components/local/TradeRequestButton";
 import PixelAvatar from "@/components/avatar/PixelAvatar";
 import { containsContact, matchLabels } from "@/utils/localTrades";
 import { formatPrice } from "@/utils/formatPrice";
@@ -35,10 +36,9 @@ export default function TradeWindow({ match, me }: TradeWindowProps) {
     <div className="border-t-2 border-frame bg-night/60 p-3 sm:p-4">
       <p className="mb-2 font-pixel text-[10px] tracking-widest text-dim">▶ ITEM INFO · {picked === "want" ? "내가 구하는 아이템" : "이웃의 아이템"}</p>
       <TradeCard post={item} />
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <button type="button" disabled className="btn-pixel h-10 px-4 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50">교환 신청 · 준비 중</button>
-        <p className="text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WISH 글에서 보낼 수 있어요.</p>
-      </div>
+      {/* 이웃의 아이템에 내 WISH를 함께 붙여 신청 */}
+      <TradeRequestButton post={match.offer} offerPostId={match.want.id} className="sm:max-w-xs" />
+      <p className="mt-2 text-xs text-dim">채팅·연락처 없이 아이템과 조건만 주고받아요. 선물은 위시맵의 WISH 글에서 보낼 수 있어요.</p>
     </div>
   </section>;
 }

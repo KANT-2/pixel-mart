@@ -9,6 +9,8 @@ import { LocalError, LocalSkeleton, localButton } from "@/components/local/Local
 import { TradeLogin } from "@/components/local/TradeStates";
 import TradeCard from "@/components/local/TradeCard";
 import TradeWindow from "@/components/local/TradeWindow";
+import TradeRequestInbox from "@/components/local/TradeRequestInbox";
+import { SentRequestsProvider } from "@/components/local/TradeRequestButton";
 import TradeStatusButtons from "@/components/local/TradeStatusButtons";
 import { localApi } from "@/lib/local";
 import { ApiError } from "@/lib/api";
@@ -52,17 +54,19 @@ function AccountTrades({ created }: AccountTradesProps) {
     {notice && <p role="status" className="text-sm text-mint">{notice}</p>}
     {error && <p role="alert" className="text-sm text-pink">{error}</p>}
     {result.error ? <LocalError message={result.error} onRetry={() => void result.refresh()} busy={pending !== null} /> : result.loading ? <LocalSkeleton label="내 글과 매칭 불러오는 중" /> : result.data && <>
+      {/* 처리할 일(받은 신청)이 먼저 보이게 맨 위에 */}
+      <TradeRequestInbox onChanged={() => void result.refresh()} />
       <section aria-labelledby="my-trades-title"><h2 id="my-trades-title" className="mb-5 text-xl font-bold">내 글 · {result.data.posts.length}개</h2>
         {result.data.posts.length ? <ul aria-label="내 거래글" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{result.data.posts.map((post) => <li key={post.id}><TradeCard post={post} actions={post.isMine ? <TradeStatusButtons key={`${post.id}:${post.status}`} status={post.status} disabled={pending !== null || auth.pending} pending={pending === post.id} onConfirm={(status) => update(post.id, status)} /> : null} /></li>)}</ul>
           : <div className="pixel-panel p-8 text-center"><p>아직 작성한 글이 없어요.</p><Link href="/local/trades/new" className={`${localButton} mt-4`}>첫 글 쓰기</Link></div>}
       </section>
-      <section aria-labelledby="trade-matches-title"><h2 id="trade-matches-title" className="mb-2 text-xl font-bold">⇄ 교환 제안 · 내 WISH와 맞는 이웃 아이템</h2><p className="mb-5 text-sm text-sub">같은 구·생활권에서 조건이 맞는 물건을 찾아요. 연락 수단과 작성자 정보는 제공하지 않아요.</p>
+      <SentRequestsProvider><section aria-labelledby="trade-matches-title"><h2 id="trade-matches-title" className="mb-2 text-xl font-bold">⇄ 교환 제안 · 내 WISH와 맞는 이웃 아이템</h2><p className="mb-5 text-sm text-sub">같은 구·생활권에서 조건이 맞는 물건을 찾아요. 연락 수단과 작성자 정보는 제공하지 않아요.</p>
         {!result.data.posts.some((post) => post.kind === "want" && post.status === "open") ? <div className="pixel-panel p-8 text-center"><p>구하는 물건을 먼저 알려 주세요.</p><Link href="/local/trades/new?kind=want" className={`${localButton} mt-4`}>WISH 글쓰기</Link></div>
           : result.data.matches.length ? <ul aria-label="이웃 매칭" className="grid gap-5 xl:grid-cols-2">{result.data.matches.map((match) => <li key={`${match.want.id}:${match.offer.id}`} className="min-w-0">
             <TradeWindow match={match} me={{ nickname: auth.user?.nickname ?? "나", avatarUrl: auth.user?.avatarUrl ?? null }} />
           </li>)}</ul>
             : <div className="pixel-panel p-8 text-center"><p>아직 맞는 물건을 찾지 못했어요.</p><p className="mt-2 text-sm text-sub">게시판을 둘러보거나 다른 WISH를 남겨 보세요.</p><Link href="/local/trades" className={`${localButton} mt-4`}>거래·교환 둘러보기</Link></div>}
-      </section>
+      </section></SentRequestsProvider>
     </>}
   </div>;
 }
