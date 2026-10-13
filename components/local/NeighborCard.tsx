@@ -32,7 +32,7 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
     </div> : null}
     <div className={`flex items-center gap-3 ${card ? "mt-3" : "pr-6"}`}>
       <span className="grid size-14 shrink-0 place-items-center rounded-lg bg-panel-2">
-        <PixelAvatar src={avatar ?? "/images/hero-slime.svg"} className="max-h-11 max-w-11" />
+        <PixelAvatar src={avatar ?? "/images/hero-slime.svg"} className="size-12 object-contain" />
       </span>
       <div className="min-w-0">
         <p className="truncate font-bold">{card?.isMe ? "나" : name}

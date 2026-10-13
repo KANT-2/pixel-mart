@@ -66,7 +66,7 @@ def next_heart_at(score: int) -> int | None:
 
 
 def coin_band(coins: int) -> str | None:
-    return next((f"교환 {band}회+" for band in COIN_BANDS if coins >= band), None)
+    return next((f"{band}회+" for band in COIN_BANDS if coins >= band), None)
 
 
 async def award(db: AsyncSession, user_id: int, kind: str, ref_id: int = 0, now: datetime | None = None) -> bool:
