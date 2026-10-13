@@ -48,8 +48,8 @@ export function createQuestionsAdapter(): QuestionsAdapter {
     let items = products.get(productId);
     if (!items) {
       items = [
-        { id: `sample-${productId}-1`, userId: -1, nickname: "데모 플레이어", title: "상품 구성은 어디에서 확인하나요?", content: "구성품 안내를 보고 싶어요.\n이 질문은 화면을 위한 데모 데이터예요.", isSecret: false, answer: "데모 답변입니다.\n실제 상품 정보는 상품정보 탭을 확인해 주세요.", createdAt: "2026-01-02T09:00:00Z" },
-        { id: `sample-${productId}-2`, userId: -2, nickname: "데모 비밀 작성자", title: "데모 비밀 질문", content: "작성자에게만 보이는 데모 질문입니다.", isSecret: true, answer: null, createdAt: "2026-01-01T09:00:00Z" },
+        { id: `sample-${productId}-1`, userId: -1, nickname: "픽셀러버", title: "상품 구성은 어디에서 확인하나요?", content: "구성품 안내를 보고 싶어요.\n이 질문은 화면을 위한 데모 데이터예요.", isSecret: false, answer: "데모 답변입니다.\n실제 상품 정보는 상품정보 탭을 확인해 주세요.", createdAt: "2026-01-02T09:00:00Z" },
+        { id: `sample-${productId}-2`, userId: -2, nickname: "비밀 작성자", title: "비밀 질문", content: "작성자에게만 보이는 질문입니다.", isSecret: true, answer: null, createdAt: "2026-01-01T09:00:00Z" },
       ];
       products.set(productId, items);
     }
@@ -63,7 +63,7 @@ export function createQuestionsAdapter(): QuestionsAdapter {
   }
   return {
     mode: "demo" as const,
-    notice: "데모 데이터예요. 작성한 질문은 이 화면의 메모리에만 저장되며 새로고침하면 사라져요. 실제 문의는 접수되지 않아요.",
+    notice: "작성한 질문은 이 화면에만 임시로 저장돼 새로고침하면 사라져요.",
     async list(productId: number, viewer: Viewer, signal?: AbortSignal): Promise<QuestionView[]> {
       signal?.throwIfAborted();
       return rows(productId).map((item) => project(item, viewer));

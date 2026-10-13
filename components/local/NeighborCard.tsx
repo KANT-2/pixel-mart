@@ -36,7 +36,6 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
       </span>
       <div className="min-w-0">
         <p className="truncate font-bold">{card?.isMe ? "나" : name}
-          {sample && <span className="ml-1.5 rounded bg-panel-2 px-1 align-middle text-[10px] font-normal text-sub">샘플 이웃</span>}
         </p>
         {rank && <p className="mt-0.5 text-xs text-sub">이 동네 구매 {rank}위 <span className="text-dim">· 금액 비공개</span></p>}
       </div>
@@ -52,8 +51,7 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
         {card.isPublic === false && <p className="mt-2 text-xs leading-relaxed text-sub">
           내 카드는 지금 나에게만 보여요. <Link href="/local/settings" className="text-mint underline">내 동네·취향 설정</Link>에서 &lsquo;지도에서 내 이웃 카드 보여 주기&rsquo;를 켜면 이웃에게도 보여요.
         </p>}
-      </> : sample ? <p className="mt-3 text-xs text-dim">시연용 샘플 캐릭터예요. 실제 이웃은 카드 공개에 동의한 경우에만 보여요.</p>
-        : card.wantCount > 0 && card.nickname && <Link href={`/local/wish-map?nickname=${encodeURIComponent(card.nickname)}`}
+      </> : !sample && card.wantCount > 0 && card.nickname && <Link href={`/local/wish-map?nickname=${encodeURIComponent(card.nickname)}`}
           className="btn-pixel mt-3 flex min-h-10 w-full items-center justify-center text-sm font-bold">
           WANT {card.wantCount}개 보기 · 선물하기
         </Link>}

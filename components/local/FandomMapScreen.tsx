@@ -123,7 +123,6 @@ export default function FandomMapScreen() {
         <div className="mb-2 flex items-center gap-2">
           <span aria-hidden="true" className="font-pixel text-sm text-lime">▮</span>
           <h2 className="text-base font-extrabold">{interestName ? `${interestName} 팬 분포` : "동네 인기 취향 분포"}</h2>
-          {mapBlocks.some((block) => block.sample) && <span className="rounded border border-line px-1.5 py-0.5 text-[11px] text-sub">예시 데이터</span>}
         </div>
         {blocks.error ? <LocalError message={blocks.error} onRetry={() => void blocks.refresh()} busy={blocks.loading} /> : (
           <PixelMap view={view} blocks={mapBlocks} selected={selected} seedKey={`${query.interest ?? "all"}:${visit}`} onSelect={choose} onPinSelect={pickPin} heat landmarks
@@ -239,7 +238,7 @@ function BuyerRanking({ ranking, loading, picked }: BuyerRankingProps) {
   if (!ranking) return null;
   return <section aria-label="구매 순위 TOP 10" className="mt-4">
     <p className="mb-2 flex items-center justify-between text-xs text-dim">
-      <span>구매 순위 TOP 10 {ranking.isSample && <span className="ml-1 rounded bg-panel-2 px-1 text-[10px] text-sub">샘플</span>}</span>
+      <span>구매 순위 TOP 10</span>
       <span>금액 비공개</span>
     </p>
     {ranking.items.length === 0 ? <p className="text-sm text-sub">아직 순위에 오른 이웃이 없어요.</p> : (
