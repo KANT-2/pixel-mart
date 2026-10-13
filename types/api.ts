@@ -157,7 +157,7 @@ export interface LocalProfileInput {
 export interface ApiMapCard {
   /** 닉네임 공개 동의자만 */
   nickname: string | null;
-  /** 지역 커뮤니티 참여도 0~3 */
+  /** 지역 커뮤니티 참여도 0~99 (아이콘 3개 + "+N") */
   hearts: number;
   level: string;
   /** 완료한 교환·거래 구간 (예: "교환 5회+") */

@@ -29,25 +29,34 @@ RULES: dict[str, Rule] = {
     "contribution": Rule("유효한 커뮤니티 기여", 5, 5),
 }
 
-# 하트 1·2·3개가 되는 점수 (예: 35점 하트 2개, 70점 하트 3개)
-HEART_STEPS = (15, 35, 70)
-MAX_HEARTS = len(HEART_STEPS)
+# 하트 1·2·3개가 되는 점수 (예: 65점 하트 2개, 90점 하트 3개)
+HEART_STEPS = (30, 65, 90)
+# 하트 3개부터는 30점마다 하나씩, 최대 99개 (화면은 하트 3개 + "+N")
+EXTRA_HEART_EVERY = 30
+MAX_HEARTS = 99
 LEVEL_TITLES = ("새내기 이웃", "동네 이웃", "친한 이웃", "단골 이웃")
 # 다른 사람에게는 완료한 교환·거래 수를 정확히 보이지 않고 구간으로만
-COIN_BANDS = (10, 5, 1)
+COIN_BANDS = (100, 50, 30, 10, 5, 1)
 
 
 def hearts_for(score: int) -> int:
-    return sum(score >= step for step in HEART_STEPS)
+    if score < HEART_STEPS[-1]:
+        return sum(score >= step for step in HEART_STEPS)
+    return min(MAX_HEARTS, len(HEART_STEPS) + (score - HEART_STEPS[-1]) // EXTRA_HEART_EVERY)
 
 
 def level_title(hearts: int) -> str:
-    return LEVEL_TITLES[min(hearts, MAX_HEARTS)]
+    return LEVEL_TITLES[min(hearts, len(LEVEL_TITLES) - 1)]
 
 
 def next_heart_at(score: int) -> int | None:
-    """다음 하트가 되는 점수 (하트가 꽉 찼으면 None)"""
-    return next((step for step in HEART_STEPS if score < step), None)
+    """다음 하트가 되는 점수 (하트가 99개면 None)"""
+    hearts = hearts_for(score)
+    if hearts >= MAX_HEARTS:
+        return None
+    if hearts < len(HEART_STEPS):
+        return HEART_STEPS[hearts]
+    return HEART_STEPS[-1] + (hearts - len(HEART_STEPS) + 1) * EXTRA_HEART_EVERY
 
 
 def coin_band(coins: int) -> str | None:

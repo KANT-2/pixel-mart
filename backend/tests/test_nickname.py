@@ -35,10 +35,10 @@ async def login():
 
 
 async def test_new_account_with_taken_nickname_is_rejected(login):
-    await login("nick-a@pixelmart.test", "슬라임킹")
+    await login("nick-a@pixelmart.test", "닉중복테스트")
     c = AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
     async with c:
-        res = await c.post("/api/auth/dev-login", json={"email": "nick-b@pixelmart.test", "nickname": "슬라임킹"})
+        res = await c.post("/api/auth/dev-login", json={"email": "nick-b@pixelmart.test", "nickname": "닉중복테스트"})
         assert res.status_code == 409 and res.json()["detail"] == "이미 사용 중인 닉네임입니다."
         assert (await c.get("/api/auth/me")).status_code == 401  # 가입·로그인되지 않음
 

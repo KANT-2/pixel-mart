@@ -52,7 +52,7 @@ class MapCardOut(CamelModel):
     """지도에서 캐릭터를 눌렀을 때의 이웃 카드 — 카드 공개 동의자만. 사용자 id·정확한 점수·금액·위치는 없다"""
 
     nickname: str | None = Field(description="닉네임 공개 동의자만, 아니면 null(화면에서 '이웃 플레이어')")
-    hearts: int = Field(ge=0, le=3, description="지역 커뮤니티 참여도 0~3")
+    hearts: int = Field(ge=0, le=99, description='지역 커뮤니티 참여도 0~99 (화면은 하트 3개 + "+N")')
     level: str = Field(examples=["단골 이웃"])
     coin_band: str | None = Field(description="완료한 교환·거래 구간 (예: '교환 5회+'), 없으면 null")
     interests: list[str] = Field(description="취향 공개 동의자의 취향 이름 (최대 3개)")

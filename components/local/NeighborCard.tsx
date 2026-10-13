@@ -8,7 +8,8 @@ import { useLocalResource } from "@/components/local/useLocalResource";
 import { localApi } from "@/lib/local";
 import type { ApiMapCard, ApiMyActivity } from "@/types/api";
 
-const MAX_HEARTS = 3;
+// 하트 아이콘은 3개까지, 그 뒤는 "+N" 숫자로 (최대 99개)
+const HEART_ICONS = 3;
 
 interface NeighborCardProps {
   avatar: string | null;
@@ -65,8 +66,10 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
 }
 
 function Hearts({ count }: { count: number }) {
-  return <span aria-label={`하트 ${count}개 / ${MAX_HEARTS}개`} className="flex gap-1">
-    {Array.from({ length: MAX_HEARTS }, (_, i) => <PixelIcon key={i} name="heart" className={`size-5 ${i < count ? "" : "opacity-25 grayscale"}`} />)}
+  const extra = count - HEART_ICONS;
+  return <span role="img" aria-label={`하트 ${count}개`} className="flex items-center gap-1">
+    {Array.from({ length: HEART_ICONS }, (_, i) => <PixelIcon key={i} name="heart" className={`size-5 ${i < count ? "" : "opacity-25 grayscale"}`} />)}
+    {extra > 0 && <span aria-hidden="true" className="ml-0.5 font-pixel text-sm text-pink">+{extra}</span>}
   </span>;
 }
 

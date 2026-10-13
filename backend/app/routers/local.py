@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, or_, select
 
 from app.deps import CurrentUser, DbSession, OptionalUser
 from app.models import ActivityPoint, FandomSample, Interest, Order, Region, TradePost, User, UserInterest
@@ -28,6 +28,7 @@ from app.services import activity, local_stats
 from app.services.local_stats import MIN_GROUP_SIZE, Period, period_start, present, rollup
 from app.services.regions import RegionTree, load_tree
 from app.services.sample_avatars import sample_avatars, sample_nicknames
+from app.services.trade_rules import DEMO_EMAIL_DOMAIN
 
 router = APIRouter(tags=["local"])
 
@@ -289,13 +290,21 @@ def _sample_cards(key: str, nicknames: list[str], interests: list[str]) -> list[
     rng = random.Random(f"card:{key}")
     cards = []
     for nickname in nicknames:
-        hearts = rng.choice((0, 1, 1, 2, 2, 2, 3, 3))
+        # 활동 기록을 지어내 실제 점수 규칙으로 하트 계산
+        trades, gifts = rng.choice((0, 0, 1, 2, 3, 5, 7, 12, 20, 35, 60, 120)), rng.randint(0, 4)
+        kinds = [
+            "profile",
+            *(["first_want"] if rng.random() < 0.7 else []),
+            *["trade_done"] * trades,
+            *["gift_sent"] * gifts,
+        ]
+        hearts = activity.hearts_for(sum(activity.RULES[kind].points for kind in kinds))
         cards.append(
             MapCardOut(
                 nickname=nickname,
                 hearts=hearts,
                 level=activity.level_title(hearts),
-                coin_band=activity.coin_band(rng.choice((0, 1, 2, 5, 7, 12))),
+                coin_band=activity.coin_band(trades),
                 interests=rng.sample(interests, min(len(interests), rng.randint(1, 2))) if interests else [],
                 want_count=0,
                 is_me=False,
@@ -322,7 +331,11 @@ async def _crowds(
         .where(
             User.map_avatar_opt_in.is_(True),
             User.region_code.is_not(None),
-            User.email.not_like(f"%{local_stats.EXCLUDED_EMAIL_SUFFIX}"),
+            # 테스트 계정(.test)은 빼되, 시연용 데모 이웃(scripts.seed_demo)은 지도 캐릭터로 보인다
+            or_(
+                User.email.not_like(f"%{local_stats.EXCLUDED_EMAIL_SUFFIX}"),
+                User.email.like(f"%{DEMO_EMAIL_DOMAIN}"),
+            ),
         )
     )
     if interest is not None:
