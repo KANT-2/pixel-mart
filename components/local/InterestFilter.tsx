@@ -48,8 +48,8 @@ export default function InterestFilter({ interests, quick, selected, onSelect }:
   const pick = (id: number | null) => { onSelect(id); setOpen(false); setText(""); };
 
   return <div ref={root} className="relative min-w-0 flex-1 sm:flex-none">
-    {/* 모바일은 줄바꿈 없이 가로로 밀어 보기 */}
-    <div role="group" aria-label="취향 필터" className="flex items-center gap-2 overflow-x-auto px-0.5 py-1 [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:p-0">
+    {/* 모바일은 줄바꿈 없이 가로로 밀어 보기 — 오른쪽 끝을 흐리게 해서 버튼에 가려진 게 아니라 더 있다는 표시 */}
+    <div role="group" aria-label="취향 필터" className="flex items-center gap-2 overflow-x-auto px-0.5 py-1 pr-6 [mask-image:linear-gradient(to_right,#000_85%,transparent)] [scrollbar-width:none] sm:flex-wrap sm:overflow-visible sm:p-0 sm:[mask-image:none]">
       <button type="button" onClick={() => pick(null)} aria-pressed={selected === null} className={`${chip} ${chipState}`}>전체 · 동네 인기 취향</button>
       {chips.map((item) => <button key={item.id} type="button" onClick={() => pick(item.id)} aria-pressed={selected === item.id}
         title={full(item)} aria-label={full(item)} className={`${chip} ${chipState} inline-flex items-center gap-1.5`}>

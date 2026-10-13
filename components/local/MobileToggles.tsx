@@ -9,7 +9,7 @@ interface SearchToggleProps { open: boolean; onToggle: () => void; }
 export function SearchToggle({ open, onToggle }: SearchToggleProps) {
   return <button type="button" onClick={onToggle} aria-expanded={open} aria-label={open ? "검색 닫기" : "검색 열기"}
     className={`${localButton} shrink-0 px-3 sm:hidden`}>
-    <span aria-hidden="true">{open ? "✕" : "⌕"}</span><span className="ml-1 text-xs">검색</span>
+    <span aria-hidden="true" className="text-base">{open ? "✕" : "⌕"}</span>
   </button>;
 }
 
