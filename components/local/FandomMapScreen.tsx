@@ -62,7 +62,7 @@ export default function FandomMapScreen() {
 
   // 캐릭터를 누르면 그 지역으로 가고, 오른쪽 구매 순위에서 그 캐릭터 줄을 강조한다
   // 캐릭터를 누르면 지도는 그대로 두고(뒤의 지역은 눌리지 않음) 그 캐릭터 지역의 순위를 패널에 연다 — 지도를 옮기면 풀림
-  const [pinned, setPinned] = useState<{ view: string; code: string; rank: number | null; neighbor: Neighbor } | null>(null);
+  const [pinned, setPinned] = useState<{ view: string; code: string; rank: number | null; neighbor: Neighbor | null } | null>(null);
   const pin = pinned?.view === viewCode ? pinned : null;
   // 모바일: 검색 줄은 눌러서 펼치고, 지역 정보는 동네·캐릭터를 눌렀을 때 아래 시트로
   const [searchOpen, setSearchOpen] = useState(false);
@@ -153,7 +153,8 @@ export default function FandomMapScreen() {
         <PlacePanel code={panelCode} region={panelCode ? byCode.get(panelCode) ?? null : null}
           block={mapBlocks.find((block) => block.code === (pin?.code ?? selected)) ?? null} interestName={interestName} interest={query.interest}
           hasChildren={Boolean(panelCode && MAP_VIEWS[panelCode])} pickedRank={pin?.rank ?? null}
-          neighbor={pin ? { ...pin.neighbor, rank: pin.rank } : null} onCloseNeighbor={() => setPinned(null)} />
+          // 닫기는 이웃 카드만 — 고른 지역 정보와 구매 순위는 그대로 둔다
+          neighbor={pin?.neighbor ? { ...pin.neighbor, rank: pin.rank } : null} onCloseNeighbor={() => setPinned((current) => current && { ...current, neighbor: null })} />
       </div>
     </div>
   </div>;
