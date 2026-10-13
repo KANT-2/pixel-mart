@@ -20,7 +20,8 @@ import { containsContact } from "@/utils/localTrades";
 import { viewCodeFor, viewTrail } from "@/utils/localMap";
 import type { ApiTradePost } from "@/types/api";
 
-const HEART = "/images/hero-heart.svg";
+// 위시맵 핀·표시는 선물 상자 — 갖고 싶은 아이템을 이웃이 선물해 주는 지도
+const GIFT = "/images/hero-gift.svg";
 
 /** 검색 — 닉네임(nickname) 또는 아이템(q) 하나만 */
 interface WishFind { nickname?: string; item?: string }
@@ -34,7 +35,7 @@ function wishHref(region: string | null, find: WishFind = {}) {
   return `/local/wish-map${query ? `?${query}` : ""}`;
 }
 
-/** 위시맵 — 픽셀 지도 위에 동네별 WISH(갖고 싶은 아이템) 하트, 고른 동네의 WISH 글에서 바로 선물 */
+/** 위시맵 — 픽셀 지도 위에 동네별 WISH(갖고 싶은 아이템) 선물 상자, 고른 동네의 WISH 글에서 바로 선물 */
 export default function WishMap() {
   const params = useSearchParams();
   const regions = useRegions();
@@ -55,7 +56,7 @@ export default function WishMap() {
   const blocks: MapBlock[] = view.legend.map((code) => {
     const row = counts.data?.find((item) => item.regionCode === code);
     const count = row?.count ?? 0;
-    return { code, name: byCode.get(code)?.name ?? code, count: count || null, pins: Array(Math.min(count, 4)).fill(HEART), sample: row?.sample ?? false, hint: "WISH", unit: "개" };
+    return { code, name: byCode.get(code)?.name ?? code, count: count || null, pins: Array(Math.min(count, 4)).fill(GIFT), sample: row?.sample ?? false, hint: "WISH", unit: "개" };
   });
   const choose = (code: string) => {
     if (MAP_VIEWS[code]) go(code); // 시·구는 지도 안으로
@@ -92,7 +93,7 @@ export default function WishMap() {
             label={`${trail.length ? byCode.get(viewCode)?.name : "서비스 지역 전체"} 위시맵${counts.loading ? " (불러오는 중)" : ""}`} />
         )}
         <MapNotes className="mt-2"><p className="text-xs leading-relaxed text-dim">
-          <PixelIcon name="heart" className="mr-1 size-3.5" />하트는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;닉네임 공개&rsquo;를 켠 이웃만 보여요.
+          <PixelIcon name="gift" className="mr-1 size-3.5" />선물 상자는 그 동네에서 진행 중인 WISH(갖고 싶은 아이템) 글이에요. 지역을 누르면 안으로 들어가고, 동네를 고르면 그 동네 글 목록이 열려요. 닉네임은 &lsquo;닉네임 공개&rsquo;를 켠 이웃만 보여요.
         </p></MapNotes>
       </div>
       {nickname
@@ -119,7 +120,7 @@ function WantPanel({ title, kicker, region, nickname, item, onClear }: WantPanel
         <h2 className="min-w-0 break-keep text-lg font-extrabold">{title}</h2>
         {onClear && <button type="button" onClick={onClear} className="btn-pixel h-8 shrink-0 px-2.5 text-xs font-bold">지우기</button>}
       </div>
-      {wants.data && <p className="mt-1 text-sm text-sub"><PixelIcon name="heart" className="mr-1 size-3.5" />WISH <strong className="text-pink">{wants.data.total}</strong>개</p>}
+      {wants.data && <p className="mt-1 text-sm text-sub"><PixelIcon name="gift" className="mr-1 size-3.5" />WISH <strong className="text-pink">{wants.data.total}</strong>개</p>}
     </header>
     <div className="max-h-[min(60dvh,32rem)] overflow-y-auto p-3">
       {wants.error ? <LocalError message={wants.error} onRetry={() => void wants.refresh()} />
@@ -132,7 +133,7 @@ function WantPanel({ title, kicker, region, nickname, item, onClear }: WantPanel
     </div>
     <footer className="space-y-3 border-t-2 border-frame p-3">
       {popular.length > 0 && <div>
-        <p className="mb-1.5 font-pixel text-[10px] tracking-widest text-dim"><PixelIcon name="heart" className="mr-1 size-3" />이 동네 인기 찜</p>
+        <p className="mb-1.5 font-pixel text-[10px] tracking-widest text-dim"><PixelIcon name="gift" className="mr-1 size-3" />이 동네 인기 찜</p>
         <ol className="space-y-1">{popular.map((row) => <li key={row.product.id} className="flex items-center justify-between gap-2 text-xs">
           <Link href={`/products/${row.product.id}`} className="min-w-0 truncate hover:text-mint"><span className="mr-1.5 font-pixel text-violet">{row.rank}</span>{row.product.name}</Link>
           <span className="shrink-0 text-dim">{row.count}명</span>
@@ -158,11 +159,11 @@ function WantRow({ post }: { post: ApiTradePost }) {
       <p className="truncate text-xs text-dim">
         <span className={post.author ? "font-bold text-ink" : ""}>{post.isMine ? "나" : post.author?.nickname ?? "이웃 플레이어"}</span> · {post.regionName.split(" ").at(-1)}
       </p>
-      <p className="truncate font-bold" style={{ color: rarity.color }}><PixelIcon name="heart" className="mr-1 size-3.5" />{name}</p>
+      <p className="truncate font-bold" style={{ color: rarity.color }}><PixelIcon name="gift" className="mr-1 size-3.5" />{name}</p>
       <p className="truncate text-[11px] text-dim">{post.price !== null ? `희망가 ${formatPrice(post.price)}` : post.product ? `연결 상품 ${post.product.name}` : "가격 제안"}</p>
     </div>
     {giftable
-      ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold"><PixelIcon name="chest" className="mr-1 size-3.5" />선물하기</Link>
+      ? <Link href={giftHref(post)} aria-label={`${name} 선물하기`} className="btn-lime inline-flex h-9 shrink-0 items-center self-center px-2.5 text-xs font-bold"><PixelIcon name="gift" className="mr-1 size-3.5" />선물하기</Link>
       : <span title={post.isMine ? "내 글" : post.isSample ? "이 글에는 선물할 수 없어요" : "PIXEL MART 상품을 위시한 글에만 선물할 수 있어요"} className="btn-pixel inline-flex h-9 shrink-0 cursor-not-allowed items-center self-center px-2.5 text-xs font-bold opacity-40">선물하기</span>}
   </article>;
 }
