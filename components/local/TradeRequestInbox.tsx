@@ -42,7 +42,7 @@ export default function TradeRequestInbox({ onChanged }: TradeRequestInboxProps)
   }
 
   const pendingCount = box === "received" ? result.data?.filter((request) => request.status === "pending").length ?? 0 : 0;
-  return <section aria-labelledby="trade-requests-title">
+  return <section id="trade-requests" aria-labelledby="trade-requests-title" className="scroll-mt-28">
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
       <h2 id="trade-requests-title" className="text-xl font-bold">⇄ 교환 신청{pendingCount > 0 && <span className="ml-2 rounded bg-lime px-1.5 py-0.5 align-middle text-xs text-lime-ink">{pendingCount}</span>}</h2>
       <div role="tablist" aria-label="교환 신청함" className="flex gap-1">

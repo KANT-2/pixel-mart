@@ -58,6 +58,7 @@ export default function UserMenu({ compact = false }: UserMenuProps) {
       {open && user && (
         <div id={panelId} className="absolute right-0 top-12 z-50 w-60 pixel-panel p-2 shadow-lg">
           <Link href="/mypage" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-sm hover:bg-panel-2">마이페이지</Link>
+          <Link href="/local/trades/mine#trade-requests" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-sm hover:bg-panel-2">교환 신청함</Link>
           <Link href="/mypage/quests" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-3 text-sm hover:bg-panel-2">내 퀘스트</Link>
           <button type="button" disabled={pending} onClick={handleLogout} className="w-full rounded-lg px-3 py-3 text-left text-sm hover:bg-panel-2 disabled:opacity-50">{pending ? "로그아웃 중…" : "로그아웃"}</button>
           {logoutError && <p role="alert" className="px-3 py-2 text-sm text-pink">{logoutError}</p>}
