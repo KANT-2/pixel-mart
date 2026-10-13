@@ -104,7 +104,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
             </div>
           </div>
           {/* 넓은 화면은 슬라이드 높이가 고정이라 4:3 무대가 잘리지 않게 폭을 맞추고, 오른쪽 끝을 헤더·상품 목록과 맞춘다 */}
-          <div className={`${styles.stageSlot} w-full min-w-0 xl:max-w-[30rem] xl:justify-self-end`}><HeroStage /></div>
+          <div className={`${styles.stageSlot} w-full min-w-0`}><HeroStage wide /></div>
         </> : slide === 3 ? <div className="min-w-0 md:col-span-2"><WorldMapTeaser embedded /></div> : <>
         {slide === 1 && <div aria-hidden="true" className={`${styles.lookbookBg} pointer-events-none absolute -z-10`}>
           {/* 사진 가장자리를 배경으로 녹여 상자 없이 — 글자 쪽은 투명하게 */}

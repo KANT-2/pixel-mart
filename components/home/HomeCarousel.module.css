@@ -70,6 +70,17 @@
 }
 
 @media (min-width: 768px) {
+  /* 첫 배너: 슬라임 무대가 배너 전체 배경 — 글자는 그 위 왼쪽에 */
+  .carousel .stageSlot {
+    position: absolute;
+    inset: 0 0 52px 0;
+    z-index: -1;
+  }
+
+  .carousel > div > [aria-roledescription="슬라이드"]:has(.stageSlot) {
+    padding-left: 48px;
+  }
+
   .carousel > div > [aria-roledescription="슬라이드"] {
     height: auto;
     min-height: 370px;
