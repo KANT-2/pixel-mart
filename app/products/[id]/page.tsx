@@ -10,6 +10,7 @@ import { rarityOf } from "@/utils/gameItem";
 import { getProduct, getProducts, getProductParams } from "@/lib/products";
 import { ProductFallbackNotice } from "@/components/products/ProductStates";
 import ProductDetailTabs from "@/components/products/ProductDetailTabs";
+import RecentlyViewed from "@/components/products/RecentlyViewed";
 import { keycapByProduct } from "@/data/keycaps";
 
 // API가 꺼져 있어도 정적 상품 ID로 상세 경로를 생성합니다.
@@ -159,6 +160,9 @@ async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </section>
       )}
+
+      {/* 최근 본 아이템 — 브라우저에 기록, 지금 상품만 빼고 */}
+      <RecentlyViewed current={{ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl }} />
     </>
   );
 }
