@@ -9,6 +9,7 @@ from app.models.order import Order, OrderItem, OrderStatusHistory
 from app.models.product import Category, Product
 from app.models.question import ProductQuestion
 from app.models.review import Review
+from app.models.trade_request import TradeRequest
 from app.models.user import User
 from app.models.wishlist import Wishlist
 
@@ -29,6 +30,7 @@ __all__ = [
     "Region",
     "Review",
     "TradePost",
+    "TradeRequest",
     "User",
     "UserInterest",
     "Wishlist",

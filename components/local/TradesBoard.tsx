@@ -8,6 +8,7 @@ import { useLocalSelection } from "@/components/local/useLocalSelection";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import LocalSearch from "@/components/local/LocalSearch";
 import TradeCard from "@/components/local/TradeCard";
+import TradeRequestButton, { SentRequestsProvider } from "@/components/local/TradeRequestButton";
 import Pagination from "@/components/Pagination";
 import { LocalError, LocalSkeleton, localButton, localToolbar } from "@/components/local/LocalStates";
 import { SearchToggle } from "@/components/local/MobileToggles";
@@ -73,7 +74,7 @@ function TradesResults({ query, regions, ownRegion }: TradesResultsProps) {
   if (!result.data) return null;
   const data = result.data;
   return data.items.length ? <><p className="text-sm text-sub">진행 중인 글 {data.total}개 · 최신순</p>
-    <ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} /></li>)}</ul>
+    <SentRequestsProvider><ul aria-label="거래·교환 글" className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">{data.items.map((post) => <li key={post.id}><TradeCard post={post} proximity={tradeProximity(regions, ownRegion, post.regionCode)} actions={<TradeRequestButton post={post} />} /></li>)}</ul></SentRequestsProvider>
     <Pagination currentPage={data.page} totalPages={data.totalPages} basePath="/local/trades" query={tradeQueryParams(query).toString()} />
   </> : <div className="pixel-panel p-8 text-center"><h2 className="text-xl font-bold">아직 조건에 맞는 물건이 없어요</h2><p className="mt-3 text-sm text-sub">범위를 넓혀 보거나 가진 물건을 올려 보세요. 갖고 싶은 아이템은 위시맵에서 찾을 수 있어요.</p>
     <div className="mt-5 flex flex-wrap justify-center gap-3"><Link href={tradeHref({ ...query, region: regions.find((region) => region.code === query.region)?.parentCode ?? null, page: 1 })} className={localButton}>상위 지역에서 보기</Link><Link href="/local/trades/new?kind=have" className={localButton}>HAVE 글쓰기</Link><Link href="/local/wish-map" className={localButton}>위시맵 보기</Link><Link href="/products" className={localButton}>관련 상품 보기</Link></div>

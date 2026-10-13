@@ -29,9 +29,9 @@ async def demo():
 
 async def test_demo_neighbors_are_searchable_and_giftable(client, demo):
     first, second = demo
-    assert "데모 이웃 8명" in first and second.endswith("새 WANT 글 0개")  # 다시 실행해도 중복 없음
+    assert "데모 이웃 8명" in first and second.endswith("새 WANT 글 0개, 새 HAVE 글 0개")  # 다시 실행해도 중복 없음
 
-    rows = (await client.get("/api/local/trades", params={"nickname": "픽셀곰"})).json()["items"]
+    rows = (await client.get("/api/local/trades", params={"nickname": "픽셀곰", "kind": "want"})).json()["items"]
     assert len(rows) == 2
     assert all(r["isDemo"] and r["kind"] == "want" and r["product"] and not r["isSample"] for r in rows)
     assert rows[0]["author"]["nickname"] == "픽셀곰"
@@ -39,6 +39,16 @@ async def test_demo_neighbors_are_searchable_and_giftable(client, demo):
     await client.post("/api/auth/dev-login", json={"email": "demo-gifter@pixelmart.test", "nickname": "선물러테스트"})
     post = rows[0]
     res = await client.post("/api/gifts", json={"tradePostId": post["id"], "productId": post["product"]["id"]})
+    assert res.status_code == 201, res.text
+
+
+async def test_demo_neighbors_have_posts_to_request(client, demo):
+    # 데모 이웃의 HAVE 글에는 바로 교환을 신청해 볼 수 있다
+    haves = (await client.get("/api/local/trades", params={"nickname": "슬라임킹", "kind": "have"})).json()["items"]
+    assert len(haves) == 2 and all(h["product"] and h["condition"] and h["isDemo"] for h in haves)
+
+    await client.post("/api/auth/dev-login", json={"email": "demo-gifter@pixelmart.test", "nickname": "선물러테스트"})
+    res = await client.post("/api/local/trade-requests", json={"postId": haves[0]["id"]})
     assert res.status_code == 201, res.text
 
 

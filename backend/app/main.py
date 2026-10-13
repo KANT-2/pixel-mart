@@ -17,6 +17,7 @@ from app.routers import (
     products,
     questions,
     reviews,
+    trade_requests,
     users,
     wishlist,
 )
@@ -64,6 +65,7 @@ for router in (
     wishlist.router,
     local.router,
     local_trades.router,
+    trade_requests.router,
     reviews.router,
     questions.router,
     questions.dev_router,

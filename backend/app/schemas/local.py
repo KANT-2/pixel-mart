@@ -208,3 +208,21 @@ class WishMapOut(CamelModel):
     product: ProductOut
     count: int
     is_sample: bool = Field(description="true면 Cold Start용 샘플 데이터 — 화면에 '샘플' 표시")
+
+
+class TradeRequestIn(CamelModel):
+    post_id: int = Field(description="교환을 신청할 이웃의 거래글")
+    offer_post_id: int | None = Field(default=None, description="함께 보낼 내 진행 중 글 (선택)")
+
+
+class TradeRequestOut(CamelModel):
+    """교환 신청 — 신청한 사람 정보는 닉네임 공개 동의자만 (id·이메일·연락처 없음)"""
+
+    id: int
+    status: Literal["pending", "accepted", "declined", "cancelled"]
+    created_at: datetime
+    decided_at: datetime | None
+    post: TradePostOut
+    offer_post: TradePostOut | None
+    is_mine: bool = Field(description="내가 보낸 신청")
+    requester: TradeAuthorOut | None = Field(default=None, description="신청한 사람이 닉네임 공개에 동의했을 때만")
