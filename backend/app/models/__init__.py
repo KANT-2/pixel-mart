@@ -2,6 +2,7 @@
 from app.models.activity import ActivityPoint
 from app.models.cancel_request import CancelRequest
 from app.models.cart import CartItem
+from app.models.compat import Keyboard, KeycapSpec
 from app.models.faq import Faq
 from app.models.gift import Gift
 from app.models.local import FandomSample, Interest, Region, TradePost, UserInterest, WishSample
@@ -22,6 +23,8 @@ __all__ = [
     "Faq",
     "Gift",
     "Interest",
+    "Keyboard",
+    "KeycapSpec",
     "Order",
     "OrderItem",
     "OrderStatusHistory",
