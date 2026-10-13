@@ -7,6 +7,7 @@ import { giftApi } from "@/lib/gifts";
 import { localApi } from "@/lib/local";
 import { api } from "@/lib/api";
 import WorldMapTeaser from "@/components/home/WorldMapTeaser";
+import ThemePicker from "@/components/home/ThemePicker";
 import HeroStage from "@/components/hero/HeroStage";
 import styles from "./HomeCarousel.module.css";
 import { deskThemes } from "@/data/deskLookbook";
@@ -120,8 +121,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
             <Link className="btn-lime px-4 py-3 text-sm font-bold" href={slide === 0 ? user ? "/local/trades/mine" : "/login" : slide === 1 ? `/lookbook?theme=${theme.slug}` : "/lookbook"}>{slide === 0 ? user ? "내 거래 보기 →" : "로그인하고 퀘스트 보기 →" : slide === 1 ? `${theme.name} 테마 상품 보기 →` : "데스크 테마 둘러보기 →"}</Link>
             {slide === 0 && <Link className="btn-pixel px-4 py-3 text-sm font-bold" href="/mypage/gifts">선물함 보기 →</Link>}
             {/* 룩북은 두 번째 버튼 자리에서 바로 테마를 바꾼다 */}
-            {slide === 1 && <><label htmlFor="hero-theme" className="sr-only">데스크 테마</label>
-              <select id="hero-theme" value={themeIndex} onChange={(event) => setThemeIndex(Number(event.target.value))} className="btn-pixel min-h-11 cursor-pointer px-4 py-2 text-sm font-bold text-ink [&>option]:bg-panel">{deskThemes.map((item, index) => <option key={item.slug} value={index}>{item.name} 테마</option>)}</select></>}
+            {slide === 1 && <ThemePicker themes={deskThemes} value={themeIndex} onChange={setThemeIndex} />}
           </div>
           {slide === 2 && <p className="mt-4 text-xs text-dim">준비 중 · 투표와 알림 신청은 아직 제공하지 않아요.</p>}
         </div>
