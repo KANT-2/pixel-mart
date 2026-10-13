@@ -11,7 +11,9 @@ import { MAP_VIEWS } from "@/lib/localMapData";
 const NAMES: Record<string, string> = { "11": "서울", "28": "인천", "41110": "수원", "41130": "성남", "41460": "용인" };
 
 /** 메인의 월드맵 입구 — 덕력지도와 같은 지도(캐릭터·지역 색·이름표·랜드마크), 지역이나 캐릭터를 누르면 덕력지도로 들어간다 */
-export default function WorldMapTeaser() {
+interface WorldMapTeaserProps { embedded?: boolean }
+
+export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps) {
   const router = useRouter();
   const view = MAP_VIEWS[""];
   // 들어올 때마다 캐릭터 자리를 새로 섞는다 — 무작위 값은 렌더가 아니라 불러올 때 만든다 (메인은 미리 렌더되는 페이지)
@@ -22,11 +24,11 @@ export default function WorldMapTeaser() {
   const data = useLocalResource(load);
   const blocks: MapBlock[] = view.legend.map((code) => {
     const row = data.data?.blocks.find((block) => block.code === code);
-    return { code, name: NAMES[code] ?? code, tag: row?.topInterest ?? undefined, count: row?.count ?? null, pins: row?.pins ?? [],
+    return { code, name: NAMES[code] ?? code, tag: row?.topInterest ?? undefined, count: row?.count ?? null, pins: (row?.pins ?? []).slice(0, 3),
       sample: row?.sample ?? false, ranked: row?.ranked ?? false, hint: "이웃" };
   });
   const open = (code: string) => router.push(`/local?region=${encodeURIComponent(code)}`);
-  return <div className="pixel-panel grid items-center gap-6 overflow-hidden p-5 md:grid-cols-[1fr_1.3fr] md:p-8">
+  return <div className={`${embedded ? "" : "pixel-panel p-5 md:p-8"} grid items-center gap-6 overflow-hidden md:grid-cols-[1fr_1.3fr]`}>
     <div>
       <p className="mb-3 font-pixel text-xs tracking-widest text-mint">▶ WORLD MAP · PIXEL LOCAL</p>
       <h2 className="text-2xl font-extrabold md:text-3xl">우리 동네에도<br />같은 덕후가 있을까?</h2>
@@ -36,7 +38,7 @@ export default function WorldMapTeaser() {
         <Link href="/local/trades" className="btn-pixel inline-flex min-h-11 items-center px-5 py-2 text-sm font-bold">동네 교환글</Link>
       </div>
     </div>
-    <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" heat landmarks
+    <PixelMap view={view} blocks={blocks} selected={null} seedKey={`home:${data.data?.visit ?? ""}`} label="PIXEL LOCAL 월드맵 미리보기" hideLabels pinScale={1.2} heat landmarks
       onSelect={open} onPinSelect={(code) => open(code)} />
   </div>;
 }

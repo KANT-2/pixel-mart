@@ -32,6 +32,8 @@ interface PixelMapProps {
   label: string;
   /** 인원 표시 없이 이름만 (메인 미리보기) */
   namesOnly?: boolean;
+  hideLabels?: boolean;
+  pinScale?: number;
   /** 캐릭터를 눌렀을 때 — 없으면 그 지역을 고른 것과 같다 */
   onPinSelect?: (code: string, index: number) => void;
   /** 인원에 따라 지역 색을 적음·보통·많음으로 칠한다 */
@@ -224,7 +226,7 @@ function useLabelSizes(canvasRef: React.RefObject<HTMLDivElement | null>, cols: 
   return sizes;
 }
 
-export default function PixelMap({ view, blocks, selected, seedKey, onSelect, label, namesOnly = false, onPinSelect, heat = false, landmarks = false }: PixelMapProps) {
+export default function PixelMap({ view, blocks, selected, seedKey, onSelect, label, namesOnly = false, hideLabels = false, pinScale = 1, onPinSelect, heat = false, landmarks = false }: PixelMapProps) {
   const rows = useMemo(() => decodeView(view), [view]);
   const cells = useMemo(() => blockCells(rows, view.legend.length), [rows, view.legend.length]);
   const labels = useMemo(() => cells.map((list) => labelCell(list, rows)), [cells, rows]);
@@ -255,7 +257,7 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
   const labelSizes = useLabelSizes(canvasRef, view.cols, `${view.legend.join(",")}|${blocks.map((block) => `${block.name}${block.tag}${block.count}`).join(",")}`);
   const zoomed = zoom.z > 1.001;
   // 핀 크기: 지도 칸 1.8개 너비 — 핀 간격(2칸)보다 작아 서로 겹치지 않는다. 확대하면 함께 커진다
-  const pinWidth = `max(14px, ${(1.8 / view.cols) * 100}%)`;
+  const pinWidth = `max(${14 * pinScale}px, ${((1.8 * pinScale) / view.cols) * 100}%)`;
 
   // 이름표 영역 — 실제 크기(지도 칸 단위)를 잰 뒤에는 그 크기로, 다른 블록의 이름표도 피한다
   const labelBoxes: Box[] = view.legend.flatMap((code, index) => {
@@ -313,7 +315,7 @@ export default function PixelMap({ view, blocks, selected, seedKey, onSelect, la
         {view.legend.map((code, index) => {
           const cell = labels[index];
           const block = blockByCode.get(code);
-          if (!cell || !block) return null;
+          if (hideLabels || !cell || !block) return null;
           // 이름표는 확대해도 같은 크기로 (배율만큼 되돌림)
           return <button key={code} type="button" className={styles.label} data-label={code} aria-pressed={selected === code} onClick={() => onSelect(code)}
             aria-label={namesOnly ? `${block.name} 지도로 이동` : block.tag ? `${block.name} · ${block.tag} ${block.count ? `${block.count}명` : "아직 없음"}` : `${block.name}${block.count ? ` · ${block.hint ?? "이웃"} ${block.count}${block.unit ?? "명"}` : block.unit ? ` · ${block.hint ?? ""} 없음` : " · 아직 없음"}`}
