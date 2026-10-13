@@ -90,7 +90,7 @@ export default function HomeCarousel({ questOnly = false }: HomeCarouselProps) {
       onTouchStart={(event) => { if (event.target instanceof Element && event.target.closest("a, button, select")) { start.current = null; return; } const touch = event.touches[0]; start.current = { x: touch.clientX, y: touch.clientY }; }}
       onTouchCancel={() => { start.current = null; }}
       onTouchEnd={(event) => { const touch = event.changedTouches[0]; if (start.current && slide !== 3) { const dx = touch.clientX - start.current.x; const dy = touch.clientY - start.current.y; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) move(dx < 0 ? 1 : -1); } start.current = null; }}>
-      <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-[0.85fr_1.15fr] md:gap-8 md:px-10 md:py-10 lg:gap-12">
+      <div role="group" aria-roledescription="슬라이드" aria-label={`${slideOrder.indexOf(slide) + 1}/${slideOrder.length} ${labels[slide]}`} className="relative isolate grid min-h-[640px] grid-cols-1 items-center gap-6 overflow-hidden rounded-t-[inherit] px-5 py-8 md:h-[508px] md:min-h-0 md:grid-cols-2 md:gap-8 md:px-10 md:py-10 lg:gap-12">
         {slide === 4 ? <>
           <div className="min-w-0">
             {/* 무대는 유저의 정체성 자리 — 아바타를 만들면 슬라임 대신 내 캐릭터가, 콜라보 시즌엔 그 세계관 무대가 선다 */}
