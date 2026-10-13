@@ -35,9 +35,12 @@ export default function NeighborCard({ avatar, card, rank, sample, onClose }: Ne
         <PixelAvatar src={avatar ?? "/images/hero-slime.svg"} className="size-12 object-contain" />
       </span>
       <div className="min-w-0">
-        <p className="truncate font-bold">{card?.isMe ? "나" : name}
+        <p className="flex min-w-0 items-center gap-1.5 font-bold"><span className="truncate">{card?.isMe ? "나" : name}</span>
+          {sample && <span className="shrink-0 rounded border border-line px-1.5 py-0.5 text-[11px] font-normal text-dim">샘플</span>}
         </p>
-        {rank && <p className="mt-0.5 text-xs text-sub">이 동네 구매 {rank}위 <span className="text-dim">· 금액 비공개</span></p>}
+        {/* 샘플 캐릭터는 실제 구매가 없으므로 순위를 보여 주지 않는다 */}
+        {sample ? <p className="mt-0.5 text-xs text-dim">시연용 샘플 캐릭터예요</p>
+          : rank && <p className="mt-0.5 text-xs text-sub">이 동네 구매 {rank}위 <span className="text-dim">· 금액 비공개</span></p>}
       </div>
     </div>
     {card ? <>

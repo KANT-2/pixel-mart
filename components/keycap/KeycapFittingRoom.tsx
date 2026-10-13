@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useCart } from "@/components/CartProvider";
 import { KEYCAPS, KEYCAP_KIND_LABEL, KEYCAP_TONES, keycapByProduct, type KeycapItem, type KeycapKind, type KeycapTone } from "@/data/keycaps";
 import { ARROW_KEYS, KEYBOARDS } from "@/data/keyboards";
-import { keycapImage, placeKeycap, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
+import { cartQuantities, keycapImage, placeKeycap, removeKeycap, trayKeycaps, withObject, type Placement } from "@/utils/keycapFit";
 import { safeNextPath } from "@/utils/safeNextPath";
 
 // 나머지 키 — 비워 두면 스위치가 보이고, 색을 고르면 기본 키캡(무각 키캡 질감 × 색)으로 채워 내 키보드와 비슷하게 맞춘다.
@@ -157,7 +157,8 @@ export default function KeycapFittingRoom({ current, productName, productId }: K
     if (!user) { router.push(`/login?next=${encodeURIComponent(safeNextPath(window.location.pathname))}`); return; }
     setCartState("adding");
     try {
-      for (const item of used) await add(item.productId, 1);
+      // 같은 단품을 여러 자리에 끼웠으면 그 수만큼, 여러 개 구성 세트는 필요한 세트 수만큼 담는다
+      for (const [productId, quantity] of cartQuantities(placed, used)) await add(productId, quantity);
       setCartState("done");
     } catch { setCartState("error"); }
   }

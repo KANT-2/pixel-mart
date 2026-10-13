@@ -5,7 +5,7 @@ import ts from "typescript";
 
 const source = await readFile(new URL("../utils/keycapFit.ts", import.meta.url), "utf8");
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText;
-const { placeKeycap, removeKeycap, keycapImage, trayKeycaps, withObject } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
+const { placeKeycap, removeKeycap, keycapImage, trayKeycaps, withObject, cartQuantities } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString("base64")}`);
 
 const heart = { id: "resin-heart", name: "HP 하트 키캡", productId: 1, kind: "one", material: "resin", color: "#ad1d1d", tone: "red" };
 const space = { id: "coin-spacebar", name: "골드 코인 스페이스바 키캡", productId: 21, kind: "space", material: "opaque", color: "#d6aa44", tone: "gold" };
@@ -54,4 +54,16 @@ test("서랍 색 필터 — 고른 색 묶음만", () => {
   const all = [space, shield, heart, arrows];
   assert.deepEqual(trayKeycaps(all, "resin-heart", "all", "", "gold").map((i) => i.id), ["coin-spacebar", "star-arrows"]);
   assert.deepEqual(trayKeycaps(all, "resin-heart", "one", "", "blue").map((i) => i.id), ["resin-shield"]);
+});
+
+test("조합 담기 수량 — 단품은 끼운 자리 수만큼, 방향키·스페이스바는 1개, 여러 개 구성 세트는 필요한 세트 수", () => {
+  const coin = { id: "resin-coin", name: "코인 키캡 세트", productId: 2, kind: "one", material: "resin", color: "#ae7c20", tone: "gold", pack: 3 };
+  const placed = {
+    Escape: "resin-heart", KeyQ: "resin-heart",
+    ArrowUp: "star-arrows", ArrowLeft: "star-arrows", ArrowDown: "star-arrows", ArrowRight: "star-arrows",
+    Space: "coin-spacebar",
+    KeyA: "resin-coin", KeyS: "resin-coin", KeyD: "resin-coin", KeyF: "resin-coin",
+  };
+  const quantities = cartQuantities(placed, [heart, arrows, space, coin]);
+  assert.deepEqual(Object.fromEntries(quantities), { 1: 2, 69: 1, 21: 1, 2: 2 });
 });

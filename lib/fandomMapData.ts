@@ -21,6 +21,8 @@ export interface MapBlockData {
 
 const CACHE_MS = 60_000;
 const cache = new Map<string, { at: number; value: Promise<unknown> }>();
+// 응답에 내 카드(isMe)·비공개 카드가 섞이므로, 보는 사람이 바뀌면(로그인·로그아웃·계정 전환) 캐시를 통째로 버린다
+let cacheViewer: number | null | undefined;
 
 /** 같은 요청은 60초 동안 재사용 (지도 이동·뒤로 가기 때 깜빡임 없이) */
 function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
@@ -51,7 +53,11 @@ async function mapLimited<T, R>(items: T[], limit: number, run: (item: T) => Pro
  * 둘 다 없으면 취향 집계 인원만큼 기본 슬라임 핀 (정책 4.2, 블록당 구매 상위 10명 — 0번 핀이 1위).
  * 좌표·개인 정보는 다루지 않는다.
  */
-export async function loadMapBlocks(viewCode: string, legend: string[], interest: number | null, signal: AbortSignal): Promise<MapBlockData[]> {
+export async function loadMapBlocks(viewerId: number | null, viewCode: string, legend: string[], interest: number | null, signal: AbortSignal): Promise<MapBlockData[]> {
+  if (viewerId !== cacheViewer) {
+    cache.clear();
+    cacheViewer = viewerId;
+  }
   const key = `${viewCode}|${interest ?? "all"}`;
   // 캐시는 여러 화면이 함께 쓰므로 한 화면의 취소 신호를 넘기지 않는다 (요청 자체에는 8초 제한이 있다)
   const avatars = await cached(`avatars|${key}`, () => localApi.mapAvatars(viewCode, interest ?? undefined))

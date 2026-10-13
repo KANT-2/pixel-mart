@@ -14,6 +14,7 @@ import NeighborCard from "@/components/local/NeighborCard";
 import { MapNotes, SearchToggle, searchRow } from "@/components/local/MobileToggles";
 import { HEAT_COLORS, HEAT_LABELS, characterIcon, shortRegionName } from "@/utils/mapSprites";
 import { loadMapBlocks } from "@/lib/fandomMapData";
+import { useAuth } from "@/components/AuthProvider";
 import { localApi } from "@/lib/local";
 import { MAP_VIEWS } from "@/lib/localMapData";
 import { interestProductHref, localHref, localSettingsHref, parseLocalQuery } from "@/utils/local";
@@ -38,10 +39,12 @@ export default function FandomMapScreen() {
     window.history.pushState(null, "", localHref(region, "all", interest));
   }, [query.interest]);
 
-  const loadBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewCode, view.legend, query.interest, signal), [viewCode, view.legend, query.interest]);
+  // 보는 사람이 바뀌면 다시 불러온다 (이전 계정의 카드가 남지 않게)
+  const viewerId = useAuth().user?.id ?? null;
+  const loadBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewerId, viewCode, view.legend, query.interest, signal), [viewerId, viewCode, view.legend, query.interest]);
   const blocks = useLocalResource(loadBlocks);
   // 칩은 취향을 골라도 바뀌지 않게 '전체' 기준 인기 취향으로 (같은 요청은 캐시돼 다시 받지 않음)
-  const loadAllBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewCode, view.legend, null, signal), [viewCode, view.legend]);
+  const loadAllBlocks = useCallback((signal: AbortSignal) => loadMapBlocks(viewerId, viewCode, view.legend, null, signal), [viewerId, viewCode, view.legend]);
   const allBlocks = useLocalResource(loadAllBlocks);
   const loadInterests = useCallback((signal: AbortSignal) => localApi.interests("", undefined, signal), []);
   const interests = useLocalResource(loadInterests);
@@ -73,7 +76,7 @@ export default function FandomMapScreen() {
     const card = data?.cards[index] ?? null;
     // 한 지역에 실제 이웃과 샘플 캐릭터가 섞일 수 있어 샘플 여부는 캐릭터마다 (카드가 없으면 실제 이웃)
     const neighbor = { avatar: block?.pins[index] ?? null, card, sample: Boolean(card?.isSample) };
-    setPinned({ view: viewCode, code, rank: block?.ranked ? index + 1 : null, neighbor });
+    setPinned({ view: viewCode, code, rank: block?.ranked && !neighbor.sample ? index + 1 : null, neighbor });
     setSheet(true);
   };
   const choose = (code: string) => {
@@ -238,7 +241,7 @@ function BuyerRanking({ ranking, loading, picked }: BuyerRankingProps) {
   if (!ranking) return null;
   return <section aria-label="구매 순위 TOP 10" className="mt-4">
     <p className="mb-2 flex items-center justify-between text-xs text-dim">
-      <span>구매 순위 TOP 10</span>
+      <span>구매 순위 TOP 10{ranking.isSample && <span className="ml-1.5 rounded border border-line px-1.5 py-0.5 text-[11px]">샘플 포함</span>}</span>
       <span>금액 비공개</span>
     </p>
     {ranking.items.length === 0 ? <p className="text-sm text-sub">아직 순위에 오른 이웃이 없어요.</p> : (

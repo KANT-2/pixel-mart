@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import PixelMap, { type MapBlock } from "@/components/local/PixelMap";
 import { useLocalResource } from "@/components/local/useLocalResource";
 import { loadMapBlocks } from "@/lib/fandomMapData";
+import { useAuth } from "@/components/AuthProvider";
 import { MAP_VIEWS } from "@/lib/localMapData";
 import styles from "./WorldMapTeaser.module.css";
 
@@ -17,11 +18,12 @@ interface WorldMapTeaserProps { embedded?: boolean }
 export default function WorldMapTeaser({ embedded = false }: WorldMapTeaserProps) {
   const router = useRouter();
   const view = MAP_VIEWS[""];
+  const viewerId = useAuth().user?.id ?? null;
   // 들어올 때마다 캐릭터 자리를 새로 섞는다 — 무작위 값은 렌더가 아니라 불러올 때 만든다 (메인은 미리 렌더되는 페이지)
   const load = useCallback(async (signal: AbortSignal) => ({
     visit: Math.random().toString(36).slice(2, 8),
-    blocks: await loadMapBlocks("", view.legend, null, signal),
-  }), [view.legend]);
+    blocks: await loadMapBlocks(viewerId, "", view.legend, null, signal),
+  }), [viewerId, view.legend]);
   const data = useLocalResource(load);
   const blocks: MapBlock[] = view.legend.map((code) => {
     const row = data.data?.blocks.find((block) => block.code === code);

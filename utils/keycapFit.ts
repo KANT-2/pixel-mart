@@ -40,6 +40,24 @@ export function removeKeycap(placed: Placement, keyId: string, kind: KeycapKind)
   return next;
 }
 
+/**
+ * 조합 그대로 담을 수량 (상품 ID → 개수). 1u 단품은 끼운 자리 수만큼,
+ * 여러 개 구성 세트(pack)는 필요한 세트 수만큼, 방향키 세트·스페이스바는 1개
+ */
+export function cartQuantities(placed: Placement, items: KeycapItem[]): Map<number, number> {
+  const byId = new Map(items.map((item) => [item.id, item]));
+  const slots = new Map<string, number>();
+  for (const id of Object.values(placed)) slots.set(id, (slots.get(id) ?? 0) + 1);
+  const result = new Map<number, number>();
+  for (const [id, count] of slots) {
+    const item = byId.get(id);
+    if (!item) continue;
+    const quantity = item.kind === "one" ? Math.ceil(count / (item.pack ?? 1)) : 1;
+    result.set(item.productId, (result.get(item.productId) ?? 0) + quantity);
+  }
+  return result;
+}
+
 /** 키 위에 올릴 그림 — 세트는 방향키 순서대로 1~4번 그림 */
 export function keycapImage(item: KeycapItem, keyId?: string): string {
   const part = item.kind === "set" ? `${item.id}-${keyId ? Math.max(1, ARROWS.indexOf(keyId) + 1) : 1}` : item.id;
