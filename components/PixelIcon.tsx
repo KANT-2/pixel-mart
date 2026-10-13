@@ -1,5 +1,5 @@
 /** 사이트의 픽셀 아이콘(HUD 하트·코인·상자 등) — 시스템 이모지 대신 쓴다 */
-export type PixelIconName = "heart" | "coin" | "chest" | "star" | "sword" | "slime";
+export type PixelIconName = "heart" | "coin" | "chest" | "star" | "sword" | "slime" | "gift";
 
 interface PixelIconProps { name: PixelIconName; className?: string; }
 
