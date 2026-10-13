@@ -24,7 +24,21 @@ USERS = "SELECT id FROM users WHERE email LIKE 'act-%@pixelmart.test'"
 
 
 @pytest.mark.parametrize(
-    ("score", "hearts", "next_at"), [(0, 0, 15), (14, 0, 15), (15, 1, 35), (35, 2, 70), (69, 2, 70), (70, 3, None)]
+    ("score", "hearts", "next_at"),
+    # 하트 3개(90점)부터는 30점마다 하나씩, 최대 99개
+    [
+        (0, 0, 30),
+        (29, 0, 30),
+        (30, 1, 65),
+        (65, 2, 90),
+        (89, 2, 90),
+        (90, 3, 120),
+        (119, 3, 120),
+        (120, 4, 150),
+        (240, 8, 270),
+        (3000, 99, None),
+        (99999, 99, None),
+    ],
 )
 def test_hearts_from_score(score, hearts, next_at):
     assert activity.hearts_for(score) == hearts
@@ -32,8 +46,15 @@ def test_hearts_from_score(score, hearts, next_at):
 
 
 def test_levels_and_coin_bands():
-    assert [activity.level_title(h) for h in range(4)] == ["새내기 이웃", "동네 이웃", "친한 이웃", "단골 이웃"]
-    assert [activity.coin_band(n) for n in (0, 1, 4, 5, 9, 10, 30)] == [
+    assert [activity.level_title(h) for h in (0, 1, 2, 3, 12, 99)] == [
+        "새내기 이웃",
+        "동네 이웃",
+        "친한 이웃",
+        "단골 이웃",
+        "단골 이웃",
+        "단골 이웃",
+    ]
+    assert [activity.coin_band(n) for n in (0, 1, 4, 5, 9, 10, 29, 30, 49, 50, 99, 100, 500)] == [
         None,
         "교환 1회+",
         "교환 1회+",
@@ -41,6 +62,12 @@ def test_levels_and_coin_bands():
         "교환 5회+",
         "교환 10회+",
         "교환 10회+",
+        "교환 30회+",
+        "교환 30회+",
+        "교환 50회+",
+        "교환 50회+",
+        "교환 100회+",
+        "교환 100회+",
     ]
 
 
@@ -118,7 +145,7 @@ async def test_profile_and_first_want_count_once(users):
     await me.post("/api/local/trades", json=want("키링 하나"))
     await me.post("/api/local/trades", json=want("머그컵 하나"))
     mine = await score(me)
-    assert mine["score"] == 15 and mine["hearts"] == 1 and mine["level"] == "동네 이웃" and mine["nextHeartAt"] == 35
+    assert mine["score"] == 15 and mine["hearts"] == 0 and mine["level"] == "새내기 이웃" and mine["nextHeartAt"] == 30
     assert [r["label"] for r in mine["recent"]] == ["첫 WANT 등록", "지역·취향 프로필 처음 완성"]
 
 
@@ -156,8 +183,8 @@ async def test_cards_only_for_opted_in_and_without_identity(users):
     mine = next(c for c in cards if c["isMe"])
     assert mine == {
         "nickname": "act-card",
-        "hearts": 1,
-        "level": "동네 이웃",
+        "hearts": 0,
+        "level": "새내기 이웃",
         "coinBand": None,
         "interests": ["나루토"],
         "wantCount": 1,

@@ -4,17 +4,21 @@
 - 이메일은 `demo-<key>@demo.pixelmart.test` — `.test`라 덕력지도·위시맵 집계에서는 빠지고, 화면에는 "데모 이웃"으로 표시
 - 닉네임 공개(opt-in)를 켠 상태라 위시맵에서 닉네임으로 찾을 수 있다
 - 받은 선물은 개발용 로그인으로 그 이메일에 로그인해 선물함에서 받기·거절할 수 있다
+- 덕력지도 캐릭터·이웃 카드도 켜고, 활동 기록(거래·선물 완료)을 넣어 하트 3개를 넘긴 "+N" 이웃도 보이게 한다
 """
 
 import asyncio
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import SessionLocal, engine
-from app.models import Product, TradePost, User
+from app.models import ActivityPoint, Interest, Product, TradePost, User, UserInterest
+from app.services.activity import RULES
+from app.services.sample_avatars import sample_avatars
 from app.services.trade_rules import DEMO_EMAIL_DOMAIN
 
 SEED_FILE = Path(__file__).resolve().parent.parent / "seed" / "demo_users.json"
@@ -32,7 +36,12 @@ async def seed_demo(db: AsyncSession) -> str:
             db.add(user)
         user.region_code = u["regionCode"]
         user.nickname_public = True
+        user.profile_public = True
+        user.map_avatar_opt_in = True
+        user.map_card_public = True
+        user.avatar_url = user.avatar_url or sample_avatars(f"demo:{u['key']}", 1)[0]
         await db.flush()
+        await _reset_interests_and_activity(db, user.id, u["interestIds"], **u["activity"])
         open_items = set(
             await db.scalars(
                 select(TradePost.product_id).where(
@@ -58,6 +67,27 @@ async def seed_demo(db: AsyncSession) -> str:
             created += 1
     await db.commit()
     return f"데모 이웃 {len(users)}명, 새 WANT 글 {created}개"
+
+
+async def _reset_interests_and_activity(
+    db: AsyncSession, user_id: int, interest_ids: list[int], trades: int, gifts: int
+):
+    """취향과 활동 기록을 JSON 그대로 다시 넣는다 — 하루 상한에 걸리지 않게 하루에 한 건씩 과거로 펼친다"""
+    await db.execute(delete(UserInterest).where(UserInterest.user_id == user_id))
+    # 취향 시드(scripts.seed)에 아직 없는 번호는 건너뛴다
+    known = set(await db.scalars(select(Interest.id).where(Interest.id.in_(interest_ids))))
+    db.add_all(UserInterest(user_id=user_id, interest_id=i) for i in interest_ids if i in known)
+    await db.execute(delete(ActivityPoint).where(ActivityPoint.user_id == user_id))
+    history = [("profile", 0), ("first_want", 0)]
+    history += [("trade_done", n) for n in range(1, trades + 1)] + [("gift_sent", n) for n in range(1, gifts + 1)]
+    now = datetime.now(UTC)
+    db.add_all(
+        ActivityPoint(
+            user_id=user_id, kind=kind, ref_id=ref_id, points=RULES[kind].points, created_at=now - timedelta(days=i + 1)
+        )
+        for i, (kind, ref_id) in enumerate(reversed(history))
+    )
+    await db.flush()
 
 
 async def main() -> None:

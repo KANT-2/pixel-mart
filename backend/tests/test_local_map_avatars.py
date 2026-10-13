@@ -267,9 +267,15 @@ async def test_buyer_ranking_lists_small_group_and_hides_empty(users):
 async def test_buyer_ranking_sample_top_ten(client):
     try:
         rows = (await client.get("/api/local/map-avatars")).json()
+        for region in ("11", "41", "28"):
+            rows += (await client.get("/api/local/map-avatars", params={"region": region})).json()
     except Exception:
         pytest.skip("로컬 DB가 없습니다")
-    sample = next((r for r in rows if r["isSample"]), None)
+    # 실제 이웃(데모 이웃 포함)이 섞이지 않은 샘플 블록 — 실제 이웃끼리는 같은 금액이면 매번 순서가 바뀐다
+    pure = (
+        r for r in rows if r["isSample"] and len(r["avatars"]) >= 10 and all(c and c["isSample"] for c in r["cards"])
+    )
+    sample = next(pure, None)
     if sample is None:
         pytest.skip("덕력지도 샘플이 없거나 실제 동의자가 충분합니다")
     body = (await client.get("/api/local/buyer-ranking", params={"region": sample["regionCode"]})).json()
