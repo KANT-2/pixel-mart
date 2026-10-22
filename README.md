@@ -92,7 +92,7 @@ DB 연결은 http://localhost:3000/api/health/db 로 확인합니다. 상품 폴
 | `npm run build` | 프로덕션 빌드 (타입 검사 포함) |
 | `npm run lint` · `npm test` | ESLint · 단위 테스트 |
 | `npx tsc --noEmit` | TypeScript 검사 |
-| `pytest` (backend/, 별도 테스트 DB 준비 후) | 백엔드 테스트 — 현재 설정된 DB 데이터를 변경하므로 [테스트 실행 안내](docs/SETUP.md) 먼저 확인 |
+| `pytest` (backend/, 별도 테스트 DB 준비 후) | 백엔드 테스트 — 현재 설정된 DB 데이터를 변경해요 (데모 이웃이 지워지니 테스트 뒤 `python -m scripts.seed_demo` 다시 실행 — [backend/AGENTS.md](backend/AGENTS.md) 테스트 절 참고) |
 
 처음 합류한 팀원은 [docs/SETUP.md](docs/SETUP.md), 백엔드는 [docs/backend/README.md](docs/backend/README.md)를 따라 환경을 맞춰 주세요.
 
@@ -149,11 +149,11 @@ pixel-mart/
 | --- | --- |
 | [docs/UI_STRUCTURE.md](docs/UI_STRUCTURE.md) | 화면 구조 기획과 분할 · 컴포넌트 조립과 배치 · 사용자 흐름 |
 | [docs/PIXEL_LOCAL_AS_BUILT.md](docs/PIXEL_LOCAL_AS_BUILT.md) | PIXEL LOCAL 현재 구현 (화면 문구·규칙·알려진 한계·시연 순서) |
-| [docs/TASTE_COMMERCE_PLAN.md](docs/TASTE_COMMERCE_PLAN.md) | 다음 단계 기획 (취향 세분화·하트·개인정보·레퍼런스 분석) |
+| [docs/archive/TASTE_COMMERCE_PLAN.md](docs/archive/TASTE_COMMERCE_PLAN.md) | (보관) 10/12 기준 다음 단계 기획 (취향 세분화·하트·개인정보·레퍼런스 분석) |
 | [docs/PIXEL_LOCAL_POLICY.md](docs/PIXEL_LOCAL_POLICY.md) · [docs/DUKRYEOK_MAP_POLICY.md](docs/DUKRYEOK_MAP_POLICY.md) · [docs/AVATAR_POLICY.md](docs/AVATAR_POLICY.md) | 운영 정책 |
 | [docs/PRODUCT_STRATEGY.md](docs/PRODUCT_STRATEGY.md) · [docs/UX_CX_STRATEGY.md](docs/UX_CX_STRATEGY.md) | 상품·UX 전략 |
 | [docs/backend/](docs/backend/README.md) | 백엔드 실행·구조·스키마·API |
-| [docs/CONVENTIONS.md](docs/CONVENTIONS.md) · [docs/SETUP.md](docs/SETUP.md) | 협업 규칙 · 환경 세팅 |
+| [AGENTS.md](AGENTS.md) · [docs/SETUP.md](docs/SETUP.md) · [docs/archive/](docs/archive/) | 작업 규칙 · 환경 세팅 · 보관 문서 |
 
 ## 팀원 및 역할
 | 이름 | 역할 | 담당 |
@@ -169,7 +169,7 @@ pixel-mart/
 - **GitHub Flow**: `main`에 직접 push하지 않고 `feat/*` · `fix/*` · `docs/*` 브랜치에서 작업 후 Pull Request로 머지 (리뷰 1명 승인)
 - 커밋 메시지: `feat(be-orders): 주문 생성 API` 형식
 - 페이지 이동은 `next/link`의 `<Link>`, API 응답은 camelCase
-- 자세한 규칙: [docs/CONVENTIONS.md](docs/CONVENTIONS.md) · 에이전트 규칙: `AGENTS.md`, `backend/AGENTS.md`
+- 자세한 규칙: `AGENTS.md`(프론트) · `backend/AGENTS.md`(백엔드)
 
 ## 화면 캡처
 | 메인 (데스크톱) | 메인 (모바일) |

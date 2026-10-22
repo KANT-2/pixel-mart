@@ -1,7 +1,7 @@
 # PIXEL LOCAL — 현재 구현 기능 정리 (As-built)
 
 > **기준: `main` 1792535 (2026-10-13, PR #211까지)** · 이 문서는 기획 제안이 아니라 **지금 코드가 실제로 하는 일**만 적습니다.
-> 화면 문구는 실제 화면 그대로 따옴표로 적었습니다. 다음 단계 제안은 [`TASTE_COMMERCE_PLAN.md`](TASTE_COMMERCE_PLAN.md)에 있습니다.
+> 화면 문구는 실제 화면 그대로 따옴표로 적었습니다. 다음 단계 제안은 [`archive/TASTE_COMMERCE_PLAN.md`](archive/TASTE_COMMERCE_PLAN.md)에 있습니다.
 
 ---
 

@@ -157,7 +157,7 @@ localhost:3000에서 "등록된 상품 8개"가 보이면 준비 완료입니다
 ---
 
 ## STEP 3. 전원 — 매일 반복하는 Git 작업 흐름
-자세한 규칙은 [docs/CONVENTIONS.md](docs/CONVENTIONS.md) 참고.
+자세한 규칙은 `AGENTS.md`, `backend/AGENTS.md` 참고.
 ```
 git switch main
 git pull                              # 1) 최신 main 받기
