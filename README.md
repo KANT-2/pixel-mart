@@ -22,7 +22,7 @@
 | 키캡 | **키캡 피팅룸** — 내 키보드 모델에 키캡을 끼워 보고 조합 그대로 장바구니 담기 · 키보드 검색·키캡 호환성 판정 API |
 | 룩북 | 데스크 테마 룩북(픽셀 고양이·구름·레벨업·산호 버섯) → 테마 상품 |
 | 플레이어 | 구글 로그인 + 닉네임, **픽셀 아바타**(AI 생성·픽셀 캔버스), 마이페이지 뱃지 도감, 내 퀘스트 |
-| PIXEL LOCAL | **덕력지도**(동네별 취향 이웃 수·지도 캐릭터·이웃 카드) · **위시맵**(이웃이 구하는 아이템) · **거래·교환**(HAVE/WISH/SELL, 매칭, 교환 신청 → 수락 → 받았어요 → 완료) · **이웃 선물**(선물 → 받는 사람 주소 입력 → 주문) |
+| PIXEL LOCAL | **덕력지도**(동네별 취향 이웃 수·지도 캐릭터·이웃 카드) · **위시맵**(이웃이 구하는 아이템) · **거래·교환**(HAVE/WISH/SELL — 화면의 WISH는 API에서 `want`, 매칭, 교환 신청 → 수락 → 받았어요 → 완료) · **이웃 선물**(선물 → 받는 사람 주소 입력 → 주문) |
 | 신뢰 | 활동 점수 → 하트(×N)·레벨(LV.1~10)·코인, 뱃지 19종, 헤더 알림 |
 | 개인정보 | 동네는 직접 선택(GPS 좌표 저장 안 함), 공개 설정 5종 모두 기본 OFF, 거래글 연락처 입력 차단 |
 
@@ -80,7 +80,7 @@ DATABASE_URL=postgresql+asyncpg://pixelmart:pixelmart@localhost:5433/pixelmart
 npm ci
 npm run dev
 ```
-브라우저에서 http://localhost:3000 접속 · API 문서 http://localhost:3000/api/docs
+브라우저에서 http://localhost:3000 접속 · API 문서 http://127.0.0.1:8000/api/docs (프론트를 거쳐 http://localhost:3000/api/docs 로도 열림)
 DB 연결은 http://localhost:3000/api/health/db 로 확인합니다. 상품 폴백 화면이 보이는 것만으로는 백엔드 연동을 확인할 수 없습니다.
 
 - 로그인: 개발 환경은 로그인 화면의 **개발용 이메일 로그인**(아무 이메일). 데모 이웃으로 보려면 `demo-coinmoa@demo.pixelmart.test` 처럼 `demo-<이름>@demo.pixelmart.test`
@@ -156,6 +156,7 @@ pixel-mart/
 | [AGENTS.md](AGENTS.md) · [docs/SETUP.md](docs/SETUP.md) · [docs/archive/](docs/archive/) | 작업 규칙 · 환경 세팅 · 보관 문서 |
 
 ## 팀원 및 역할
+### 1차 프로젝트 (2026.10.07 ~ 10.13)
 | 이름 | 역할 | 담당 |
 | --- | --- | --- |
 | 채희주 ([@kixxuya](https://github.com/kixxuya)) | 프론트엔드 | 화면 전체, 디자인 시스템, 메인·상품·PIXEL LOCAL UI |
@@ -163,7 +164,7 @@ pixel-mart/
 | [@totoriri605-oss](https://github.com/totoriri605-oss) | BE-B 주문·CS | FAQ, 가상 주문·배송, 취소, 리뷰, 상품 Q&A, 키캡 호환성 |
 | [@kyrdufmal-summer](https://github.com/kyrdufmal-summer) | BE-C → 기획·정책 | PIXEL LOCAL 서비스 정의·운영 정책·개인정보 기준 정리(이슈 #151~), 현재 구현·화면 구조 문서화 |
 
-> 작업 단위는 GitHub 이슈(라벨 `FE` · `BE-A` · `BE-B` · `BE-C` · `policy`)로 관리합니다.
+> 1차 때는 GitHub 이슈 라벨 `FE` · `BE-A` · `BE-B` · `BE-C` · `policy`로 나눠 작업했어요. 2차 팀 구성과 역할은 아래에 새로 추가해 주세요.
 
 ## 협업 규칙
 - **GitHub Flow**: `main`에 직접 push하지 않고 `feat/*` · `fix/*` · `docs/*` 브랜치에서 작업 후 Pull Request로 머지 (리뷰 1명 승인)
