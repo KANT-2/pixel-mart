@@ -1,9 +1,10 @@
 # API 목록
 
 > 🔒 = 로그인 필요 (`CurrentUser`) · ✅ = 구현됨 · 전체 경로는 `/api` 접두사 포함
-> 실제 요청/응답 모양은 http://localhost:3000/api/docs (Swagger)가 기준입니다.
+> 실제 요청/응답 모양은 Swagger가 기준입니다: http://127.0.0.1:8000/api/docs (프론트를 거쳐 http://localhost:3000/api/docs 로도 열림)
+> 데스크 꾸미기·토너먼트 API는 범위에서 빠져 만들지 않습니다.
 
-## 공통 · 상품 — BE-A
+## 공통 · 상품
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/health, /api/health/db | 서버·DB 상태 | ✅ |
@@ -28,7 +29,7 @@
 | GET · POST · PATCH · DELETE | /api/cart, /api/cart/items/{productId} 🔒 | 장바구니 조회·담기(같은 상품은 수량 합산, 최대 99)·수량변경·삭제 — 응답은 모두 장바구니 전체 | ✅ |
 | GET · PUT · DELETE | /api/wishlist, /api/wishlist/{productId} 🔒 | 찜 목록(Page, 최근 찜한 순)·찜(이미 있으면 그대로)·해제 | ✅ |
 
-## 주문 · CS · 호환성 — BE-B
+## 주문 · CS · 호환성
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | POST | /api/orders 🔒 | 장바구니로 가상 주문 생성 (결제 없음) → 장바구니 비움 | ✅ |
@@ -41,30 +42,14 @@
 | GET | /api/products/{id}/reviews | 리뷰 목록 + 평균 별점 | ✅ |
 | POST | /api/products/{id}/reviews 🔒 | 리뷰 작성 (배송 완료 상품만) | ✅ |
 | DELETE | /api/products/{id}/reviews/{reviewId} 🔒 | 내 리뷰 삭제 (남의 리뷰는 404, 삭제 후 다시 작성 가능) | ✅ |
-| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) | ✅ |
+| GET | /api/products/{id}/questions | 상품 Q&A (비밀글은 내용 가림) — ⚠️ 프론트는 아직 미연결(`lib/questions.ts` 인메모리) | ✅ |
 | POST | /api/products/{id}/questions 🔒 | 문의 작성 | ✅ |
 | POST | /api/dev/questions/{id}/answer 🔒 | [로컬 전용] 문의에 답변 달기 (비밀글 내용은 작성자 외에는 응답에서도 가림) | ✅ |
 | GET | /api/faqs?category= | FAQ | ✅ |
 | GET | /api/keyboards?maker=&q= | 키보드 모델 검색 (Mock) | ✅ |
 | GET | /api/compatibility?keyboardId=&productId= | 키캡 호환 결과 (키별 호환/일부/불가) | ✅ |
 
-## 데스크테리어 · 토너먼트 · 뱃지 — BE-C
-| 메서드 | 경로 | 설명 |
-| --- | --- | --- |
-| GET | /api/desk-specs | 상품별 DP·크기·허용 Zone (데스크 꾸미기 화면용) |
-| POST | /api/desks/validate | 출품 규칙 검사만 (저장 X) → 위반 항목 목록 |
-| GET · POST | /api/desks 🔒 | 내 데스크 목록 · 저장 |
-| GET · PUT · DELETE | /api/desks/{id} 🔒 | 데스크 조회·수정·삭제 |
-| GET | /api/tournaments | 토너먼트 목록 (진행 상태 포함) |
-| POST | /api/tournaments/{id}/entries 🔒 | 출품 (규칙 검사 + 스냅샷) |
-| GET | /api/tournaments/{id}/gallery | 예선 갤러리 (작성자 숨김) |
-| POST | /api/tournaments/{id}/gallery-votes 🔒 | 예선 투표 (최대 3개) |
-| GET | /api/tournaments/{id}/bracket | 대진표 |
-| POST | /api/matches/{id}/votes 🔒 | 1:1 투표 |
-| POST | /api/dev/tournaments/{id}/advance | [로컬 전용] 다음 단계로 (예선 마감 → 대진 생성 → 라운드 진행) |
-| GET | /api/users/me/badges 🔒 | 내 뱃지 |
-
-## PIXEL LOCAL — BE-A (3단계)
+## PIXEL LOCAL
 | 메서드 | 경로 | 설명 | 상태 |
 | --- | --- | --- | --- |
 | GET | /api/regions?parent= | 지역 목록 (parent 없으면 시, 있으면 그 아래 구·생활권). `fullName` 예: 성남시 분당구 판교 | ✅ |

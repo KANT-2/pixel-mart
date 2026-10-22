@@ -8,7 +8,6 @@
 | [ARCHITECTURE.md](ARCHITECTURE.md) | 전체 구조, 로그인 방식, 기능별 설계 결정 |
 | [SCHEMA.md](SCHEMA.md) | DB 테이블 설계 (전체 기능) |
 | [API.md](API.md) | API 목록과 담당자 |
-| [ROADMAP.md](ROADMAP.md) | 담당 트랙(BE-A/B/C), 마일스톤, 작업 순서 |
 
 ---
 
