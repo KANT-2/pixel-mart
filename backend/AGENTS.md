@@ -7,7 +7,7 @@
 - PIXEL MART: 픽셀아트 게이밍 데스크 소품 쇼핑몰 + 취향 커뮤니티(PIXEL LOCAL). **로컬 개발 전용**(배포 없음), 실제 결제 없음(가상 주문), 로그인은 구글 + 로컬 개발용 이메일 로그인(`dev-login`).
 - 프론트: Next.js 16 (저장소 루트). 브라우저는 `localhost:3000`만 보고, `/api/*`는 Next.js rewrites로 FastAPI(`127.0.0.1:8000`)에 전달된다.
 - 지금 있는 백엔드 기능: 상품·카테고리·검색, 장바구니·찜, 가상 주문·배송 타임라인·취소, 리뷰, 상품 Q&A, FAQ, 키보드·키캡 호환성, 픽셀 아바타(AI 포함), PIXEL LOCAL(지역·취향·덕력지도·지도 아바타·구매 순위, 거래글·교환 신청·교환 진행, 위시맵·선물), 활동 점수·하트·레벨·뱃지(기록으로 계산, 뱃지 테이블 없음), 알림.
-- **범위 밖(만들지 않음)**: 데스크 꾸미기·데스크 출품·토너먼트 — 관련 이슈는 not planned로 닫힘. 자료는 `docs/archive/`에만 있다.
+- **범위 밖(만들지 않음)**: 데스크 꾸미기·데스크 출품·토너먼트 — 관련 이슈는 not planned로 닫힘. 옛 정책 문서는 삭제됨(git 기록에만 있음).
 - 작업 단위는 GitHub 이슈. 이슈 본문(만들 테이블·API·완료 기준)을 기준으로 삼는다: `gh issue view <번호>`
 - 현재 구현 기준 문서: `docs/PIXEL_LOCAL_AS_BUILT.md`, `docs/UI_STRUCTURE.md`, `docs/backend/API.md` · 비전: `docs/PRODUCT_STRATEGY.md`, `docs/UX_CX_STRATEGY.md`
 
